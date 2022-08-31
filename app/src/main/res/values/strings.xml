@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ARK Memo</string>
+    <string name="app_name_debug">ARK Memo [Debug]</string>
+</resources>
