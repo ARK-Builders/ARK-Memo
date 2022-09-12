@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">ARK Memo</string>
     <string name="app_name_debug">ARK Memo [Debug]</string>
+    <string name="crash_dialog_desc">Sorry, the application crashed. Please send a report to the developers.</string>
+    <string name="crash_dialog_title">Crash</string>
+    <string name="crash_dialog_comment">You can add a comment here:</string>
+    <string name="file_picker_title">Choose folder</string>
+    <string name="select">Select</string>
+    <string name="no_file_access">Failed, allow ARK-Memo to access your files.</string>
+    <string name="new_note">New note</string>
+    <string name="note">Note</string>
+    <string name="date">Date</string>
+    <string name="settings">Settings</string>
 </resources>
