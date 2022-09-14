@@ -1,48 +1,75 @@
 package space.taran.arkmemo.ui.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
 import space.taran.arkmemo.databinding.TextNotesBinding
+import space.taran.arkmemo.time.MemoCalendar
+import space.taran.arkmemo.ui.activities.replaceFragment
+import space.taran.arkmemo.ui.activities.showSettingsButton
 import space.taran.arkmemo.ui.adapters.TextNotesListAdapter
 
 @AndroidEntryPoint
-class TextNotes: Fragment() {
+class TextNotes: Fragment(R.layout.text_notes) {
 
-    private var _binding: TextNotesBinding? = null
-    private val binding get() = _binding!!
-    private val textNotesViewModel: TextNotesViewModel by viewModels()
+    private val binding by viewBinding(TextNotesBinding::bind)
+    private val activity: AppCompatActivity by lazy {
+        requireActivity() as AppCompatActivity
+    }
+    private val textNotesViewModel: TextNotesViewModel by activityViewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = TextNotesBinding.inflate(layoutInflater)
-        return binding.root
+    private lateinit var newNoteButton: FloatingActionButton
+
+    private lateinit var recyclerView: RecyclerView
+
+    private val newNoteClickListener = View.OnClickListener{
+        val editTextNotes = EditTextNotes()
+        editTextNotes.noteTimeStamp = MemoCalendar.getDateToday()
+        (requireActivity() as AppCompatActivity).replaceFragment(editTextNotes, EditTextNotes.TAG)
+        (it as FloatingActionButton).hide()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val layoutManager = LinearLayoutManager(requireContext())
-        val recyclerView = binding.include.recyclerView
-        val adapter = TextNotesListAdapter(textNotesViewModel.getAllNotes())
-
-        recyclerView.apply{
-            this.layoutManager = layoutManager
-            this.adapter = adapter
+        if (savedInstanceState == null) {
+            recyclerView = binding.include.recyclerView
+            activity.title = getString(R.string.app_name_debug) //To change before production
+            activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            newNoteButton = binding.newNote
+            newNoteButton.setOnClickListener(newNoteClickListener)
+            lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    textNotesViewModel.getAllTextNotes(requireContext()).collect {
+                        val adapter = TextNotesListAdapter(it)
+                        val layoutManager = LinearLayoutManager(requireContext())
+                        adapter.setActivity(activity)
+                        recyclerView.apply {
+                            this.layoutManager = layoutManager
+                            this.adapter = adapter
+                        }
+                    }
+                }
+            }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun onResume() {
+        super.onResume()
+        newNoteButton.show()
+        showSettingsButton()
     }
 
     companion object{

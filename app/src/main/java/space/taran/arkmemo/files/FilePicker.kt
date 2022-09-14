@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import space.taran.arkfilepicker.ArkFilePickerConfig
-import space.taran.arkfilepicker.ArkFilePickerFragment
-import space.taran.arkfilepicker.ArkFilePickerMode
+import space.taran.arkfilepicker.presentation.filepicker.ArkFilePickerMode
+import space.taran.arkfilepicker.presentation.filepicker.ArkFilePickerFragment
 import space.taran.arkmemo.BuildConfig
 import space.taran.arkmemo.R
 

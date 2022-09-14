@@ -1,20 +1,15 @@
 package space.taran.arkmemo.data.repositories
 
+import android.content.Context
+import space.taran.arkmemo.files.text.TextFiles
 import space.taran.arkmemo.models.TextNote
 import javax.inject.Inject
 
 class TextNotesRepository @Inject constructor() {
 
-    fun saveNote(note: TextNote){
+    fun saveNote(context: Context, note: TextNote) =
+        TextFiles.saveNote(context, note)
 
-    }
-
-    fun getAllNotes(): List<TextNote>{
-        val notes = listOf(
-            TextNote(),
-            TextNote(),
-            TextNote()
-        )
-        return notes
-    }
+    fun getAllTextNotes(context: Context) =
+        TextFiles.readAllNotes(context)
 }
