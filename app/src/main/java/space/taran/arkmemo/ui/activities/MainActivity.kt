@@ -1,16 +1,18 @@
 package space.taran.arkmemo.ui.activities
 
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkfilepicker.presentation.onArkPathPicked
 import space.taran.arkmemo.R
@@ -18,6 +20,7 @@ import space.taran.arkmemo.contracts.PermissionContract
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
 import space.taran.arkmemo.databinding.ActivityMainBinding
 import space.taran.arkmemo.files.FilePicker
+import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
 import space.taran.arkmemo.time.MemoCalendar
 import space.taran.arkmemo.ui.fragments.EditTextNotes
@@ -60,9 +63,22 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             if (MemoPreferences.getInstance(this).getPath() == null)
                 FilePicker.show(this, supportFragmentManager)
 
-            supportFragmentManager.beginTransaction().apply {
-                add(fragContainer, TextNotes(), TextNotes.TAG)
-                commit()
+            val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
+            if(textDataFromIntent != null){
+                val editTextNotes = EditTextNotes(textDataFromIntent)
+                editTextNotes.noteDate = MemoCalendar.getDateToday()
+                editTextNotes.noteTimeStamp = MemoCalendar.getFullDateToday()
+                supportFragmentManager.beginTransaction().apply{
+                    replace(fragContainer, editTextNotes, EditTextNotes.TAG)
+                    commit()
+                }
+            }
+            else
+            {
+                supportFragmentManager.beginTransaction().apply {
+                    add(fragContainer, TextNotes(), TextNotes.TAG)
+                    commit()
+                }
             }
 
             supportFragmentManager.onArkPathPicked(this) {
@@ -104,6 +120,16 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     }
 }
 
+fun AppCompatActivity.deleteTextNote(note: TextNote){
+    val textNotesViewModel: TextNotesViewModel by viewModels()
+    textNotesViewModel.deleteTextNote(this, note)
+}
+
+fun Context.getTextFromClipBoard(): String?{
+    val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+    return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
+}
+
 fun hideSettingsButton(){
     val settingsItem = mMenu?.findItem(R.id.settings)
     settingsItem?.isVisible = false
@@ -111,5 +137,5 @@ fun hideSettingsButton(){
 
 fun showSettingsButton(){
     val settingsItem = mMenu?.findItem(R.id.settings)
-    settingsItem?.isVisible = false
+    settingsItem?.isVisible = true
 }

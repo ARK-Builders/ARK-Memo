@@ -3,18 +3,18 @@ package space.taran.arkmemo.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkmemo.R
 import space.taran.arkmemo.databinding.TextNoteBinding
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.time.MemoCalendar
+import space.taran.arkmemo.ui.activities.deleteTextNote
 import space.taran.arkmemo.ui.activities.replaceFragment
+import space.taran.arkmemo.ui.dialogs.NoteDeleteDialog
 import space.taran.arkmemo.ui.fragments.EditTextNotes
-import javax.inject.Inject
 
 class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
 
@@ -41,18 +41,27 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
             TextNoteBinding.bind(itemView)
         }
 
+        val title = binding.noteTitle
+        val date = binding.noteDate
+
         private val clickNoteToEditListener = View.OnClickListener {
             val selectedNote = notes[bindingAdapterPosition]
             val editTextNotes = EditTextNotes(selectedNote)
-            editTextNotes.noteTimeStamp = MemoCalendar.getDateToday()
+            editTextNotes.noteDate = MemoCalendar.getDateToday()
+            editTextNotes.noteTimeStamp = MemoCalendar.getFullDateToday()
             activity?.replaceFragment(editTextNotes, EditTextNotes.TAG)
         }
 
-        init {
-            binding.root.setOnClickListener(clickNoteToEditListener)
+        private val deleteNoteClickListener = View.OnClickListener{
+            NoteDeleteDialog()
+                .setNoteToBeDeleted(notes[bindingAdapterPosition])
+                .show(activity?.supportFragmentManager!!, NoteDeleteDialog.TAG)
         }
 
-        val title: TextView = binding.noteTitle
-        val date: TextView = binding.noteDate
+        init {
+            binding.theNote.setOnClickListener(clickNoteToEditListener)
+            binding.deleteNote.setOnClickListener(deleteNoteClickListener)
+        }
+
     }
 }

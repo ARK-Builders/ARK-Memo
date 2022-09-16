@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/editNote"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="@string/start_text_note"
+        android:focusedByDefault="true"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/saveNote"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"
+        android:text="@string/save" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

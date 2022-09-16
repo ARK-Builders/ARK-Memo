@@ -7,19 +7,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import space.taran.arkmemo.data.repositories.TextNotesRepository
 import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.ui.fragments.TextNotes
 import javax.inject.Inject
 
 @HiltViewModel
 class TextNotesViewModel @Inject constructor(): ViewModel() {
 
-    @Inject lateinit var repository: TextNotesRepository
+    @Inject lateinit var textNotesRepo: TextNotesRepository
     private val iODispatcher = Dispatchers.IO
     private val textNotes: MutableStateFlow<List<TextNote>> by lazy{
         MutableStateFlow(listOf())
@@ -28,7 +25,17 @@ class TextNotesViewModel @Inject constructor(): ViewModel() {
     fun saveNote(context: Context, note: TextNote){
         viewModelScope.launch {
             withContext(iODispatcher) {
-                repository.saveNote(context, note)
+                textNotesRepo.saveNote(context, note)
+                textNotes.value = textNotesRepo.getAllTextNotes(context)
+            }
+        }
+    }
+
+    fun deleteTextNote(context: Context, note: TextNote){
+        viewModelScope.launch {
+            withContext(iODispatcher) {
+                textNotesRepo.deleteTextNote(context, note)
+                textNotes.value = textNotesRepo.getAllTextNotes(context)
             }
         }
     }
@@ -36,7 +43,7 @@ class TextNotesViewModel @Inject constructor(): ViewModel() {
     fun getAllTextNotes(context: Context): StateFlow<List<TextNote>>{
         viewModelScope.launch {
             withContext(iODispatcher) {
-                textNotes.value = repository.getAllTextNotes(context)
+                textNotes.value = textNotesRepo.getAllTextNotes(context)
             }
         }
         return textNotes

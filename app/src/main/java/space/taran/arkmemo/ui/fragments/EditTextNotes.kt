@@ -3,28 +3,29 @@ package space.taran.arkmemo.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
-import space.taran.arkmemo.databinding.EditTextNotesBinding
+import space.taran.arkmemo.databinding.FragmentEditTextNotesBinding
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.ui.activities.hideSettingsButton
 
 @AndroidEntryPoint
-class EditTextNotes(): Fragment(R.layout.edit_text_notes) {
+class EditTextNotes(): Fragment(R.layout.fragment_edit_text_notes) {
     constructor(note: TextNote): this(){
         this.note = note
+    }
+
+    constructor(note: String): this(){
+        noteStr = note
     }
 
     private val activity: AppCompatActivity by lazy{
@@ -33,11 +34,13 @@ class EditTextNotes(): Fragment(R.layout.edit_text_notes) {
 
     private val textNotesViewModel: TextNotesViewModel by activityViewModels()
 
-    private val binding by viewBinding(EditTextNotesBinding::bind)
+    private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
 
     var noteTimeStamp = ""
+    var noteDate = ""
 
     private var note: TextNote? = null
+    private var noteStr = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -61,27 +64,35 @@ class EditTextNotes(): Fragment(R.layout.edit_text_notes) {
                         note = TextNote(
                             title = title ,
                             contents = noteString,
-                            date = noteTimeStamp
+                            date = noteDate,
+                            timeStamp = noteTimeStamp
                         )
                     }
                 }
             }
-            val editNote: EditText = binding.editNote
-            val saveNoteButton: ExtendedFloatingActionButton = binding.saveNote
+            val editNote = binding.editNote
+            val saveNoteButton = binding.saveNote
 
             activity.title = getString(R.string.edit_note)
             activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
             hideSettingsButton()
 
+            editNote.requestFocus()
             editNote.addTextChangedListener(editTextListener)
 
             if(this.note != null)
                 editNote.setText(this.note?.contents)
 
+            if(noteStr.isNotEmpty())
+                editNote.setText(noteStr)
+
             saveNoteButton.setOnClickListener {
                 if(note != null) {
                     with(textNotesViewModel){
                         saveNote(requireContext(), note!!)
+                        Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
+                            Toast.LENGTH_SHORT)
+                            .show()
                         activity.onBackPressed()
                     }
                 }

@@ -7,6 +7,7 @@
         android:id="@+id/include"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="80dp"
         layout="@layout/recyclerview"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -19,4 +20,12 @@
         android:clickable="true"
         android:contentDescription="@string/new_note"
         android:src="@drawable/add" />
+
+    <Button
+        android:id="@+id/pasteNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="10dp"
+        android:text="@string/paste" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

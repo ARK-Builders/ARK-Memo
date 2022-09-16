@@ -2,39 +2,37 @@ package space.taran.arkmemo.files.text
 
 import android.content.Context
 import android.util.Log
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import space.taran.arkmemo.files.parsers.JsonParser
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
 import java.io.*
+import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
+import java.security.MessageDigest
+import kotlin.io.path.Path
 import kotlin.io.path.extension
 
-class TextFiles {
+class TextNoteFiles {
     companion object{
         private const val NOTE_EXT = "note"
-        private const val FILENAME = "Note"
 
-        private fun createFile(path: Path?, noteString: String?){
-            var numberOfFiles = 0
-            if(path != null) {
-                Files.list(path).forEach {
-                    if (it.fileName.extension == NOTE_EXT)
-                        numberOfFiles += 1
+        private fun createTextNoteFile(path: Path?, noteString: String?, filename: String){
+            fun writeToFile(bufferedWriter: BufferedWriter){
+                with(bufferedWriter) {
+                    write(noteString)
+                    Log.d("Note$filename", noteString!!)
+                    close()
                 }
+            }
+            if(path != null) {
                 val file = path.toFile()
-                val noteFile = File(file, "$FILENAME$numberOfFiles.$NOTE_EXT")
-                if(!noteFile.exists()) {
+                val noteFile = File(file, filename)
+                if (!noteFile.exists()) {
                     try {
                         val fileWriter = FileWriter(noteFile)
                         val bufferedWriter = BufferedWriter(fileWriter)
-                        with(bufferedWriter){
-                            write(noteString)
-                            Log.d("Note $numberOfFiles", noteString!!)
-                            close()
-                        }
+                        writeToFile(bufferedWriter)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -42,15 +40,29 @@ class TextFiles {
             }
         }
 
+        private fun removeFileFromMemory(path: Path?){
+            if(path != null)
+                Files.deleteIfExists(path)
+        }
+
         fun saveNote(context: Context, note: TextNote?){
             if(note != null){
                 val path = getPath(context)
                 if(path != null){
-                    createFile(path,
-                        JsonParser.parseNoteToJson(note)
+                    val filename = "${sha512(note.timeStamp)}.$NOTE_EXT"
+                    Log.d("File name", filename)
+                    createTextNoteFile(path,
+                        JsonParser.parseNoteToJson(note),
+                        filename
                     )
                 }
             }
+        }
+
+        fun deleteNote(context: Context, note: TextNote){
+            val filePath = getPath(context)?.resolve("${sha512(note.timeStamp)}.$NOTE_EXT")
+            removeFileFromMemory(filePath)
+            Log.d("File deleted", filePath.toString())
         }
 
         fun readAllNotes(context: Context): List<TextNote>{
@@ -97,6 +109,14 @@ class TextFiles {
                 e.printStackTrace()
             }
             return path
+        }
+
+        private fun sha512(string: String): String{
+            return MessageDigest.getInstance("SHA-512")
+                .digest(string.toByteArray(Charsets.UTF_8))
+                .fold(""){ str, it ->
+                    str + "%02x".format(it)
+                }
         }
     }
 }
