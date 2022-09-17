@@ -10,6 +10,7 @@
         android:icon="${appIcon}"
         android:label="${appLabel}"
         android:supportsRtl="true"
+        android:name=".App"
         android:theme="@style/Theme.ARKMemo"
         tools:targetApi="31">
         <activity
