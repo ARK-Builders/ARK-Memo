@@ -1,8 +1,14 @@
 package space.taran.arkmemo.models
 
+import space.taran.arkmemo.data.ResourceMeta
+
 data class TextNote (
-    val title: String = "",
-    val contents: String = "",
-    val  date: String = "",
-    val timeStamp: String = "",
+    val content: Content,
+    val meta: ResourceMeta? = null
     )
+{
+    data class Content(
+        val title: String,
+        val data: String
+        )
+}

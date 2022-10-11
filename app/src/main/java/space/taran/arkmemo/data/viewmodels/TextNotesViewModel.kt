@@ -23,28 +23,21 @@ class TextNotesViewModel @Inject constructor(): ViewModel() {
     }
 
     fun saveNote(context: Context, note: TextNote){
-        viewModelScope.launch {
-            withContext(iODispatcher) {
-                textNotesRepo.saveNote(context, note)
-                textNotes.value = textNotesRepo.getAllTextNotes(context)
-            }
+        viewModelScope.launch(iODispatcher) {
+             textNotesRepo.saveNote(context, note)
         }
     }
 
     fun deleteTextNote(context: Context, note: TextNote){
-        viewModelScope.launch {
-            withContext(iODispatcher) {
+        viewModelScope.launch(iODispatcher) {
                 textNotesRepo.deleteTextNote(context, note)
                 textNotes.value = textNotesRepo.getAllTextNotes(context)
-            }
         }
     }
 
     fun getAllTextNotes(context: Context): StateFlow<List<TextNote>>{
-        viewModelScope.launch {
-            withContext(iODispatcher) {
+        viewModelScope.launch(iODispatcher) {
                 textNotes.value = textNotesRepo.getAllTextNotes(context)
-            }
         }
         return textNotes
     }

@@ -1,10 +1,8 @@
 package space.taran.arkmemo.ui.fragments
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -24,7 +22,6 @@ import space.taran.arkmemo.databinding.FragmentTextNotesBinding
 import space.taran.arkmemo.time.MemoCalendar
 import space.taran.arkmemo.ui.activities.getTextFromClipBoard
 import space.taran.arkmemo.ui.activities.replaceFragment
-import space.taran.arkmemo.ui.activities.showSettingsButton
 import space.taran.arkmemo.ui.adapters.TextNotesListAdapter
 
 @AndroidEntryPoint
@@ -43,8 +40,6 @@ class TextNotes: Fragment(R.layout.fragment_text_notes) {
 
     private val newNoteClickListener = View.OnClickListener{
         val editTextNotes = EditTextNotes()
-        editTextNotes.noteDate = MemoCalendar.getDateToday()
-        editTextNotes.noteTimeStamp = MemoCalendar.getFullDateToday()
         (requireActivity() as AppCompatActivity).replaceFragment(editTextNotes, EditTextNotes.TAG)
     }
 
@@ -52,8 +47,6 @@ class TextNotes: Fragment(R.layout.fragment_text_notes) {
         val clipBoardText = requireContext().getTextFromClipBoard()
         if (clipBoardText != null) {
             val editTextNotes = EditTextNotes(clipBoardText)
-            editTextNotes.noteDate = MemoCalendar.getDateToday()
-            editTextNotes.noteTimeStamp = MemoCalendar.getFullDateToday()
             activity.replaceFragment(editTextNotes, EditTextNotes.TAG)
         }
         else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
@@ -63,7 +56,7 @@ class TextNotes: Fragment(R.layout.fragment_text_notes) {
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState == null) {
             recyclerView = binding.include.recyclerView
-            activity.title = getString(R.string.app_name_debug) //To change before production
+            activity.title = getString(R.string.app_name_debug) //Activity title to change before production
             activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
             newNoteButton = binding.newNote
             pasteNoteButton = binding.pasteNote

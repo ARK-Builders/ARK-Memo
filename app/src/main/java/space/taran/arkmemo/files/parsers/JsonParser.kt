@@ -7,11 +7,11 @@ class JsonParser {
     companion object{
         private val gson = Gson()
 
-        fun parseNoteToJson(note: TextNote): String =
-            gson.toJson(note, TextNote::class.java)
+        fun parseNoteToJson(note: TextNote.Content): String =
+            gson.toJson(note, TextNote.Content::class.java)
 
-        fun parseNoteFromJson(json: String): TextNote =
-            gson.fromJson(json, TextNote::class.java)
+        fun parseNoteFromJson(json: String): TextNote.Content =
+            gson.fromJson(json, TextNote.Content::class.java)
 
     }
 }

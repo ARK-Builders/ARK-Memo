@@ -2,37 +2,53 @@ package space.taran.arkmemo.files.text
 
 import android.content.Context
 import android.util.Log
+import space.taran.arklib.computeId
+import space.taran.arkmemo.data.ResourceMeta
 import space.taran.arkmemo.files.parsers.JsonParser
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
 import java.io.*
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.nio.file.Path
-import java.security.MessageDigest
-import kotlin.io.path.Path
 import kotlin.io.path.extension
+import kotlin.io.path.getLastModifiedTime
 
 class TextNoteFiles {
-    companion object{
+    companion object {
         private const val NOTE_EXT = "note"
+        private const val DUMMY_FILENAME =  "Note"
 
-        private fun createTextNoteFile(path: Path?, noteString: String?, filename: String){
-            fun writeToFile(bufferedWriter: BufferedWriter){
+        private fun createTextNoteFile(path: Path?, noteString: String?) {
+            fun writeToFile(bufferedWriter: BufferedWriter) {
                 with(bufferedWriter) {
                     write(noteString)
-                    Log.d("Note$filename", noteString!!)
                     close()
                 }
             }
-            if(path != null) {
+            if (path != null) {
                 val file = path.toFile()
-                val noteFile = File(file, filename)
+                val noteFile = File(file, "$DUMMY_FILENAME.$NOTE_EXT")
                 if (!noteFile.exists()) {
                     try {
                         val fileWriter = FileWriter(noteFile)
                         val bufferedWriter = BufferedWriter(fileWriter)
                         writeToFile(bufferedWriter)
+
+                        val id = computeId(Files.size(noteFile.toPath()), noteFile.toPath())
+
+                        Log.d("Filename", noteFile.name)
+
+                        with(noteFile){
+                            val newFile = File(file, "$id.$NOTE_EXT")
+
+                            if(!newFile.exists())
+                                if (renameTo(newFile))
+                                    Log.d("New filename", newFile.name)
+                            else
+                                removeFileFromMemory(noteFile.toPath())
+
+                        }
+
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -40,36 +56,45 @@ class TextNoteFiles {
             }
         }
 
-        private fun removeFileFromMemory(path: Path?){
-            if(path != null)
+        private fun removeFileFromMemory(path: Path?) {
+            if (path != null)
                 Files.deleteIfExists(path)
         }
 
-        fun saveNote(context: Context, note: TextNote?){
-            if(note != null){
+        private fun countNotes(path: Path?): Int{
+            var numberOfNotes = 0
+            if(path != null)
+                Files.list(path).forEach {
+                    if(it.extension == NOTE_EXT)
+                        numberOfNotes += 1
+                }
+            return numberOfNotes
+        }
+
+        fun saveNote(context: Context, note: TextNote?) {
+            if (note != null) {
                 val path = getPath(context)
-                if(path != null){
-                    val filename = "${sha512(note.timeStamp)}.$NOTE_EXT"
-                    Log.d("File name", filename)
-                    createTextNoteFile(path,
-                        JsonParser.parseNoteToJson(note),
-                        filename
+                if (path != null) {
+                    Files.list(path)
+                    createTextNoteFile(
+                        path,
+                        JsonParser.parseNoteToJson(note.content),
                     )
                 }
             }
         }
 
-        fun deleteNote(context: Context, note: TextNote){
-            val filePath = getPath(context)?.resolve("${sha512(note.timeStamp)}.$NOTE_EXT")
+        fun deleteNote(context: Context, note: TextNote) {
+            val filePath = getPath(context)?.resolve("${note.meta?.name}")
             removeFileFromMemory(filePath)
-            Log.d("File deleted", filePath.toString())
+            Log.d("Deleted", note.meta?.name!!)
         }
 
-        fun readAllNotes(context: Context): List<TextNote>{
+        fun readAllNotes(context: Context): List<TextNote> {
             val notes = mutableListOf<TextNote>()
             val path = getPath(context)
             var number = 0
-            if(path != null) {
+            if (path != null) {
                 Files.list(path).forEach { filePath ->
                     if (filePath.fileName.extension == NOTE_EXT) {
                         number += 1
@@ -82,12 +107,22 @@ class TextNoteFiles {
                                 forEachLine {
                                     jsonTextNote.append(it)
                                 }
-                                notes.add(JsonParser.parseNoteFromJson(jsonTextNote.toString()))
-                                Log.d("Note $number", jsonTextNote.toString())
+                                val content = JsonParser.parseNoteFromJson(jsonTextNote.toString())
+                                val size = Files.size(filePath)
+                                val id = computeId(size, filePath)
+                                val meta = ResourceMeta(
+                                    id,
+                                    filePath.fileName.toString(),
+                                    filePath.extension,
+                                    filePath.getLastModifiedTime(),
+                                    size
+                                )
+
+                                val note = TextNote(content, meta)
+                                notes.add(note)
                                 close()
                             }
-                        }
-                        catch(e: Exception){
+                        } catch (e: Exception) {
                             e.printStackTrace()
                         }
                     }
@@ -96,7 +131,7 @@ class TextNoteFiles {
             return notes
         }
 
-        private fun getPath(context: Context):Path?{
+        private fun getPath(context: Context): Path? {
             val prefs = MemoPreferences.getInstance(context)
             val pathString = prefs.getPath()
             var path: Path? = null
@@ -104,19 +139,10 @@ class TextNoteFiles {
                 val file = File(pathString!!)
                 file.mkdir()
                 path = file.toPath()
-            }
-            catch(e: Exception) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
             return path
-        }
-
-        private fun sha512(string: String): String{
-            return MessageDigest.getInstance("SHA-512")
-                .digest(string.toByteArray(Charsets.UTF_8))
-                .fold(""){ str, it ->
-                    str + "%02x".format(it)
-                }
         }
     }
 }

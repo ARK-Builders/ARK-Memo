@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
@@ -36,9 +34,6 @@ class EditTextNotes(): Fragment(R.layout.fragment_edit_text_notes) {
 
     private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
 
-    var noteTimeStamp = ""
-    var noteDate = ""
-
     private var note: TextNote? = null
     private var noteStr = ""
 
@@ -61,11 +56,12 @@ class EditTextNotes(): Fragment(R.layout.fragment_edit_text_notes) {
                             }
                             else break
                         }
+                        val content = TextNote.Content(
+                            title = title,
+                            data = noteString
+                        )
                         note = TextNote(
-                            title = title ,
-                            contents = noteString,
-                            date = noteDate,
-                            timeStamp = noteTimeStamp
+                            content = content
                         )
                     }
                 }
@@ -81,7 +77,7 @@ class EditTextNotes(): Fragment(R.layout.fragment_edit_text_notes) {
             editNote.addTextChangedListener(editTextListener)
 
             if(this.note != null)
-                editNote.setText(this.note?.contents)
+                editNote.setText(this.note?.content?.data)
 
             if(noteStr.isNotEmpty())
                 editNote.setText(noteStr)

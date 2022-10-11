@@ -30,8 +30,8 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].title
-        holder.date.text = notes[position].date
+        holder.title.text = notes[position].content.title
+        holder.date.text = notes[position].meta?.modified.toString()
     }
 
     override fun getItemCount() = notes.size
@@ -47,8 +47,6 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
         private val clickNoteToEditListener = View.OnClickListener {
             val selectedNote = notes[bindingAdapterPosition]
             val editTextNotes = EditTextNotes(selectedNote)
-            editTextNotes.noteDate = MemoCalendar.getDateToday()
-            editTextNotes.noteTimeStamp = MemoCalendar.getFullDateToday()
             activity?.replaceFragment(editTextNotes, EditTextNotes.TAG)
         }
 

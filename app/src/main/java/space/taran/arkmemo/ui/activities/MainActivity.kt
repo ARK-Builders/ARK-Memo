@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkfilepicker.presentation.onArkPathPicked
+import space.taran.arklib.initRustLogger
 import space.taran.arkmemo.R
 import space.taran.arkmemo.contracts.PermissionContract
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
@@ -35,8 +36,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     @IdRes
     private val fragContainer = R.id.container
 
-    private val textNotesViewModel: TextNotesViewModel by viewModels()
-
     init {
         FilePicker.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -53,6 +52,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        System.loadLibrary("arklib")
+
         if (savedInstanceState == null) {
             setContentView(binding.root)
             setSupportActionBar(binding.toolbar)
@@ -66,8 +67,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
             if(textDataFromIntent != null){
                 val editTextNotes = EditTextNotes(textDataFromIntent)
-                editTextNotes.noteDate = MemoCalendar.getDateToday()
-                editTextNotes.noteTimeStamp = MemoCalendar.getFullDateToday()
                 supportFragmentManager.beginTransaction().apply{
                     replace(fragContainer, editTextNotes, EditTextNotes.TAG)
                     commit()
