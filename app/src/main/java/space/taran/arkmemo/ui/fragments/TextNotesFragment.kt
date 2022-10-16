@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -19,19 +19,21 @@ import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
 import space.taran.arkmemo.databinding.FragmentTextNotesBinding
-import space.taran.arkmemo.time.MemoCalendar
+import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.ui.activities.MainActivity
 import space.taran.arkmemo.ui.activities.getTextFromClipBoard
 import space.taran.arkmemo.ui.activities.replaceFragment
 import space.taran.arkmemo.ui.adapters.TextNotesListAdapter
 
 @AndroidEntryPoint
-class TextNotes: Fragment(R.layout.fragment_text_notes) {
+class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
 
     private val binding by viewBinding(FragmentTextNotesBinding::bind)
-    private val activity: AppCompatActivity by lazy {
-        requireActivity() as AppCompatActivity
+
+    private val activity: MainActivity by lazy {
+        requireActivity() as MainActivity
     }
-    private val textNotesViewModel: TextNotesViewModel by activityViewModels()
+    private val textNotesViewModel: TextNotesViewModel by viewModels()
 
     private lateinit var newNoteButton: FloatingActionButton
     private lateinit var pasteNoteButton: Button
@@ -39,35 +41,36 @@ class TextNotes: Fragment(R.layout.fragment_text_notes) {
     private lateinit var recyclerView: RecyclerView
 
     private val newNoteClickListener = View.OnClickListener{
-        val editTextNotes = EditTextNotes()
-        (requireActivity() as AppCompatActivity).replaceFragment(editTextNotes, EditTextNotes.TAG)
+        activity.fragment = EditTextNotesFragment()
+        activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
     }
 
     private val pasteNoteClickListener = View.OnClickListener {
         val clipBoardText = requireContext().getTextFromClipBoard()
         if (clipBoardText != null) {
-            val editTextNotes = EditTextNotes(clipBoardText)
-            activity.replaceFragment(editTextNotes, EditTextNotes.TAG)
+            activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
+            activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
         }
         else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (savedInstanceState == null) {
-            recyclerView = binding.include.recyclerView
-            activity.title = getString(R.string.app_name_debug) //Activity title to change before production
-            activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-            newNoteButton = binding.newNote
-            pasteNoteButton = binding.pasteNote
-            newNoteButton.setOnClickListener(newNoteClickListener)
-            pasteNoteButton.setOnClickListener(pasteNoteClickListener)
-            lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        recyclerView = binding.include.recyclerView
+        activity.title = getString(R.string.app_name_debug) //Activity title to change before production
+        activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        newNoteButton = binding.newNote
+        pasteNoteButton = binding.pasteNote
+        newNoteButton.setOnClickListener(newNoteClickListener)
+        pasteNoteButton.setOnClickListener(pasteNoteClickListener)
+        lifecycleScope.launch {
+            viewLifecycleOwner.apply{
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
                     textNotesViewModel.getAllTextNotes(requireContext()).collect {
                         val adapter = TextNotesListAdapter(it)
                         val layoutManager = LinearLayoutManager(requireContext())
                         adapter.setActivity(activity)
+                        adapter.setFragmentManager(childFragmentManager)
                         recyclerView.apply {
                             this.layoutManager = layoutManager
                             this.adapter = adapter
@@ -78,7 +81,17 @@ class TextNotes: Fragment(R.layout.fragment_text_notes) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        activity.fragment = this
+    }
+
     companion object{
         const val TAG = "Text Notes Fragment"
     }
+}
+
+fun Fragment.deleteTextNote(note: TextNote){
+    val viewModel: TextNotesViewModel by viewModels()
+    viewModel.deleteTextNote(this.requireContext(), note)
 }

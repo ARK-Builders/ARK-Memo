@@ -4,21 +4,16 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import space.taran.arkmemo.R
 import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.ui.activities.deleteTextNote
+import space.taran.arkmemo.ui.fragments.deleteTextNote
 
-class NoteDeleteDialog: DialogFragment() {
-
-    private val activity: AppCompatActivity by lazy{
-        requireActivity() as AppCompatActivity
-    }
+class NoteDeleteDialogFragment: DialogFragment() {
 
     private var note: TextNote? = null
 
-    fun setNoteToBeDeleted(note: TextNote): NoteDeleteDialog{
+    fun setNoteToBeDeleted(note: TextNote): NoteDeleteDialogFragment{
         this.note = note
         return this
     }
@@ -32,7 +27,7 @@ class NoteDeleteDialog: DialogFragment() {
             }
             .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
                 if(note != null) {
-                    activity.deleteTextNote(note!!)
+                    parentFragment?.deleteTextNote(note!!)
                     Toast.makeText(
                         requireContext(), getString(R.string.note_deleted),
                         Toast.LENGTH_SHORT

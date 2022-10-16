@@ -3,25 +3,29 @@ package space.taran.arkmemo.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import space.taran.arkmemo.R
 import space.taran.arkmemo.databinding.TextNoteBinding
 import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.time.MemoCalendar
-import space.taran.arkmemo.ui.activities.deleteTextNote
+import space.taran.arkmemo.ui.activities.MainActivity
 import space.taran.arkmemo.ui.activities.replaceFragment
-import space.taran.arkmemo.ui.dialogs.NoteDeleteDialog
-import space.taran.arkmemo.ui.fragments.EditTextNotes
+import space.taran.arkmemo.ui.dialogs.NoteDeleteDialogFragment
+import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
 
 class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
 
-    private var activity: AppCompatActivity? = null
+    private var activity: MainActivity? = null
+    private var fragmentManager: FragmentManager? = null
 
     fun setActivity(activity: AppCompatActivity){
-        this.activity = activity
+        this.activity = activity as MainActivity
+    }
+
+    fun setFragmentManager(manager: FragmentManager){
+        fragmentManager = manager
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -46,14 +50,14 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
 
         private val clickNoteToEditListener = View.OnClickListener {
             val selectedNote = notes[bindingAdapterPosition]
-            val editTextNotes = EditTextNotes(selectedNote)
-            activity?.replaceFragment(editTextNotes, EditTextNotes.TAG)
+            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
+            activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
         }
 
         private val deleteNoteClickListener = View.OnClickListener{
-            NoteDeleteDialog()
+            NoteDeleteDialogFragment()
                 .setNoteToBeDeleted(notes[bindingAdapterPosition])
-                .show(activity?.supportFragmentManager!!, NoteDeleteDialog.TAG)
+                .show(fragmentManager!!, NoteDeleteDialogFragment.TAG)
         }
 
         init {

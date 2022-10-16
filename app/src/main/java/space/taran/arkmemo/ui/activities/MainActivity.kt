@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,10 +13,11 @@ import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkfilepicker.presentation.onArkPathPicked
-import space.taran.arklib.initRustLogger
 import space.taran.arkmemo.R
 import space.taran.arkmemo.contracts.PermissionContract
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
@@ -23,10 +25,9 @@ import space.taran.arkmemo.databinding.ActivityMainBinding
 import space.taran.arkmemo.files.FilePicker
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
-import space.taran.arkmemo.time.MemoCalendar
-import space.taran.arkmemo.ui.fragments.EditTextNotes
-import space.taran.arkmemo.ui.fragments.Settings
-import space.taran.arkmemo.ui.fragments.TextNotes
+import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
+import space.taran.arkmemo.ui.fragments.SettingsFragment
+import space.taran.arkmemo.ui.fragments.TextNotesFragment
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
@@ -35,6 +36,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     @IdRes
     private val fragContainer = R.id.container
+
+    private var menu: Menu? = null
+
+    var fragment: Fragment = TextNotesFragment()
 
     init {
         FilePicker.readPermLauncher =
@@ -54,56 +59,79 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         super.onCreate(savedInstanceState)
         System.loadLibrary("arklib")
 
-        if (savedInstanceState == null) {
-            setContentView(binding.root)
-            setSupportActionBar(binding.toolbar)
-            binding.toolbar.setNavigationOnClickListener {
-                onBackPressed()
-            }
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
 
-            if (MemoPreferences.getInstance(this).getPath() == null)
-                FilePicker.show(this, supportFragmentManager)
+        if (MemoPreferences.getInstance(this).getPath() == null)
+            FilePicker.show(this, supportFragmentManager)
 
-            val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
-            if(textDataFromIntent != null){
-                val editTextNotes = EditTextNotes(textDataFromIntent)
-                supportFragmentManager.beginTransaction().apply{
-                    replace(fragContainer, editTextNotes, EditTextNotes.TAG)
-                    commit()
-                }
+        val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
+
+        if(textDataFromIntent != null){
+            fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
+            supportFragmentManager.beginTransaction().apply{
+                replace(fragContainer, fragment, EditTextNotesFragment.TAG)
+                commit()
             }
-            else
-            {
+        }
+        else {
+            if (savedInstanceState == null)
                 supportFragmentManager.beginTransaction().apply {
-                    add(fragContainer, TextNotes(), TextNotes.TAG)
+                    add(fragContainer, fragment, TextNotesFragment.TAG)
                     commit()
                 }
+            else{
+                supportFragmentManager.apply{
+                    val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)!!
+                    fragment = findFragmentByTag(tag)!!
+                    if(!fragment.isInLayout)
+                        resumeFragment(fragment)
+                }
             }
+        }
 
-            supportFragmentManager.onArkPathPicked(this) {
-                MemoPreferences.getInstance(this).storePath(it.toString())
-            }
+        supportFragmentManager.onArkPathPicked(this) {
+            MemoPreferences.getInstance(this).storePath(it.toString())
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-        mMenu = menu
+        this.menu = menu
+        if(fragment.tag != TextNotesFragment.TAG)
+            showSettingsButton(false)
         return true
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(CURRENT_FRAGMENT_TAG, fragment.tag)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settings -> {
-                replaceFragment(Settings(), Settings.TAG)
-                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+                fragment = SettingsFragment()
+                replaceFragment(fragment, SettingsFragment.TAG)
             }
         }
         return true
     }
-}
 
-private var mMenu: Menu? = null
+    fun showSettingsButton(show: Boolean = true){
+        if(menu != null) {
+            val settingsItem = menu?.findItem(R.id.settings)
+            settingsItem?.isVisible = show
+        }
+    }
+
+    companion object{
+        private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
+    }
+}
 
 fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     supportFragmentManager.beginTransaction().apply {
@@ -119,22 +147,14 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     }
 }
 
-fun AppCompatActivity.deleteTextNote(note: TextNote){
-    val textNotesViewModel: TextNotesViewModel by viewModels()
-    textNotesViewModel.deleteTextNote(this, note)
+fun AppCompatActivity.resumeFragment(fragment: Fragment){
+    supportFragmentManager.beginTransaction().apply{
+        show(fragment)
+        commit()
+    }
 }
 
 fun Context.getTextFromClipBoard(): String?{
     val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
-}
-
-fun hideSettingsButton(){
-    val settingsItem = mMenu?.findItem(R.id.settings)
-    settingsItem?.isVisible = false
-}
-
-fun showSettingsButton(){
-    val settingsItem = mMenu?.findItem(R.id.settings)
-    settingsItem?.isVisible = true
 }
