@@ -57,7 +57,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = binding.include.recyclerView
-        activity.title = getString(R.string.app_name_debug) //Activity title to change before production
+        activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         newNoteButton = binding.newNote
         pasteNoteButton = binding.pasteNote
