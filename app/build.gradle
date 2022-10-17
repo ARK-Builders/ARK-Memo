@@ -72,5 +72,5 @@ dependencies {
 
     implementation 'ch.acra:acra-http:5.9.6'
     implementation 'ch.acra:acra-dialog:5.9.6'
-    implementation 'com.github.SimpleMobileTools:Simple-Commons:7e0240b1e3'
+    implementation 'com.simplemobiletools:commons:5.29.20'
 }
