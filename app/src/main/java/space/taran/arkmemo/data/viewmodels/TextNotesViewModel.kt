@@ -22,16 +22,16 @@ class TextNotesViewModel @Inject constructor(): ViewModel() {
         MutableStateFlow(listOf())
     }
 
-    fun deleteTextNote(context: Context, note: TextNote){
+    fun deleteNote(note: TextNote){
         viewModelScope.launch(iODispatcher) {
-            textNotesRepo.deleteTextNote(context, note)
-            textNotes.value = textNotesRepo.getAllTextNotes(context)
+            textNotesRepo.deleteNote(note)
+            textNotes.value = textNotesRepo.getAllNotes()
         }
     }
 
-    fun getAllTextNotes(context: Context): StateFlow<List<TextNote>>{
+    fun getAllNotes(): StateFlow<List<TextNote>>{
         viewModelScope.launch(iODispatcher) {
-                textNotes.value = textNotesRepo.getAllTextNotes(context)
+                textNotes.value = textNotesRepo.getAllNotes()
         }
         return textNotes
     }

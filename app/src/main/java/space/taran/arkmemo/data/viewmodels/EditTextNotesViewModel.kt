@@ -17,9 +17,9 @@ class EditTextNotesViewModel @Inject constructor(): ViewModel() {
 
     @Inject lateinit var repo: TextNotesRepository
 
-    fun saveNote(context: Context, note: TextNote){
+    fun saveNote(note: TextNote){
         viewModelScope.launch(iODispatcher) {
-            repo.saveNote(context, note)
+            repo.saveNote(note)
         }
     }
 }

@@ -5,25 +5,19 @@ import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import space.taran.arkfilepicker.presentation.onArkPathPicked
+import space.taran.arkfilepicker.onArkPathPicked
 import space.taran.arkmemo.R
 import space.taran.arkmemo.contracts.PermissionContract
-import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
 import space.taran.arkmemo.databinding.ActivityMainBinding
 import space.taran.arkmemo.files.FilePicker
-import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
 import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
 import space.taran.arkmemo.ui.fragments.SettingsFragment
@@ -65,37 +59,41 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             onBackPressed()
         }
 
-        if (MemoPreferences.getInstance(this).getPath() == null)
-            FilePicker.show(this, supportFragmentManager)
-
-        val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
-
-        if(textDataFromIntent != null){
-            fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
-            supportFragmentManager.beginTransaction().apply{
-                replace(fragContainer, fragment, EditTextNotesFragment.TAG)
-                commit()
-            }
-        }
-        else {
-            if (savedInstanceState == null)
+        fun showFragment(){
+            val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
+            if (textDataFromIntent != null) {
+                fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
                 supportFragmentManager.beginTransaction().apply {
-                    add(fragContainer, fragment, TextNotesFragment.TAG)
+                    replace(fragContainer, fragment, EditTextNotesFragment.TAG)
                     commit()
                 }
-            else{
-                supportFragmentManager.apply{
-                    val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)!!
-                    fragment = findFragmentByTag(tag)!!
-                    if(!fragment.isInLayout)
-                        resumeFragment(fragment)
+            } else {
+                if (savedInstanceState == null)
+                    supportFragmentManager.beginTransaction().apply {
+                        add(fragContainer, fragment, TextNotesFragment.TAG)
+                        commit()
+                    }
+                else {
+                    supportFragmentManager.apply {
+                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)!!
+                        fragment = findFragmentByTag(tag)!!
+                        if (!fragment.isInLayout)
+                            resumeFragment(fragment)
+                    }
                 }
             }
+
         }
 
-        supportFragmentManager.onArkPathPicked(this) {
-            MemoPreferences.getInstance(this).storePath(it.toString())
+        if (MemoPreferences.getInstance(this).getPath() == null) {
+            FilePicker.show(this, supportFragmentManager)
+
+            supportFragmentManager.onArkPathPicked(this) {
+                MemoPreferences.getInstance(this).storePath(it.toString())
+                showFragment()
+            }
         }
+        else showFragment()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -126,6 +124,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             val settingsItem = menu?.findItem(R.id.settings)
             settingsItem?.isVisible = show
         }
+    }
+
+    fun showFragment(){
+
     }
 
     companion object{

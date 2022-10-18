@@ -5,7 +5,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -66,7 +65,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         lifecycleScope.launch {
             viewLifecycleOwner.apply{
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    textNotesViewModel.getAllTextNotes(requireContext()).collect {
+                    textNotesViewModel.getAllNotes().collect {
                         val adapter = TextNotesListAdapter(it)
                         val layoutManager = LinearLayoutManager(requireContext())
                         adapter.setActivity(activity)
@@ -93,5 +92,5 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
 
 fun Fragment.deleteTextNote(note: TextNote){
     val viewModel: TextNotesViewModel by viewModels()
-    viewModel.deleteTextNote(this.requireContext(), note)
+    viewModel.deleteNote(note)
 }
