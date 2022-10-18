@@ -20,7 +20,6 @@ android {
         buildConfigField "String", "ACRA_PASS", "\"$password\""
         buildConfigField "String", "ACRA_URI", "\"$uri\""
 
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
