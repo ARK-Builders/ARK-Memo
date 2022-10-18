@@ -85,7 +85,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         saveNoteButton.setOnClickListener {
             if(note != null) {
                 with(editViewModel){
-                    saveNote(requireContext(), note!!)
+                    saveNote(note!!)
                     Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
                         Toast.LENGTH_SHORT)
                         .show()
