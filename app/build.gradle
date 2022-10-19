@@ -7,22 +7,21 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "space.taran.arkmemo"
         minSdk 26
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
-        def uri = System.getenv("ACRA_URI")?: ""
-        def login = System.getenv("ACRA_LOGIN")?: ""
-        def password = System.getenv("ACRA_PASS")?: ""
-
-        buildConfigField "String", "ACRA_URI", "\"$uri\""
+        def login = System.getenv("ACRA_LOGIN") ?: ""
+        def password = System.getenv("ACRA_PASS") ?: ""
+        def uri = System.getenv("ACRA_URI") ?: ""
         buildConfigField "String", "ACRA_LOGIN", "\"$login\""
         buildConfigField "String", "ACRA_PASS", "\"$password\""
+        buildConfigField "String", "ACRA_URI", "\"$uri\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +37,7 @@ android {
     }
     buildTypes {
         debug {
+            debuggable true
             manifestPlaceholders = [
                     appIcon : "@mipmap/ic_launcher",
                     appLabel: "@string/app_name"
@@ -97,4 +97,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    implementation 'ch.acra:acra-http:5.9.6'
+    implementation 'ch.acra:acra-dialog:5.9.6'
+    implementation 'com.simplemobiletools:commons:5.29.20'
 }
