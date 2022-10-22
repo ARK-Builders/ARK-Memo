@@ -1,21 +1,2 @@
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-        mavenCentral()
-
-        jcenter()
-        maven { url "https://jitpack.io" }
-    }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven { url "https://jitpack.io" }
-        jcenter()
-    }
-}
 rootProject.name = "ARK Memo"
 include ':app'
