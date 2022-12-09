@@ -1,5 +1,6 @@
 package space.taran.arkmemo.ui.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,15 +11,27 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import space.taran.arkmemo.R
 import space.taran.arkmemo.databinding.TextNoteBinding
 import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.models.Version
 import space.taran.arkmemo.ui.activities.MainActivity
 import space.taran.arkmemo.ui.activities.replaceFragment
 import space.taran.arkmemo.ui.dialogs.NoteDeleteDialogFragment
 import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
 
-class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
+class TextNotesListAdapter(): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
 
     private var activity: MainActivity? = null
     private var fragmentManager: FragmentManager? = null
+
+    private var notes: List<TextNote>? = null
+    private var versions: List<Version>? = null
+
+    fun setNotes(notes: List<TextNote>){
+        this.notes = notes
+    }
+
+    fun setVersions(versions: List<Version>){
+        this.versions = versions
+    }
 
     fun setActivity(activity: AppCompatActivity){
         this.activity = activity as MainActivity
@@ -34,11 +47,11 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].content.title
-        holder.date.text = notes[position].meta?.modified.toString()
+        holder.title.text = notes?.get(position)?.content?.title
+        holder.date.text = notes?.get(position)?.meta?.modified.toString()
     }
 
-    override fun getItemCount() = notes.size
+    override fun getItemCount() = notes?.size ?: 0
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         private val binding by viewBinding{
@@ -49,14 +62,17 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
         val date = binding.noteDate
 
         private val clickNoteToEditListener = View.OnClickListener {
-            val selectedNote = notes[bindingAdapterPosition]
-            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
+            val selectedNote = notes!![bindingAdapterPosition]
+            val selectedVersion = versions!![bindingAdapterPosition]
+            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote,
+                selectedVersion.meta?.rootResourceId
+            )
             activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
         }
 
         private val deleteNoteClickListener = View.OnClickListener{
             NoteDeleteDialogFragment()
-                .setNoteToBeDeleted(notes[bindingAdapterPosition])
+                .setNoteToBeDeleted(notes!![bindingAdapterPosition],versions!![bindingAdapterPosition])
                 .show(fragmentManager!!, NoteDeleteDialogFragment.TAG)
         }
 

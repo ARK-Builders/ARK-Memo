@@ -7,14 +7,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import space.taran.arkmemo.R
 import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.models.Version
 import space.taran.arkmemo.ui.fragments.deleteTextNote
 
 class NoteDeleteDialogFragment: DialogFragment() {
 
     private var note: TextNote? = null
+    private var version: Version? = null
 
-    fun setNoteToBeDeleted(note: TextNote): NoteDeleteDialogFragment{
+    fun setNoteToBeDeleted(note: TextNote, version:Version): NoteDeleteDialogFragment{
         this.note = note
+        this.version = version
         return this
     }
 
@@ -27,7 +30,7 @@ class NoteDeleteDialogFragment: DialogFragment() {
             }
             .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
                 if(note != null) {
-                    parentFragment?.deleteTextNote(note!!)
+                    parentFragment?.deleteTextNote(note!!,version!!)
                     Toast.makeText(
                         requireContext(), getString(R.string.note_deleted),
                         Toast.LENGTH_SHORT

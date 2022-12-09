@@ -14,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
 import space.taran.arkmemo.databinding.FragmentTextNotesBinding
 import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.models.Version
 import space.taran.arkmemo.ui.activities.MainActivity
 import space.taran.arkmemo.ui.activities.getTextFromClipBoard
 import space.taran.arkmemo.ui.activities.replaceFragment
@@ -39,6 +42,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
 
     private lateinit var recyclerView: RecyclerView
 
+    private val textNotesListAdapter = TextNotesListAdapter()
     private val newNoteClickListener = View.OnClickListener{
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
@@ -65,16 +69,21 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         lifecycleScope.launch {
             viewLifecycleOwner.apply{
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    textNotesViewModel.getAllNotes().collect {
-                        val adapter = TextNotesListAdapter(it)
-                        val layoutManager = LinearLayoutManager(requireContext())
-                        adapter.setActivity(activity)
-                        adapter.setFragmentManager(childFragmentManager)
-                        recyclerView.apply {
-                            this.layoutManager = layoutManager
-                            this.adapter = adapter
-                        }
+                    val layoutManager = LinearLayoutManager(requireContext())
+                    textNotesListAdapter.setActivity(activity)
+                    textNotesListAdapter.setFragmentManager(childFragmentManager)
+                    recyclerView.apply {
+                        this.layoutManager = layoutManager
                     }
+                    val notesFlow = textNotesViewModel.getAllNotes()
+                    val versFlow = textNotesViewModel.getAllVersions()
+                    notesFlow.combine( versFlow ) { notes, vers ->
+                        textNotesListAdapter.setNotes(notes)
+                        textNotesListAdapter.setVersions(vers)
+                        recyclerView.apply {
+                            this.adapter = textNotesListAdapter
+                        }
+                    }.collect()
                 }
             }
         }
@@ -90,7 +99,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     }
 }
 
-fun Fragment.deleteTextNote(note: TextNote){
+fun Fragment.deleteTextNote(note: TextNote, version: Version){
     val viewModel: TextNotesViewModel by viewModels()
-    viewModel.deleteNote(note)
+    viewModel.deleteNote(note,version)
 }

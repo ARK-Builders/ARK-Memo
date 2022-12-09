@@ -1,6 +1,7 @@
 package space.taran.arkmemo.data.viewmodels
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,9 +18,9 @@ class EditTextNotesViewModel @Inject constructor(): ViewModel() {
 
     @Inject lateinit var repo: TextNotesRepository
 
-    fun saveNote(note: TextNote){
+    fun saveNote(note: TextNote,rootResourceId: Long? = null){
         viewModelScope.launch(iODispatcher) {
-            repo.saveNote(note)
+            repo.saveNote(note,rootResourceId)
         }
     }
 }
