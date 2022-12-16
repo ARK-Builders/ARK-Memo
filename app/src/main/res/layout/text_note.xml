@@ -48,6 +48,14 @@
         </LinearLayout>
 
         <ImageButton
+            android:id="@+id/versionsNote"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:contentDescription="@string/versions"
+            android:src="@drawable/history" />
+
+        <ImageButton
             android:id="@+id/deleteNote"
             android:layout_width="50dp"
             android:layout_height="match_parent"

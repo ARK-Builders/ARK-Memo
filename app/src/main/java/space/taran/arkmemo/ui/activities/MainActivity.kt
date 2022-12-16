@@ -126,10 +126,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
     }
 
-    fun showFragment(){
-
-    }
-
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }

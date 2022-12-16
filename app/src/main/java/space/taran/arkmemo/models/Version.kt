@@ -14,6 +14,6 @@ data class Version (
 {
     @Parcelize
     data class Content(
-        val data: String
+        val idList: List<String>
         ): Parcelable
 }

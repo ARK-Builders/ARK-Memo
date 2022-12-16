@@ -18,6 +18,7 @@
     <string name="save">Save</string>
     <string name="edit_note">Edit note</string>
     <string name="delete">Delete note</string>
+    <string name="versions">View versions from note</string>
     <string name="note_deleted">Note deleted successfully.</string>
     <string name="start_text_note">Start editing your text note here</string>
     <string name="paste">Paste</string>
@@ -25,6 +26,9 @@
     <string name="ark_memo_ok">OK</string>
     <string name="ark_memo_cancel">Cancel</string>
     <string name="ark_memo_delete_warn">Are you sure to delete note?</string>
+    <string name="ark_memo_delete_warn_history">Are you sure to delete note from history?</string>
     <string name="ark_memo_note_saved">Note saved successfully.</string>
+    <string name="ark_memo_err_note_already_exists">Note already exists.</string>
+    <string name="ark_memo_err_note_not_created">Note was not created.</string>
 
 </resources>
