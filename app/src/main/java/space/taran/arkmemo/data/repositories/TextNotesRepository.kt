@@ -17,13 +17,13 @@ import javax.inject.Inject
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 import space.taran.arkmemo.space.taran.arkmemo.utils.CODES_CREATING_NOTE
-import space.taran.arkmemo.space.taran.arkmemo.utils.CODES_DELETING_NOTE
 
 class TextNotesRepository @Inject constructor() {
 
     @Inject @ApplicationContext lateinit var context: Context
 
-    fun saveNote(note: TextNote?,rootResourceId: String? = null):Long {
+    fun saveNote(note: TextNote?,rootResourceId: ResourceId? = null):Long {
+        val versionStorage = VersionStorage(getPath()!!)
         if (note != null) {
             val path = getPath()
             if (path != null) {
@@ -36,31 +36,7 @@ class TextNotesRepository @Inject constructor() {
                 if(newResourceId < 0){//Error creating TextNote file:
                     return newResourceId
                 }
-                if( rootResourceId == null ){//new .ark/versions/newResourceId file:
-                    createVersionFile(path, newResourceId)
-                }else{ //add relation to .ark/versions/rootResourceId file:
-                    val versionDir = File(path.toFile(), ARK_VERSIONS_DIR)
-                    val versionFile = File(versionDir,rootResourceId)
-                    val fileReader = FileReader(versionFile)
-                    val bufferedReader = BufferedReader(fileReader)
-                    val jsonVersion = StringBuilder()
-                    with(bufferedReader) {
-                        forEachLine {
-                            jsonVersion.append(it)
-                        }
-                    }
-                    val meta = VersionMeta(
-                        rootResourceId,
-                        versionFile.toPath().fileName.toString()
-                    )
-                    val verToWrite = if(jsonVersion.toString() == ""){//adding first relation, using rootResourceId as oldResourceId
-                        Version(Version.Content( listOf() ),meta )
-                    }else{
-                        val oldVerContent = JsonParser.parseVersionContentFromJson(jsonVersion.toString())
-                        Version( oldVerContent, meta )
-                    }
-                    addNoteToVersion(newResourceId.toString(), verToWrite)
-                }
+                versionStorage.addVersion(newResourceId,rootResourceId)
                 return newResourceId
             }
         }
@@ -69,64 +45,10 @@ class TextNotesRepository @Inject constructor() {
 
     fun deleteNote(note: TextNote,version:Version) {
         val notePath = getPath()?.resolve("${note.meta?.name}")
-        val versionPath = getPath()?.resolve(ARK_VERSIONS_DIR)?.resolve("${version.meta?.name}")
+        val versionPath = getPath()?.resolve(ARK_VERSIONS_DIR)?.resolve("${version.meta?.rootResourceId}")
         removeFileFromMemory(notePath)
         removeFileFromMemory(versionPath)
         //we should delete all notes listed in version that don't have been forked? by now it just deletes the last note.
-    }
-
-    fun deleteNoteFromVersion(note: TextNote,version:Version):Int {
-        if(version.meta == null || note.meta == null){
-            return CODES_DELETING_NOTE.NOTE_NOT_DELETED.code
-        }
-        val versionPath = getPath()?.resolve(ARK_VERSIONS_DIR)?.resolve(version.meta.name)
-        val notePath = getPath()?.resolve(note.meta.name)
-        if( version.content.idList.isEmpty() ){//means that root TextNote its being deleted, and no more content
-            //just delete note and version.
-            removeFileFromMemory(notePath)
-            removeFileFromMemory(versionPath)
-            return CODES_DELETING_NOTE.SUCCESS_NOTE_AND_VERSION_DELETED.code
-        }else if( version.meta.rootResourceId == note.meta.id ){//means that root TextNote its being deleted,
-            //rename version file:
-            val newVersionContent = Version.Content(version.content.idList.drop(1))
-            val secondNoteFromVId = version.content.idList[0]
-            val newVersionPath = getPath()?.resolve(ARK_VERSIONS_DIR)?.resolve(secondNoteFromVId)
-            val versionFile = versionPath!!.toFile()
-            val newVersionFile = newVersionPath!!.toFile()
-            versionFile.renameTo(newVersionFile)
-            writeToVersionFile( newVersionPath, newVersionContent )
-            //delete note:
-            removeFileFromMemory(notePath)
-            return CODES_DELETING_NOTE.SUCCESS_NOTE_DELETED_VERSION_CHANGED.code
-        }else{
-            val noteIndex = version.content.idList.indexOf(note.meta.id)
-            if(noteIndex == -1){
-                return CODES_DELETING_NOTE.NOTE_NOT_DELETED.code
-            }
-            val idListMutable = version.content.idList.toMutableList()
-            idListMutable.removeAt(noteIndex)
-            //overwrite version file:
-            writeToVersionFile(versionPath!!,Version.Content( idListMutable.toList() ))
-            //delete note:
-            removeFileFromMemory(notePath)
-        }
-        return CODES_DELETING_NOTE.SUCCESS.code
-    }
-
-    fun getAllNotesFromVersion(version:Version): List<TextNote> {
-        val notes = mutableListOf<TextNote>()
-        val rootNote = getNote( version.meta!!.rootResourceId )
-        notes.add(rootNote)
-        for(noteResId in version.content.idList){
-            val note = getNote( noteResId )
-            notes.add(note)
-        }
-        return notes
-    }
-
-    fun getSecondNoteFromVersion(version:Version): TextNote {
-        val noteResId = version.content.idList[0]
-        return getNote( noteResId )
     }
 
     fun getAllNotesWithHistory(): List<TextNote> {
@@ -141,6 +63,19 @@ class TextNotesRepository @Inject constructor() {
         return notes
     }
 
+    fun getAllNotesFromVersion(rootResourceId:ResourceId): List<TextNote> {
+        val versionStorage = VersionStorage(getPath()!!)
+        val versions = versionStorage.versions(rootResourceId)
+        val notes = mutableListOf<TextNote>()
+        val rootNote = getNote( rootResourceId )
+        notes.add(rootNote)
+        for(noteResId in versions){
+            val note = getNote( noteResId )
+            notes.add(note)
+        }
+        return notes
+    }
+
     fun getAllVersions(): List<Version> {
         val versions = mutableListOf<Version>()//content
         val path = getPath()
@@ -150,12 +85,12 @@ class TextNotesRepository @Inject constructor() {
                 Files.list( versionDir.toPath() ).forEach { filePath ->
                     try {
                         val fileName = filePath.fileName.toString()
-                        val rootResourceId:String = fileName
+                        val rootResourceId:ResourceId = fileName.toLong()
                         val meta = VersionMeta(
-                            rootResourceId,
-                            fileName
+                            rootResourceId
                         )
-                        val verContent = getVersionContent(rootResourceId)
+                        val versionStorage = VersionStorage(getPath()!!)
+                        val verContent = Version.Content( versionStorage.versions(rootResourceId) )
                         val ver = Version(verContent,meta)
                         versions.add(ver)
                     } catch (e: Exception) {
@@ -167,39 +102,12 @@ class TextNotesRepository @Inject constructor() {
         return versions
     }
 
-    fun getVersionContent(rootResourceId:String):Version.Content {
+    private fun getLastChildrenId(rootResourceId: ResourceId):ResourceId {
         val path = getPath()
-        var verContent:Version.Content? = null
+        var lastChildResourceId:ResourceId? = null
         if (path != null) {
             val versionDir = File(path.toFile(), ARK_VERSIONS_DIR)
-            val versionFile = File(versionDir, rootResourceId)
-            try {
-                val fileReader = FileReader(versionFile)
-                val bufferedReader = BufferedReader(fileReader)
-                val jsonVersion = StringBuilder()
-                with(bufferedReader) {
-                    forEachLine {
-                        jsonVersion.append(it)
-                    }
-                }
-                verContent = if(jsonVersion.toString() == ""){
-                    Version.Content(listOf())
-                }else{
-                    JsonParser.parseVersionContentFromJson(jsonVersion.toString())
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        return verContent!!
-    }
-
-    private fun getLastChildrenId(rootResourceId: String):String {
-        val path = getPath()
-        var lastChildResourceId:String? = null
-        if (path != null) {
-            val versionDir = File(path.toFile(), ARK_VERSIONS_DIR)
-            val versionFile = File(versionDir, rootResourceId)
+            val versionFile = File(versionDir, rootResourceId.toString())
             if(versionFile.exists()){
                 val fileReader = FileReader(versionFile)
                 val bufferedReader = BufferedReader(fileReader)
@@ -224,7 +132,7 @@ class TextNotesRepository @Inject constructor() {
         return lastChildResourceId!!
     }
 
-    private fun getNote(ResourceId:String): TextNote {
+    private fun getNote(ResourceId:ResourceId): TextNote {
         val path = getPath()
         var note:TextNote? = null
         if (path != null) {
@@ -243,7 +151,7 @@ class TextNotesRepository @Inject constructor() {
                 val size = Files.size(notePath)
                 val id = computeId(size, notePath)
                 val meta = ResourceMeta(
-                    id.toString(),
+                    id,
                     notePath.fileName.toString(),
                     notePath.extension,
                     notePath.getLastModifiedTime(),
@@ -291,49 +199,6 @@ class TextNotesRepository @Inject constructor() {
         return null
     }
 
-    private fun createVersionFile(path: Path? ,rootResourceId: Long):Path?{//returns version file Path
-        if (path != null) {
-            val file = path.toFile()
-            val versionDir = File(file, ARK_VERSIONS_DIR)
-            if(!versionDir.exists()){
-                versionDir.mkdirs()
-            }
-            val versionFile = File(versionDir, "$rootResourceId")
-            var fileCreated = false
-            try {
-                if (!versionFile.exists()) {
-                    fileCreated = versionFile.createNewFile()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            if( versionFile.exists() || fileCreated ){
-                return versionFile.toPath()
-            }
-        }
-        return null
-    }
-
-    private fun addNoteToVersion(textNoteId: String,version: Version):Int{
-        val idListMutable = version.content.idList.toMutableList()
-        if(version.meta == null){
-            return -1
-        }
-        val versionPath = getPath()?.resolve(ARK_VERSIONS_DIR)?.resolve(version.meta.name)
-        idListMutable.add(textNoteId)
-        writeToVersionFile(versionPath!!,Version.Content( idListMutable.toList() ))
-        return 0
-    }
-
-    private fun writeToVersionFile(path:Path,versionCont:Version.Content){
-        val fileWriter = FileWriter( path.toFile() )
-        val bufferedWriter = BufferedWriter(fileWriter)
-        with(bufferedWriter) {
-            write( JsonParser.parseVersionContentToJson(versionCont) )
-            close()
-        }
-    }
-
     private fun removeFileFromMemory(path: Path?) {
         if (path != null)
             Files.deleteIfExists(path)
@@ -354,7 +219,7 @@ class TextNotesRepository @Inject constructor() {
     }
 
     companion object {
-        private const val NOTE_EXT = "note"
+        const val NOTE_EXT = "note"
         private const val DUMMY_FILENAME =  "Note"
         private const val ARK_VERSIONS_DIR =  ".ark/versions"
     }

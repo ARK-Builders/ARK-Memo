@@ -65,9 +65,10 @@ class VersionsListAdapter: RecyclerView.Adapter<VersionsListAdapter.VersionViewH
         private val clickNoteToEditListener = View.OnClickListener {
             val selectedNote = notes!![bindingAdapterPosition]
             val selectedVersion = version!!
+            val isReadOnly = bindingAdapterPosition != notes!!.size - 1//read only unless its last item.
             activity?.fragment = EditTextNotesFragment.newInstance(selectedNote,
                 selectedVersion.meta?.rootResourceId,
-                true
+                isReadOnly
             )
             activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
         }

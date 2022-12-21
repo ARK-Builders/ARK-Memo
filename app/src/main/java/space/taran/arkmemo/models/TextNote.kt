@@ -1,6 +1,5 @@
 package space.taran.arkmemo.models
 
-import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.parcelize.IgnoredOnParcel
 import space.taran.arkmemo.data.ResourceMeta

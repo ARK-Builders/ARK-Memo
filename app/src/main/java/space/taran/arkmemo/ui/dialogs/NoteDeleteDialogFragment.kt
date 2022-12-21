@@ -25,16 +25,17 @@ class NoteDeleteDialogFragment: DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(requireContext())
+            .setNegativeButton(R.string.ark_memo_cancel)
+            { dialog, _ ->
+                dialog.cancel()
+            }
         if(isHistory){
-            val builder = AlertDialog.Builder(requireContext())
+            builder
                 .setMessage(R.string.ark_memo_delete_warn_history)
-                .setNegativeButton(R.string.ark_memo_cancel)
-                { dialog, _ ->
-                    dialog.cancel()
-                }
                 .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
                     if(note != null) {
-                        parentFragment?.deleteTextNoteFromVersion(note!!,version!!)
+                        parentFragment?.deleteTextNoteFromVersion(note!!)
                         Toast.makeText(
                             requireContext(), getString(R.string.note_deleted),
                             Toast.LENGTH_SHORT
@@ -42,25 +43,20 @@ class NoteDeleteDialogFragment: DialogFragment() {
                         dialog.cancel()
                     }
                 }
-            return builder.create()
-        }
-
-        val builder = AlertDialog.Builder(requireContext())
-            .setMessage(R.string.ark_memo_delete_warn)
-            .setNegativeButton(R.string.ark_memo_cancel)
-            { dialog, _ ->
-                dialog.cancel()
-            }
-            .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
-                if(note != null) {
-                    parentFragment?.deleteTextNote(note!!,version!!)
-                    Toast.makeText(
-                        requireContext(), getString(R.string.note_deleted),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    dialog.cancel()
+        }else{
+            builder
+                .setMessage(R.string.ark_memo_delete_warn)
+                .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
+                    if(note != null) {
+                        parentFragment?.deleteTextNote(note!!,version!!)
+                        Toast.makeText(
+                            requireContext(), getString(R.string.note_deleted),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        dialog.cancel()
+                    }
                 }
-            }
+        }
         return builder.create()
     }
 

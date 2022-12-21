@@ -22,7 +22,7 @@ class EditTextNotesViewModel @Inject constructor(): ViewModel() {
         MutableSharedFlow(0)
     }
 
-    fun saveNote(note: TextNote,rootResourceId: String? = null): SharedFlow<Long> {
+    fun saveNote(note: TextNote,rootResourceId: Long? = null): SharedFlow<Long> {
         viewModelScope.launch(iODispatcher) {
             saveNoteResult.emit( repo.saveNote(note,rootResourceId) )
             saveNoteResult.emit( 0L )

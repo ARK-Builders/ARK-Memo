@@ -4,6 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import space.taran.arkmemo.data.VersionMeta
+import space.taran.arkmemo.data.repositories.ResourceId
 
 @Parcelize
 data class Version (
@@ -14,6 +15,6 @@ data class Version (
 {
     @Parcelize
     data class Content(
-        val idList: List<String>
+        val idList: List<ResourceId>
         ): Parcelable
 }

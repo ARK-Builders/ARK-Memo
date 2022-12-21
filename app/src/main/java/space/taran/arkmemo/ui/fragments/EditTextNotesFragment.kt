@@ -1,5 +1,6 @@
 package space.taran.arkmemo.ui.fragments
 
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
@@ -10,11 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.simplemobiletools.commons.extensions.adjustAlpha
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.EditTextNotesViewModel
+import space.taran.arkmemo.data.viewmodels.VersionsViewModel
 import space.taran.arkmemo.databinding.FragmentEditTextNotesBinding
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.space.taran.arkmemo.utils.CODES_CREATING_NOTE
@@ -34,7 +37,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
     private var note: TextNote? = null
     private var noteStr: String? = null
     private var isReadOnly = false
-    private var rootResourceId: String? = null
+    private var rootResourceId: Long? = null
     private var noteContent:TextNote.Content=TextNote.Content("","")
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,7 +70,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         if(arguments != null) {
             this.note = requireArguments().getParcelable(NOTE_KEY)
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
-            rootResourceId = requireArguments().getString(ROOT_RESOURCE_ID_LONG_KEY)
+            rootResourceId = requireArguments().getLong(ROOT_RESOURCE_ID_LONG_KEY)
             isReadOnly = requireArguments().getBoolean(READ_ONLY_KEY)
         }
 
@@ -92,6 +95,8 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
             //sets editNote readOnly: maybe it would be best to just use TextView instead, since this maybe brokes scrolling
             editNote.inputType = InputType.TYPE_NULL
             editNote.isLongClickable = false
+            editNote.setTextColor(Color.BLACK.adjustAlpha(0.75f))
+            editNote.setBackgroundColor(Color.parseColor("#757575"))
         }else{
             saveNoteButton.setOnClickListener{
                 val noteToSave = if(note != null && note!!.meta != null){//is not new note
@@ -134,18 +139,18 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         private const val READ_ONLY_KEY = "read only"
         private const val NOTE_KEY = "note key"
 
-        fun newInstance(note: String,rootResourceId:String? = null,isReadOnly:Boolean? = null) = EditTextNotesFragment().apply{
+        fun newInstance(note: String,rootResourceId:Long? = null,isReadOnly:Boolean? = null,versionsViewModel: VersionsViewModel? = null) = EditTextNotesFragment().apply{
             arguments = Bundle().apply {
                 putString(NOTE_STRING_KEY, note)
-                rootResourceId?.let { putString(ROOT_RESOURCE_ID_LONG_KEY, it) }
+                rootResourceId?.let { putLong(ROOT_RESOURCE_ID_LONG_KEY, it) }
                 isReadOnly?.let { putBoolean(READ_ONLY_KEY, it) }
             }
         }
 
-        fun newInstance(note: TextNote,rootResourceId:String? = null,isReadOnly:Boolean? = null) = EditTextNotesFragment().apply{
+        fun newInstance(note: TextNote,rootResourceId:Long? = null,isReadOnly:Boolean? = null) = EditTextNotesFragment().apply{
             arguments = Bundle().apply{
                 putParcelable(NOTE_KEY, note)
-                rootResourceId?.let { putString(ROOT_RESOURCE_ID_LONG_KEY, it) }
+                rootResourceId?.let { putLong(ROOT_RESOURCE_ID_LONG_KEY, it) }
                 isReadOnly?.let { putBoolean(READ_ONLY_KEY, it) }
             }
         }

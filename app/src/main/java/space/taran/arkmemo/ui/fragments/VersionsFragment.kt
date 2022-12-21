@@ -1,6 +1,7 @@
 package space.taran.arkmemo.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -36,17 +37,21 @@ class VersionsFragment: Fragment(R.layout.fragment_versions) {
 
     private val versionsListAdapter = VersionsListAdapter()
 
-    private var version:Version? = null
+    private var versionFromArgument:Version? = null
+    private var verFromArgumentChanged = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = binding.include.recyclerView
-        activity.title = getString(R.string.app_name)
+        activity.title = getString(R.string.versions_title)
+        activity.showSettingsButton(false)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         if(arguments != null) {
-            this.version = requireArguments().getParcelable(VERSION_KEY)
-            versionsListAdapter.setVersion(version!!)
-            versionsViewModel.setVersion(version!!)
+            this.versionFromArgument = requireArguments().getParcelable(VERSION_KEY)
+            if(!verFromArgumentChanged) {//this if is needed since onViewCreated its executed again after version rootResourceId changed.
+                versionsListAdapter.setVersion(versionFromArgument!!)
+                versionsViewModel.setVersion(versionFromArgument!!)
+            }
         }
         lifecycleScope.launch {
             viewLifecycleOwner.apply{
@@ -64,6 +69,9 @@ class VersionsFragment: Fragment(R.layout.fragment_versions) {
                             activity.onBackPressed()
                         }else if(ver.meta != null){
                             versionsListAdapter.setVersion(ver)
+                            if(ver.meta.rootResourceId != versionFromArgument!!.meta!!.rootResourceId){
+                                verFromArgumentChanged = true
+                            }
                         }
                         versionsListAdapter.setNotes(notes)
                         //Log.d("combine", "ver: "+ver)
@@ -94,11 +102,11 @@ class VersionsFragment: Fragment(R.layout.fragment_versions) {
 }
 
 
-fun Fragment.deleteTextNoteFromVersion(note: TextNote, version: Version){
+fun Fragment.deleteTextNoteFromVersion(note: TextNote){
     val viewModel: VersionsViewModel by viewModels()
     lifecycleScope.launch {
         viewLifecycleOwner.apply {
-            viewModel.deleteNote(note, version)
+            viewModel.deleteNote(note)
         }
     }
 
