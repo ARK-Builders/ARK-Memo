@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             onBackPressed()
         }
 
-        fun showFragment(){
+        fun showFragment() {
             val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
             if (textDataFromIntent != null) {
                 fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
@@ -93,14 +92,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 MemoPreferences.getInstance(this).storePath(it.toString())
                 showFragment()
             }
-        }
-        else showFragment()
+        } else showFragment()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         this.menu = menu
-        if(fragment.tag != TextNotesFragment.TAG)
+        if (fragment.tag != TextNotesFragment.TAG)
             showSettingsButton(false)
         return true
     }
@@ -120,14 +118,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         return true
     }
 
-    fun showSettingsButton(show: Boolean = true){
-        if(menu != null) {
+    fun showSettingsButton(show: Boolean = true) {
+        if (menu != null) {
             val settingsItem = menu?.findItem(R.id.settings)
             settingsItem?.isVisible = show
         }
     }
 
-    companion object{
+    companion object {
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }
 }
@@ -146,14 +144,14 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     }
 }
 
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
+fun AppCompatActivity.resumeFragment(fragment: Fragment) {
+    supportFragmentManager.beginTransaction().apply {
         show(fragment)
         commit()
     }
 }
 
-fun Context.getTextFromClipBoard(): String?{
+fun Context.getTextFromClipBoard(): String? {
     val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }

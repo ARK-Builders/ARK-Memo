@@ -5,7 +5,7 @@ import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.models.Version
 
 class JsonParser {
-    companion object{
+    companion object {
         private val gson = Gson()
 
         fun parseNoteContentToJson(note: TextNote.Content): String =

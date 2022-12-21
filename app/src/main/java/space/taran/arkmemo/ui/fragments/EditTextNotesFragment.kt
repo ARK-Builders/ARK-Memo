@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.simplemobiletools.commons.extensions.adjustAlpha
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.EditTextNotesViewModel
@@ -24,9 +24,9 @@ import space.taran.arkmemo.space.taran.arkmemo.utils.CODES_CREATING_NOTE
 import space.taran.arkmemo.ui.activities.MainActivity
 
 @AndroidEntryPoint
-class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
+class EditTextNotesFragment : Fragment(R.layout.fragment_edit_text_notes) {
 
-    private val activity: MainActivity by lazy{
+    private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
 
@@ -38,24 +38,24 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
     private var noteStr: String? = null
     private var isReadOnly = false
     private var rootResourceId: Long? = null
-    private var noteContent:TextNote.Content=TextNote.Content("","")
+    private var noteContent: TextNote.Content = TextNote.Content("", "")
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val editTextListener = object: TextWatcher{
+        val editTextListener = object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = Unit
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) =
+                Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val noteString = s?.toString()
                 var title = ""
-                if(noteString != null){
-                    for(char in noteString){
-                        if(char != '\n'){
+                if (noteString != null) {
+                    for (char in noteString) {
+                        if (char != '\n') {
                             title += char
-                        }
-                        else break
+                        } else break
                     }
                     noteContent = TextNote.Content(
                         title = title,
@@ -67,7 +67,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         val editNote = binding.editNote
         val saveNoteButton = binding.saveNote
 
-        if(arguments != null) {
+        if (arguments != null) {
             this.note = requireArguments().getParcelable(NOTE_KEY)
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
             rootResourceId = requireArguments().getLong(ROOT_RESOURCE_ID_LONG_KEY)
@@ -81,15 +81,15 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         editNote.requestFocus()
         editNote.addTextChangedListener(editTextListener)
 
-        if(this.note != null) {
+        if (this.note != null) {
             noteContent = note!!.content
             editNote.setText(this.note?.content?.data!!)
         }
 
-        if(noteStr != null)
+        if (noteStr != null)
             editNote.setText(noteStr)
 
-        if(isReadOnly){
+        if (isReadOnly) {
             saveNoteButton.visibility = View.GONE
             saveNoteButton.isEnabled = false
             //sets editNote readOnly: maybe it would be best to just use TextView instead, since this maybe brokes scrolling
@@ -97,19 +97,19 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
             editNote.isLongClickable = false
             editNote.setTextColor(Color.BLACK.adjustAlpha(0.75f))
             editNote.setBackgroundColor(Color.parseColor("#757575"))
-        }else{
-            saveNoteButton.setOnClickListener{
-                val noteToSave = if(note != null && note!!.meta != null){//is not new note
-                    TextNote( noteContent,note?.meta )
-                }else{
-                    TextNote( noteContent )
+        } else {
+            saveNoteButton.setOnClickListener {
+                val noteToSave = if (note != null && note!!.meta != null) {//is not new note
+                    TextNote(noteContent, note?.meta)
+                } else {
+                    TextNote(noteContent)
                 }
                 viewLifecycleOwner.lifecycleScope.launch {
-                    editViewModel.saveNote(noteToSave,rootResourceId).takeWhile {
+                    editViewModel.saveNote(noteToSave, rootResourceId).takeWhile {
                         it != 0L
                     }.collect {
                         //Show toast here
-                        val toastText = if(it < 0){
+                        val toastText = if (it < 0) {
                             when (it) {
                                 CODES_CREATING_NOTE.NOTE_ALREADY_EXISTS.errCode.toLong() -> {
                                     getString(R.string.ark_memo_err_note_already_exists)
@@ -118,11 +118,13 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
                                     getString(R.string.ark_memo_err_note_not_created)
                                 }
                             }
-                        }else{
+                        } else {
                             getString(R.string.ark_memo_note_saved)
                         }
-                        Toast.makeText(requireContext(), toastText,
-                            Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            requireContext(), toastText,
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                         activity.onBackPressed()
                     }
@@ -132,14 +134,19 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
     }
 
 
-    companion object{
+    companion object {
         const val TAG = "Edit Text Notes"
         private const val NOTE_STRING_KEY = "note string"
         private const val ROOT_RESOURCE_ID_LONG_KEY = "root resource id long"
         private const val READ_ONLY_KEY = "read only"
         private const val NOTE_KEY = "note key"
 
-        fun newInstance(note: String,rootResourceId:Long? = null,isReadOnly:Boolean? = null,versionsViewModel: VersionsViewModel? = null) = EditTextNotesFragment().apply{
+        fun newInstance(
+            note: String,
+            rootResourceId: Long? = null,
+            isReadOnly: Boolean? = null,
+            versionsViewModel: VersionsViewModel? = null
+        ) = EditTextNotesFragment().apply {
             arguments = Bundle().apply {
                 putString(NOTE_STRING_KEY, note)
                 rootResourceId?.let { putLong(ROOT_RESOURCE_ID_LONG_KEY, it) }
@@ -147,12 +154,13 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
             }
         }
 
-        fun newInstance(note: TextNote,rootResourceId:Long? = null,isReadOnly:Boolean? = null) = EditTextNotesFragment().apply{
-            arguments = Bundle().apply{
-                putParcelable(NOTE_KEY, note)
-                rootResourceId?.let { putLong(ROOT_RESOURCE_ID_LONG_KEY, it) }
-                isReadOnly?.let { putBoolean(READ_ONLY_KEY, it) }
+        fun newInstance(note: TextNote, rootResourceId: Long? = null, isReadOnly: Boolean? = null) =
+            EditTextNotesFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(NOTE_KEY, note)
+                    rootResourceId?.let { putLong(ROOT_RESOURCE_ID_LONG_KEY, it) }
+                    isReadOnly?.let { putBoolean(READ_ONLY_KEY, it) }
+                }
             }
-        }
     }
 }

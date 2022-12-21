@@ -8,7 +8,7 @@ class Config(context: Context) : BaseConfig(context) {
         fun newInstance(context: Context) = Config(context)
     }
 
-    var crashReport:Boolean
+    var crashReport: Boolean
         get() = prefs.getBoolean(CRASH_REPORT_ENABLE, true)
         set(isEnable) = prefs.edit().putBoolean(CRASH_REPORT_ENABLE, isEnable)
             .apply()

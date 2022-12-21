@@ -25,24 +25,25 @@ class TextNotesListAdapter : RecyclerView.Adapter<TextNotesListAdapter.NoteViewH
     private var notes: List<TextNote>? = null
     private var versions: List<Version>? = null
 
-    fun setNotes(notes: List<TextNote>){
+    fun setNotes(notes: List<TextNote>) {
         this.notes = notes
     }
 
-    fun setVersions(versions: List<Version>){
+    fun setVersions(versions: List<Version>) {
         this.versions = versions
     }
 
-    fun setActivity(activity: AppCompatActivity){
+    fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
     }
 
-    fun setFragmentManager(manager: FragmentManager){
+    fun setFragmentManager(manager: FragmentManager) {
         fragmentManager = manager
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.text_note, parent, false)
+        val itemView =
+            LayoutInflater.from(parent.context).inflate(R.layout.text_note, parent, false)
         return NoteViewHolder(itemView)
     }
 
@@ -53,8 +54,8 @@ class TextNotesListAdapter : RecyclerView.Adapter<TextNotesListAdapter.NoteViewH
 
     override fun getItemCount() = notes?.size ?: 0
 
-    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-        private val binding by viewBinding{
+    inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val binding by viewBinding {
             TextNoteBinding.bind(itemView)
         }
 
@@ -70,15 +71,19 @@ class TextNotesListAdapter : RecyclerView.Adapter<TextNotesListAdapter.NoteViewH
         private val clickNoteToEditListener = View.OnClickListener {
             val selectedNote = notes!![bindingAdapterPosition]
             val selectedVersion = versions!![bindingAdapterPosition]
-            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote,
+            activity?.fragment = EditTextNotesFragment.newInstance(
+                selectedNote,
                 selectedVersion.meta?.rootResourceId
             )
             activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
         }
 
-        private val deleteNoteClickListener = View.OnClickListener{
+        private val deleteNoteClickListener = View.OnClickListener {
             NoteDeleteDialogFragment()
-                .setNoteToBeDeleted(notes!![bindingAdapterPosition],versions!![bindingAdapterPosition])
+                .setNoteToBeDeleted(
+                    notes!![bindingAdapterPosition],
+                    versions!![bindingAdapterPosition]
+                )
                 .show(fragmentManager!!, NoteDeleteDialogFragment.TAG)
         }
 

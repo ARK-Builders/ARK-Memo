@@ -16,8 +16,8 @@ import space.taran.arkfilepicker.ArkFilePickerMode
 import space.taran.arkmemo.BuildConfig
 import space.taran.arkmemo.R
 
-class FilePicker private constructor(){
-    companion object{
+class FilePicker private constructor() {
+    companion object {
 
         private const val TAG = "file_picker"
         private var fragmentManager: FragmentManager? = null
@@ -28,35 +28,37 @@ class FilePicker private constructor(){
             ArkFilePickerFragment.newInstance(getFilePickerConfig()).show(fragmentManager!!, TAG)
         }
 
-        fun show(activity: AppCompatActivity, fragmentManager: FragmentManager){
+        fun show(activity: AppCompatActivity, fragmentManager: FragmentManager) {
             this.fragmentManager = fragmentManager
-            if(isReadPermissionGranted(activity)){
+            if (isReadPermissionGranted(activity)) {
                 show()
-            }
-            else askForReadPermissions()
+            } else askForReadPermissions()
         }
 
-        private fun isReadPermissionGranted(activity: AppCompatActivity): Boolean{
-            return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        private fun isReadPermissionGranted(activity: AppCompatActivity): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
                 Environment.isExternalStorageManager()
-            else{
-                ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+            else {
+                ContextCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) ==
                         PackageManager.PERMISSION_GRANTED
             }
         }
 
         private fun askForReadPermissions() {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                val packageUri ="package:" + BuildConfig.APPLICATION_ID
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val packageUri = "package:" + BuildConfig.APPLICATION_ID
                 readPermLauncher_SDK_R?.launch(packageUri)
-            }
-            else{
+            } else {
                 readPermLauncher?.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
         }
 
-        fun permissionDeniedError(context: Context){
-            Toast.makeText(context, context.getString(R.string.no_file_access), Toast.LENGTH_SHORT).show()
+        fun permissionDeniedError(context: Context) {
+            Toast.makeText(context, context.getString(R.string.no_file_access), Toast.LENGTH_SHORT)
+                .show()
         }
 
         private fun getFilePickerConfig() = ArkFilePickerConfig(

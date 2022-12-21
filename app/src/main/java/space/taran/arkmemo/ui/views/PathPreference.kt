@@ -8,17 +8,17 @@ import androidx.preference.PreferenceViewHolder
 import space.taran.arkmemo.R
 import space.taran.arkmemo.preferences.MemoPreferences
 
-class PathPreference(context: Context, attrs: AttributeSet): Preference(context, attrs) {
+class PathPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {
     private var title: TextView? = null
     private var path: TextView? = null
 
-    fun setPath(path: String?){
-        if(path != null)
+    fun setPath(path: String?) {
+        if (path != null)
             this.path?.text = path
     }
 
-    fun setTitle(title: String?){
-        if(title != null)
+    fun setTitle(title: String?) {
+        if (title != null)
             this.title?.text = title
     }
 

@@ -7,14 +7,13 @@ import space.taran.arkmemo.data.VersionMeta
 import space.taran.arkmemo.data.repositories.ResourceId
 
 @Parcelize
-data class Version (
+data class Version(
     val content: Content,
     @IgnoredOnParcel
     val meta: VersionMeta? = null
-): Parcelable
-{
+) : Parcelable {
     @Parcelize
     data class Content(
         val idList: List<ResourceId>
-        ): Parcelable
+    ) : Parcelable
 }

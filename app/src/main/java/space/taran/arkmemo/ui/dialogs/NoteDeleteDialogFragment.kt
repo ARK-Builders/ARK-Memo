@@ -11,13 +11,17 @@ import space.taran.arkmemo.models.Version
 import space.taran.arkmemo.ui.fragments.deleteTextNote
 import space.taran.arkmemo.ui.fragments.deleteTextNoteFromVersion
 
-class NoteDeleteDialogFragment: DialogFragment() {
+class NoteDeleteDialogFragment : DialogFragment() {
 
     private var note: TextNote? = null
     private var version: Version? = null
     private var isHistory: Boolean = false
 
-    fun setNoteToBeDeleted(note: TextNote, version:Version, isHistory:Boolean? = null): NoteDeleteDialogFragment{
+    fun setNoteToBeDeleted(
+        note: TextNote,
+        version: Version,
+        isHistory: Boolean? = null
+    ): NoteDeleteDialogFragment {
         this.note = note
         this.version = version
         isHistory?.let { this.isHistory = it }
@@ -30,11 +34,11 @@ class NoteDeleteDialogFragment: DialogFragment() {
             { dialog, _ ->
                 dialog.cancel()
             }
-        if(isHistory){
+        if (isHistory) {
             builder
                 .setMessage(R.string.ark_memo_delete_warn_history)
-                .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
-                    if(note != null) {
+                .setPositiveButton(R.string.ark_memo_ok) { dialog, _ ->
+                    if (note != null) {
                         parentFragment?.deleteTextNoteFromVersion(note!!)
                         Toast.makeText(
                             requireContext(), getString(R.string.note_deleted),
@@ -43,12 +47,12 @@ class NoteDeleteDialogFragment: DialogFragment() {
                         dialog.cancel()
                     }
                 }
-        }else{
+        } else {
             builder
                 .setMessage(R.string.ark_memo_delete_warn)
-                .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
-                    if(note != null) {
-                        parentFragment?.deleteTextNote(note!!,version!!)
+                .setPositiveButton(R.string.ark_memo_ok) { dialog, _ ->
+                    if (note != null) {
+                        parentFragment?.deleteTextNote(note!!, version!!)
                         Toast.makeText(
                             requireContext(), getString(R.string.note_deleted),
                             Toast.LENGTH_SHORT
@@ -60,7 +64,7 @@ class NoteDeleteDialogFragment: DialogFragment() {
         return builder.create()
     }
 
-    companion object{
+    companion object {
         const val TAG = "Note Delete Dialog"
     }
 }

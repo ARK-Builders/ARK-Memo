@@ -12,7 +12,7 @@ import space.taran.arkmemo.ui.views.PathPreference
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private val activity: MainActivity by lazy{
+    private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
 
@@ -40,12 +40,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    override fun onResume(){
+    override fun onResume() {
         super.onResume()
         activity.fragment = this
     }
 
-    companion object{
+    companion object {
         const val TAG = "Settings"
     }
 }

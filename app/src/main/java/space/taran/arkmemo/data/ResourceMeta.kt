@@ -9,4 +9,4 @@ data class ResourceMeta(
     val extension: String,
     val modified: FileTime,
     val size: Long
-    )
+)

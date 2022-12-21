@@ -5,4 +5,4 @@ import space.taran.arkmemo.data.repositories.ResourceId
 
 data class VersionMeta(
     val rootResourceId: ResourceId
-    )
+)

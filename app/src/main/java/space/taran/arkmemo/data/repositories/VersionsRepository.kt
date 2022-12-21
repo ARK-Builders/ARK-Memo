@@ -14,14 +14,14 @@ class VersionsRepository @Inject constructor() {
     @ApplicationContext
     lateinit var context: Context
 
-    fun deleteNoteFromVersion(note: TextNote, rootResourceId:ResourceId):Int {
+    fun deleteNoteFromVersion(note: TextNote, rootResourceId: ResourceId): Int {
         val versionStorage = VersionStorage(getPath()!!)
-        return versionStorage.removeVersion(note.meta!!.resourceId,rootResourceId)
+        return versionStorage.removeVersion(note.meta!!.resourceId, rootResourceId)
     }
 
-    fun getVersionContent(id:ResourceId): Version.Content {
+    fun getVersionContent(id: ResourceId): Version.Content {
         val versionStorage = VersionStorage(getPath()!!)
-        return Version.Content( versionStorage.versions(id) )
+        return Version.Content(versionStorage.versions(id))
     }
 
     private fun getPath(): Path? {

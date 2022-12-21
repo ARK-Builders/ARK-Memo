@@ -10,42 +10,45 @@ import space.taran.arkmemo.files.parsers.JsonParser
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.models.Version
 import space.taran.arkmemo.preferences.MemoPreferences
+import space.taran.arkmemo.space.taran.arkmemo.utils.CODES_CREATING_NOTE
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
-import space.taran.arkmemo.space.taran.arkmemo.utils.CODES_CREATING_NOTE
 
 class TextNotesRepository @Inject constructor() {
 
-    @Inject @ApplicationContext lateinit var context: Context
+    @Inject
+    @ApplicationContext
+    lateinit var context: Context
 
-    fun saveNote(note: TextNote?,rootResourceId: ResourceId? = null):Long {
+    fun saveNote(note: TextNote?, rootResourceId: ResourceId? = null): Long {
         val versionStorage = VersionStorage(getPath()!!)
         if (note != null) {
             val path = getPath()
             if (path != null) {
                 Files.list(path)
                 val newResourceId =
-                createTextNoteFile(
-                    path,
-                    JsonParser.parseNoteContentToJson(note.content),
-                )!!
-                if(newResourceId < 0){//Error creating TextNote file:
+                    createTextNoteFile(
+                        path,
+                        JsonParser.parseNoteContentToJson(note.content),
+                    )!!
+                if (newResourceId < 0) {//Error creating TextNote file:
                     return newResourceId
                 }
-                versionStorage.addVersion(newResourceId,rootResourceId)
+                versionStorage.addVersion(newResourceId, rootResourceId)
                 return newResourceId
             }
         }
         return CODES_CREATING_NOTE.NOTE_NOT_CREATED.errCode.toLong()
     }
 
-    fun deleteNote(note: TextNote,version:Version) {
+    fun deleteNote(note: TextNote, version: Version) {
         val notePath = getPath()?.resolve("${note.meta?.name}")
-        val versionPath = getPath()?.resolve(ARK_VERSIONS_DIR)?.resolve("${version.meta?.rootResourceId}")
+        val versionPath =
+            getPath()?.resolve(ARK_VERSIONS_DIR)?.resolve("${version.meta?.rootResourceId}")
         removeFileFromMemory(notePath)
         removeFileFromMemory(versionPath)
         //we should delete all notes listed in version that don't have been forked? by now it just deletes the last note.
@@ -54,7 +57,7 @@ class TextNotesRepository @Inject constructor() {
     fun getAllNotesWithHistory(): List<TextNote> {
         val versions = getAllVersions()
         val notes = mutableListOf<TextNote>()
-        for(ver in versions){
+        for (ver in versions) {
             val rootResourceId = ver.meta!!.rootResourceId
             val lastChildId = getLastChildrenId(rootResourceId)
             val note = getNote(lastChildId)
@@ -63,14 +66,14 @@ class TextNotesRepository @Inject constructor() {
         return notes
     }
 
-    fun getAllNotesFromVersion(rootResourceId:ResourceId): List<TextNote> {
+    fun getAllNotesFromVersion(rootResourceId: ResourceId): List<TextNote> {
         val versionStorage = VersionStorage(getPath()!!)
         val versions = versionStorage.versions(rootResourceId)
         val notes = mutableListOf<TextNote>()
-        val rootNote = getNote( rootResourceId )
+        val rootNote = getNote(rootResourceId)
         notes.add(rootNote)
-        for(noteResId in versions){
-            val note = getNote( noteResId )
+        for (noteResId in versions) {
+            val note = getNote(noteResId)
             notes.add(note)
         }
         return notes
@@ -81,17 +84,17 @@ class TextNotesRepository @Inject constructor() {
         val path = getPath()
         if (path != null) {
             val versionDir = File(path.toFile(), ARK_VERSIONS_DIR)
-            if(versionDir.exists() && versionDir.isDirectory ){
-                Files.list( versionDir.toPath() ).forEach { filePath ->
+            if (versionDir.exists() && versionDir.isDirectory) {
+                Files.list(versionDir.toPath()).forEach { filePath ->
                     try {
                         val fileName = filePath.fileName.toString()
-                        val rootResourceId:ResourceId = fileName.toLong()
+                        val rootResourceId: ResourceId = fileName.toLong()
                         val meta = VersionMeta(
                             rootResourceId
                         )
                         val versionStorage = VersionStorage(getPath()!!)
-                        val verContent = Version.Content( versionStorage.versions(rootResourceId) )
-                        val ver = Version(verContent,meta)
+                        val verContent = Version.Content(versionStorage.versions(rootResourceId))
+                        val ver = Version(verContent, meta)
                         versions.add(ver)
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -102,13 +105,13 @@ class TextNotesRepository @Inject constructor() {
         return versions
     }
 
-    private fun getLastChildrenId(rootResourceId: ResourceId):ResourceId {
+    private fun getLastChildrenId(rootResourceId: ResourceId): ResourceId {
         val path = getPath()
-        var lastChildResourceId:ResourceId? = null
+        var lastChildResourceId: ResourceId? = null
         if (path != null) {
             val versionDir = File(path.toFile(), ARK_VERSIONS_DIR)
             val versionFile = File(versionDir, rootResourceId.toString())
-            if(versionFile.exists()){
+            if (versionFile.exists()) {
                 val fileReader = FileReader(versionFile)
                 val bufferedReader = BufferedReader(fileReader)
                 val jsonVersion = StringBuilder()
@@ -117,13 +120,14 @@ class TextNotesRepository @Inject constructor() {
                         jsonVersion.append(it)
                     }
                 }
-                lastChildResourceId = if(jsonVersion.toString() == ""){
+                lastChildResourceId = if (jsonVersion.toString() == "") {
                     rootResourceId
-                }else{
-                    val versionContent = JsonParser.parseVersionContentFromJson( jsonVersion.toString() )
-                    if(versionContent.idList.isEmpty()){
+                } else {
+                    val versionContent =
+                        JsonParser.parseVersionContentFromJson(jsonVersion.toString())
+                    if (versionContent.idList.isEmpty()) {
                         rootResourceId
-                    }else{
+                    } else {
                         versionContent.idList.last()
                     }
                 }
@@ -132,9 +136,9 @@ class TextNotesRepository @Inject constructor() {
         return lastChildResourceId!!
     }
 
-    private fun getNote(ResourceId:ResourceId): TextNote {
+    private fun getNote(ResourceId: ResourceId): TextNote {
         val path = getPath()
-        var note:TextNote? = null
+        var note: TextNote? = null
         if (path != null) {
             val noteFile = File(path.toFile(), "$ResourceId.$NOTE_EXT")
             val notePath = noteFile.toPath()
@@ -157,7 +161,7 @@ class TextNotesRepository @Inject constructor() {
                     notePath.getLastModifiedTime(),
                     size
                 )
-                note = TextNote( textnoteContent,meta )
+                note = TextNote(textnoteContent, meta)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -165,7 +169,7 @@ class TextNotesRepository @Inject constructor() {
         return note!!
     }
 
-    private fun createTextNoteFile(path: Path?, noteString: String?):Long? {
+    private fun createTextNoteFile(path: Path?, noteString: String?): Long? {
         fun writeToFile(bufferedWriter: BufferedWriter) {
             with(bufferedWriter) {
                 write(noteString)
@@ -181,12 +185,12 @@ class TextNotesRepository @Inject constructor() {
                 writeToFile(bufferedWriter)
                 val id = computeId(Files.size(tempFile.toPath()), tempFile.toPath())
                 val noteFile = File(file, "$id.${NOTE_EXT}")
-                if(!noteFile.exists()){
+                if (!noteFile.exists()) {
                     if (tempFile.renameTo(noteFile))
                         Log.d("New filename", noteFile.name)
                     else
                         removeFileFromMemory(tempFile.toPath())
-                }else{//file already exists, since we use content-addressing, it means content already existed in another note.
+                } else {//file already exists, since we use content-addressing, it means content already existed in another note.
                     //for the time being, we just ban having same content.
                     removeFileFromMemory(tempFile.toPath())
                     return CODES_CREATING_NOTE.NOTE_ALREADY_EXISTS.errCode.toLong()
@@ -220,7 +224,7 @@ class TextNotesRepository @Inject constructor() {
 
     companion object {
         const val NOTE_EXT = "note"
-        private const val DUMMY_FILENAME =  "Note"
-        private const val ARK_VERSIONS_DIR =  ".ark/versions"
+        private const val DUMMY_FILENAME = "Note"
+        private const val ARK_VERSIONS_DIR = ".ark/versions"
     }
 }

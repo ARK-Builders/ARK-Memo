@@ -14,7 +14,7 @@ import org.acra.sender.HttpSender
 import space.taran.arkmemo.space.taran.arkmemo.utils.Config
 
 @HiltAndroidApp
-class App: Application() {
+class App : Application() {
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
