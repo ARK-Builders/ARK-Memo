@@ -19,6 +19,7 @@
         android:layout_marginBottom="20dp"
         android:clickable="true"
         android:contentDescription="@string/new_note"
+        android:visibility="gone"
         android:src="@drawable/add" />
 
     <Button
@@ -27,5 +28,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
         android:layout_marginBottom="10dp"
+        android:visibility="gone"
         android:text="@string/paste" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

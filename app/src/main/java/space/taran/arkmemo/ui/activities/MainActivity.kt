@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import space.taran.arkfilepicker.onArkPathPicked
+import space.taran.arkfilepicker.presentation.onArkPathPicked
 import space.taran.arkmemo.R
 import space.taran.arkmemo.contracts.PermissionContract
 import space.taran.arkmemo.databinding.ActivityMainBinding
@@ -21,6 +21,7 @@ import space.taran.arkmemo.files.FilePicker
 import space.taran.arkmemo.preferences.MemoPreferences
 import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
 import space.taran.arkmemo.ui.fragments.SettingsFragment
+import space.taran.arkmemo.ui.fragments.TextNoteVersionsFragment
 import space.taran.arkmemo.ui.fragments.TextNotesFragment
 
 @AndroidEntryPoint
@@ -56,10 +57,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
 
-        fun showFragment(){
+        fun showFragment() {
             val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
             if (textDataFromIntent != null) {
                 fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
@@ -99,8 +100,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         this.menu = menu
-        if(fragment.tag != TextNotesFragment.TAG)
-            showSettingsButton(false)
+        if(
+            fragment.tag == TextNotesFragment.TAG ||
+            fragment.tag == TextNoteVersionsFragment.TAG
+        )
+            showSettingsButton(true)
+        else showSettingsButton(false)
         return true
     }
 
@@ -124,10 +129,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             val settingsItem = menu?.findItem(R.id.settings)
             settingsItem?.isVisible = show
         }
-    }
-
-    fun showFragment(){
-
     }
 
     companion object{

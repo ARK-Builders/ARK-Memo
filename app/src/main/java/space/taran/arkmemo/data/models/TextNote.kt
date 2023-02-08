@@ -1,4 +1,4 @@
-package space.taran.arkmemo.models
+package space.taran.arkmemo.data.models
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -8,11 +8,17 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TextNote (
-    val content: Content,
+    var content: Content,
     @IgnoredOnParcel
     val meta: ResourceMeta? = null
 ): Parcelable
 {
+    fun putContent(content: Content) {
+        this.content = content
+    }
+
+    fun isNotEmpty() = content.data.isNotEmpty()
+
     @Parcelize
     data class Content(
         val title: String,

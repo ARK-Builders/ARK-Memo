@@ -26,5 +26,7 @@
     <string name="ark_memo_cancel">Cancel</string>
     <string name="ark_memo_delete_warn">Are you sure to delete note?</string>
     <string name="ark_memo_note_saved">Note saved successfully.</string>
-
+    <string name="ark_memo_track_versions">Track versions</string>
+    <string name="ark_memo_history">History</string>
+    <string name="ark_memo_old_version">Older version</string>
 </resources>

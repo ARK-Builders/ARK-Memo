@@ -1,7 +1,8 @@
-package space.taran.arkmemo.space.taran.arkmemo.utils
+package space.taran.arkmemo.utils
 
 import android.content.Context
 import com.simplemobiletools.commons.helpers.BaseConfig
+import space.taran.arkmemo.space.taran.arkmemo.utils.CRASH_REPORT_ENABLE
 
 class Config(context: Context) : BaseConfig(context) {
     companion object {

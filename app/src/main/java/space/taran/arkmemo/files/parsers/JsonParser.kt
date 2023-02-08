@@ -1,7 +1,7 @@
 package space.taran.arkmemo.files.parsers
 
 import com.google.gson.Gson
-import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.data.models.TextNote
 
 class JsonParser {
     companion object{

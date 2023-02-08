@@ -1,21 +1,28 @@
 package space.taran.arkmemo.ui.fragments
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.EditTextNotesViewModel
-import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
 import space.taran.arkmemo.databinding.FragmentEditTextNotesBinding
-import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.data.models.TextNote
+import space.taran.arkmemo.data.viewmodels.VersionsViewModel
 import space.taran.arkmemo.ui.activities.MainActivity
 
 @AndroidEntryPoint
@@ -26,15 +33,25 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
     }
 
     private val editViewModel: EditTextNotesViewModel by viewModels()
+    private val versionsViewModel: VersionsViewModel by activityViewModels()
 
     private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
 
-    private var note: TextNote? = null
+    private var note =  TextNote(
+        TextNote.Content("", "")
+    )
+
     private var noteStr: String? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        lifecycleScope.launch {
+            versionsViewModel.init()
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var note:TextNote? = null
         val editTextListener = object: TextWatcher{
             override fun afterTextChanged(s: Editable?) = Unit
 
@@ -54,9 +71,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
                         title = title,
                         data = noteString
                     )
-                    note = TextNote(
-                        content = content
-                    )
+                    note.putContent(content)
                 }
             }
         }
@@ -64,32 +79,61 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         val saveNoteButton = binding.saveNote
 
         if(arguments != null) {
-            this.note = requireArguments().getParcelable(NOTE_KEY)
-            //Log.d("Note", "${this.note?.content}")
+            this.note = requireArguments().getParcelable(NOTE_KEY)!!
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
+            if (noteStr != null) {
+                val title = noteStr?.split("\n")?.get(0)!!
+                note.putContent(
+                    TextNote.Content(
+                        title = title,
+                        data = noteStr!!
+                    )
+                )
+            }
         }
 
-        activity.title = getString(R.string.edit_note)
+        if (
+            versionsViewModel.isVersioned(note) &&
+            !versionsViewModel.isLatestVersion(note)
+        ) {
+            activity.title = getString(R.string.ark_memo_old_version)
+            editNote.isClickable = false
+            editNote.isFocusable = false
+            editNote.setBackgroundColor(Color.LTGRAY)
+        } else {
+            val inputMethodManager = requireContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE)
+                    as InputMethodManager
+            editNote.requestFocus()
+            inputMethodManager.showSoftInput(editNote, SHOW_IMPLICIT)
+            activity.title = getString(R.string.edit_note)
+            editNote.addTextChangedListener(editTextListener)
+        }
+
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
-        editNote.requestFocus()
-        editNote.addTextChangedListener(editTextListener)
+        editNote.setText(note.content.data)
 
-        if(this.note != null)
-            editNote.setText(this.note?.content?.data!!)
-
-        if(noteStr != null)
-            editNote.setText(noteStr)
-
-        saveNoteButton.setOnClickListener {
-            if(note != null) {
-                with(editViewModel){
-                    saveNote(note!!)
-                    Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
-                        Toast.LENGTH_SHORT)
-                        .show()
-                    activity.onBackPressed()
+        saveNoteButton.apply {
+            isVisible = versionsViewModel.isLatestVersion(note) ||
+                    versionsViewModel.isNotVersionedYet(note)
+            if (isVisible) {
+                setOnClickListener {
+                    if (note.isNotEmpty()) {
+                        with(editViewModel) {
+                            saveNote(note) { note, newId ->
+                                versionsViewModel.addNoteToVersions(note, newId)
+                                versionsViewModel.emitLatestVersionNoteId(newId)
+                            }
+                            Toast.makeText(
+                                requireContext(), getString(R.string.ark_memo_note_saved),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                            activity.onBackPressedDispatcher.onBackPressed()
+                        }
+                    }
                 }
             }
         }
@@ -97,7 +141,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
 
     companion object{
-        const val TAG = "Edit Text Notes"
+        const val TAG = "edit-text-notes-fragment"
         private const val NOTE_STRING_KEY = "note string"
         private const val NOTE_KEY = "note key"
 
