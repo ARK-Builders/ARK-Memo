@@ -84,7 +84,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
 
-    implementation 'com.github.ark-builders:ark-filepicker:ae2c37ea87'
+    implementation 'com.github.ARK-Builders:ark-filepicker:c6d66141c1'
     implementation 'space.taran:arklib:0.1.0-SNAPSHOT-cb4314df78'
 
     implementation 'ch.acra:acra-http:5.9.5'

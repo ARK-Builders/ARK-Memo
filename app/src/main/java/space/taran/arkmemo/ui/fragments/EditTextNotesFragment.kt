@@ -2,10 +2,10 @@ package space.taran.arkmemo.ui.fragments
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
@@ -79,7 +79,9 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         val saveNoteButton = binding.saveNote
 
         if(arguments != null) {
-            this.note = requireArguments().getParcelable(NOTE_KEY)!!
+            this.note = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)!!
+            else requireArguments().getParcelable(NOTE_KEY)!!
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
             if (noteStr != null) {
                 val title = noteStr?.split("\n")?.get(0)!!
