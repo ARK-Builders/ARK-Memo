@@ -2,14 +2,13 @@ package space.taran.arkmemo.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,9 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import space.taran.arkmemo.R
 import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
 import space.taran.arkmemo.databinding.FragmentTextNotesBinding
@@ -39,6 +36,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
+    private val mainScope = MainScope()
     private val textNotesViewModel: TextNotesViewModel by activityViewModels()
     private val versionsViewModel: VersionsViewModel by activityViewModels()
 
@@ -59,6 +57,37 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
             activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
         }
         else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
+    }
+
+    private var showButtons = false
+
+    private fun delayHide() {
+        if (showButtons) {
+            mainScope.launch {
+                delay(DELAY_HIDE)
+                hide()
+            }
+        }
+    }
+
+    private fun hide() {
+        newNoteButton.isVisible = false
+        pasteNoteButton.isVisible = false
+    }
+
+    private fun maintainButtonsVisibility() {
+        newNoteButton.isVisible = showButtons
+        pasteNoteButton.isVisible = showButtons
+    }
+
+    private fun toggle() {
+        newNoteButton.apply {
+            isVisible = !isVisible
+        }
+        pasteNoteButton.apply {
+            isVisible = !isVisible
+            showButtons = isVisible
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -83,6 +112,23 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
             isVisible = true
             setOnClickListener(pasteNoteClickListener)
         }
+
+        delayHide()
+        recyclerView.apply {
+            setOnClickListener {
+                toggle()
+            }
+            setOnTouchListener { view1, motionEvent ->
+                view1.onTouchEvent(motionEvent)
+                when (motionEvent.action) {
+                    MotionEvent.ACTION_DOWN -> view1.performClick()
+                    MotionEvent.ACTION_MOVE -> maintainButtonsVisibility()
+                    MotionEvent.ACTION_UP -> delayHide()
+                }
+                true
+            }
+        }
+
         lifecycleScope.launch {
             viewLifecycleOwner.apply {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -112,8 +158,14 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         activity.fragment = this
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mainScope.cancel()
+    }
+
     companion object{
-        const val TAG = "Text Notes Fragment"
+        const val TAG = "text-notes-fragment"
+        const val DELAY_HIDE = 10000L
     }
 }
 
@@ -128,8 +180,8 @@ fun Fragment.deleteTextNote(note: TextNote){
             viewModel.collectAllNotes {
                 it.filter { note1 ->
                     note.meta?.id == note1.meta?.id ||
-                    versionsViewModel.getNoteParentsFromVersions(note)
-                        .contains(note1.meta?.id!!)
+                            versionsViewModel.getNoteParentsFromVersions(note)
+                                .contains(note1.meta?.id!!)
                 }
                     .forEach { note2 ->
                         viewModel.deleteNote(note2)
