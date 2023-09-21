@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.data.repo.notes.text.TextNotesRepo
 import space.taran.arkmemo.data.models.TextNote
@@ -33,5 +34,20 @@ class TextNotesViewModel @Inject constructor(): ViewModel() {
         textNotes.collect {
             emit(it)
         }
+    }
+
+    fun computeId() {
+
+    }
+    fun noteExists(note: TextNote): Boolean {
+        var exists = false
+        viewModelScope.launch {
+            textNotes.collect { notes ->
+                exists = notes.any {
+                    it.meta?.id == note.meta?.id
+                }
+            }
+        }
+        return exists
     }
 }

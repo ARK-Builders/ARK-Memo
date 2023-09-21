@@ -9,6 +9,8 @@ plugins {
 android {
     compileSdk 33
 
+    namespace 'space.taran.arkmemo'
+
     defaultConfig {
         applicationId "space.taran.arkmemo"
         minSdk 26
@@ -85,7 +87,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
 
     implementation 'com.github.ARK-Builders:ark-filepicker:c6d66141c1'
-    implementation 'space.taran:arklib:0.1.0-SNAPSHOT-cb4314df78'
+    implementation 'dev.arkbuilders:arklib:0.3.1'
 
     implementation 'ch.acra:acra-http:5.9.5'
     implementation 'ch.acra:acra-dialog:5.9.5'

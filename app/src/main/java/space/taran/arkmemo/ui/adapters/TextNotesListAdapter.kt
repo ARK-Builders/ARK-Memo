@@ -25,6 +25,7 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
     var showLatestNoteIcon: (TextNote) -> Boolean = {
         false
     }
+    private var showVersionsFork = false
 
     fun setActivity(activity: AppCompatActivity){
         this.activity = activity as MainActivity
@@ -36,6 +37,10 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
 
     fun showVersionsTracker(show: Boolean) {
         showVersionsTracker = show
+    }
+
+    fun showVersionsFork(show: Boolean) {
+        showVersionsFork = show
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -61,9 +66,11 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
         val ivLatestNote = binding.ivLatestNote
 
         private val clickNoteToEditListener = View.OnClickListener {
-            val selectedNote = notes[bindingAdapterPosition]
-            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
-            activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
+            editNote()
+        }
+
+        private val forkNoteToEditListener = View.OnClickListener {
+            editNote(true)
         }
 
         private val deleteNoteClickListener = View.OnClickListener {
@@ -87,7 +94,17 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
                 isVisible = showVersionsTracker
                 setOnClickListener(trackVersionsListener)
             }
+            binding.btnForkVersions.apply {
+                isVisible = showVersionsFork
+                setOnClickListener(forkNoteToEditListener)
+            }
         }
 
+        private fun editNote(forked: Boolean = false) {
+            val selectedNote = notes[bindingAdapterPosition]
+            selectedNote.isForked = forked
+            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
+            activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
+        }
     }
 }

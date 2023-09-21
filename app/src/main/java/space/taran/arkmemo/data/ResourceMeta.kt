@@ -1,7 +1,7 @@
 package space.taran.arkmemo.data
 
+import dev.arkbuilders.arklib.ResourceId
 import java.nio.file.attribute.FileTime
-import space.taran.arklib.ResourceId
 
 data class ResourceMeta(
     val id: ResourceId,

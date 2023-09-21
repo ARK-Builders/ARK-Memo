@@ -3,9 +3,9 @@ package space.taran.arkmemo.data.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arklib.ResourceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import space.taran.arklib.ResourceId
 import space.taran.arkmemo.data.repo.notes.text.TextNotesRepo
 import space.taran.arkmemo.data.models.TextNote
 import javax.inject.Inject

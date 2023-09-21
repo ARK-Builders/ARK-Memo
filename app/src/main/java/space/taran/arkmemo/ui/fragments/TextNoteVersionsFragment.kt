@@ -69,6 +69,7 @@ class TextNoteVersionsFragment: Fragment(R.layout.fragment_text_notes) {
                         val layoutManager = LinearLayoutManager(requireContext())
                         adapter.setActivity(activity)
                         adapter.setFragmentManager(childFragmentManager)
+                        adapter.showVersionsFork(true)
                         adapter.showLatestNoteIcon = { note ->
                             versionsViewModel.isLatestVersion(note) ||
                                     versionsViewModel.isNotVersionedYet(note)

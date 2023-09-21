@@ -3,11 +3,11 @@ package space.taran.arkmemo.data.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arklib.ResourceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import space.taran.arklib.ResourceId
 import space.taran.arkmemo.data.models.TextNote
 import space.taran.arkmemo.data.models.Version
 import space.taran.arkmemo.data.repo.versions.VersionStorage
@@ -38,7 +38,7 @@ class VersionsViewModel @Inject constructor(): ViewModel() {
     }
 
     fun getNoteParentsFromVersions(note: TextNote): List<ResourceId> {
-        return versionStorage.parentsTreeByChild(note.meta?.id!!)[note.meta.id]!!
+        return versionStorage.parentsTreeByChild(note.meta?.id!!)[note.meta?.id]!!
     }
 
     fun addNoteToVersions(note: TextNote, newId: ResourceId) {

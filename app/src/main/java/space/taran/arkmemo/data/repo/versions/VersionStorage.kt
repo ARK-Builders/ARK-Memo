@@ -1,6 +1,6 @@
 package space.taran.arkmemo.data.repo.versions
 
-import space.taran.arklib.ResourceId
+import dev.arkbuilders.arklib.ResourceId
 import space.taran.arkmemo.data.models.Version
 
 interface VersionStorage {

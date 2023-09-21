@@ -14,7 +14,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -52,6 +54,8 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val editNote = binding.editNote
+        val saveNoteButton = binding.saveNote
         val editTextListener = object: TextWatcher{
             override fun afterTextChanged(s: Editable?) = Unit
 
@@ -72,37 +76,18 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
                         data = noteString
                     )
                     note.putContent(content)
+                    if (note.isForked) {
+                        lifecycleScope.launchWhenStarted {
+                            note.hasChanged {
+                                saveNoteButton.isEnabled = it
+                            }
+                        }
+                    }
                 }
             }
         }
-        val editNote = binding.editNote
-        val saveNoteButton = binding.saveNote
 
-        if(arguments != null) {
-            this.note = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)!!
-            else requireArguments().getParcelable(NOTE_KEY)!!
-            noteStr = requireArguments().getString(NOTE_STRING_KEY)
-            if (noteStr != null) {
-                val title = noteStr?.split("\n")?.get(0)!!
-                note.putContent(
-                    TextNote.Content(
-                        title = title,
-                        data = noteStr!!
-                    )
-                )
-            }
-        }
-
-        if (
-            versionsViewModel.isVersioned(note) &&
-            !versionsViewModel.isLatestVersion(note)
-        ) {
-            activity.title = getString(R.string.ark_memo_old_version)
-            editNote.isClickable = false
-            editNote.isFocusable = false
-            editNote.setBackgroundColor(Color.LTGRAY)
-        } else {
+        fun setupKeyboard() {
             val inputMethodManager = requireContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE)
                     as InputMethodManager
@@ -112,6 +97,34 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
             editNote.addTextChangedListener(editTextListener)
         }
 
+        if(arguments != null) {
+            val note = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)
+            else requireArguments().getParcelable(NOTE_KEY)
+            noteStr = requireArguments().getString(NOTE_STRING_KEY)
+            if (note != null) this.note = note
+            if (noteStr != null) {
+                val title = noteStr?.split("\n")?.get(0)!!
+                this.note.putContent(
+                    TextNote.Content(
+                        title = title,
+                        data = noteStr!!
+                    )
+                )
+            }
+        }
+
+        if (
+            versionsViewModel.isVersioned(note) && !versionsViewModel.isLatestVersion(note)
+        ) {
+            if (note.isForked) setupKeyboard() else {
+                activity.title = getString(R.string.ark_memo_old_version)
+                editNote.isClickable = false
+                editNote.isFocusable = false
+                editNote.setBackgroundColor(Color.LTGRAY)
+            }
+        } else setupKeyboard()
+
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
@@ -119,7 +132,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
         saveNoteButton.apply {
             isVisible = versionsViewModel.isLatestVersion(note) ||
-                    versionsViewModel.isNotVersionedYet(note)
+                    versionsViewModel.isNotVersionedYet(note) || note.isForked
             if (isVisible) {
                 setOnClickListener {
                     if (note.isNotEmpty()) {

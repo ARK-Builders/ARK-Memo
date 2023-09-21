@@ -3,13 +3,11 @@ package space.taran.arkmemo.data.repo.notes.text
 import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
-import space.taran.arklib.ResourceId
-import space.taran.arklib.computeId
+import dev.arkbuilders.arklib.ResourceId
+import dev.arkbuilders.arklib.computeId
 import space.taran.arkmemo.data.ResourceMeta
 import space.taran.arkmemo.files.parsers.JsonParser
 import space.taran.arkmemo.data.models.TextNote
-import space.taran.arkmemo.data.models.Version
-import space.taran.arkmemo.data.repo.versions.VersionStorageRepo
 import space.taran.arkmemo.preferences.MemoPreferences
 import java.io.*
 import java.nio.file.Files
