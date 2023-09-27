@@ -34,7 +34,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         requireActivity() as MainActivity
     }
 
-    private val editViewModel: EditTextNotesViewModel by viewModels()
+    private val editViewModel: EditTextNotesViewModel by activityViewModels()
     private val versionsViewModel: VersionsViewModel by activityViewModels()
 
     private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
