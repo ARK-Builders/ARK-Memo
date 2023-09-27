@@ -3,10 +3,7 @@ package space.taran.arkmemo.data.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.data.repositories.TextNotesRepository
