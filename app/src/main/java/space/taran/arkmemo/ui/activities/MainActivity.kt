@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import space.taran.arkfilepicker.onArkPathPicked
+import space.taran.arkfilepicker.presentation.onArkPathPicked
 import space.taran.arkmemo.R
 import space.taran.arkmemo.contracts.PermissionContract
 import space.taran.arkmemo.databinding.ActivityMainBinding
@@ -51,15 +51,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        System.loadLibrary("arklib")
-
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
 
-        fun showFragment(){
+        fun showFragment() {
             val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
             if (textDataFromIntent != null) {
                 fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
@@ -85,7 +83,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         }
 
-        if (MemoPreferences.getInstance(this).getPath() == null) {
+        if (MemoPreferences.getInstance(this).getPathString() == null) {
             FilePicker.show(this, supportFragmentManager)
 
             supportFragmentManager.onArkPathPicked(this) {

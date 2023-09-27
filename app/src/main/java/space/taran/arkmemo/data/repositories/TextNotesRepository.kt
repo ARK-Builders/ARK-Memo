@@ -1,139 +1,150 @@
 package space.taran.arkmemo.data.repositories
 
-import android.content.Context
 import android.util.Log
-import dagger.hilt.android.qualifiers.ApplicationContext
-import space.taran.arklib.computeId
+import dev.arkbuilders.arklib.computeId
+import dev.arkbuilders.arklib.data.index.RootIndex
+import dev.arkbuilders.arklib.user.properties.Properties
+import dev.arkbuilders.arklib.user.properties.PropertiesStorage
+import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import space.taran.arkmemo.data.ResourceMeta
-import space.taran.arkmemo.files.parsers.JsonParser
 import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.preferences.MemoPreferences
-import java.io.*
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 
+@Singleton
 class TextNotesRepository @Inject constructor() {
 
-    @Inject @ApplicationContext lateinit var context: Context
+    private val _textNotes = MutableStateFlow(listOf<TextNote>())
+    val textNotes: StateFlow<List<TextNote>> = _textNotes
 
-    fun saveNote(note: TextNote?) {
+    private val iODispatcher = Dispatchers.IO
+
+    private lateinit var propertiesStorage: PropertiesStorage
+    private lateinit var propertiesStorageRepo: PropertiesStorageRepo
+
+    private lateinit var root: Path
+
+    fun init(root: Path, scope: CoroutineScope) {
+        this.root = root
+        scope.launch(iODispatcher) {
+            propertiesStorageRepo = PropertiesStorageRepo(this)
+            propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
+            readAllNotes()
+        }
+    }
+
+    suspend fun saveNote(note: TextNote?) {
         if (note != null) {
-            val path = getPath()
-            if (path != null) {
-                Files.list(path)
-                createTextNoteFile(
-                    path,
-                    JsonParser.parseNoteToJson(note.content),
-                )
+            withContext(iODispatcher) {
+                writeTextNoteFile(note.content)
+                readAllNotes()
             }
         }
     }
 
-    fun deleteNote(note: TextNote) {
-        val filePath = getPath()?.resolve("${note.meta?.name}")
+    suspend fun deleteNote(note: TextNote) = withContext(iODispatcher) {
+        val filePath = root.resolve("${note.meta?.name}")
         removeFileFromMemory(filePath)
-        Log.d("Deleted", note.meta?.name!!)
+        propertiesStorage.remove(note.meta?.id!!)
+        propertiesStorage.persist()
+        Log.d("notes-repo", "${note.meta.name} has been deleted")
+        readAllNotes()
     }
 
-    fun getAllNotes(): List<TextNote> {
+    private suspend fun readAllNotes() {
         val notes = mutableListOf<TextNote>()
-        val path = getPath()
-        var number = 0
-        if (path != null) {
-            Files.list(path).forEach { filePath ->
-                if (filePath.fileName.extension == NOTE_EXT) {
-                    number += 1
-                    try {
-                        val jsonFile = filePath.toFile()
-                        val fileReader = FileReader(jsonFile)
-                        val bufferedReader = BufferedReader(fileReader)
-                        val jsonTextNote = StringBuilder()
-                        with(bufferedReader) {
-                            forEachLine {
-                                jsonTextNote.append(it)
-                            }
-                            val content = JsonParser.parseNoteFromJson(jsonTextNote.toString())
-                            val size = Files.size(filePath)
-                            val id = computeId(size, filePath)
-                            val meta = ResourceMeta(
-                                id,
-                                filePath.fileName.toString(),
-                                filePath.extension,
-                                filePath.getLastModifiedTime(),
-                                size
-                            )
-
-                            val note = TextNote(content, meta)
-                            notes.add(note)
-                            close()
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
-        return notes
-    }
-
-    private fun createTextNoteFile(path: Path?, noteString: String?) {
-        fun writeToFile(bufferedWriter: BufferedWriter) {
-            with(bufferedWriter) {
-                write(noteString)
-                close()
-            }
-        }
-        if (path != null) {
-            val file = path.toFile()
-            val noteFile = File(file, "${DUMMY_FILENAME}.${NOTE_EXT}")
-            if (!noteFile.exists()) {
+        Files.list(root).forEach { filePath ->
+            if (filePath.fileName.extension == NOTE_EXT) {
                 try {
-                    val fileWriter = FileWriter(noteFile)
-                    val bufferedWriter = BufferedWriter(fileWriter)
-                    writeToFile(bufferedWriter)
-
-                    val id = computeId(Files.size(noteFile.toPath()), noteFile.toPath())
-
-                    Log.d("Filename", noteFile.name)
-
-                    with(noteFile){
-                        val newFile = File(file, "$id.${NOTE_EXT}")
-
-                        if(!newFile.exists())
-                            if (renameTo(newFile))
-                                Log.d("New filename", newFile.name)
-                            else
-                                removeFileFromMemory(noteFile.toPath())
-
+                    val file = filePath.toFile()
+                    val fileReader = FileReader(file)
+                    val bufferedReader = BufferedReader(fileReader)
+                    val data = StringBuilder()
+                    with(bufferedReader) {
+                        forEachLine {
+                            data.append(it)
+                        }
+                        val size = Files.size(filePath)
+                        val id = computeId(size, filePath)
+                        val meta = ResourceMeta(
+                            id,
+                            filePath.fileName.toString(),
+                            filePath.extension,
+                            filePath.getLastModifiedTime(),
+                            size
+                        )
+                        val titles = propertiesStorage.getProperties(id).titles
+                        val content = TextNote.Content(titles.elementAt(0), data.toString())
+                        val note = TextNote(content, meta)
+                        notes.add(note)
+                        close()
                     }
-
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
         }
+        Log.d("notes-repo", "notes ${notes.size}")
+        _textNotes.emit(notes)
     }
 
-    private fun removeFileFromMemory(path: Path?) {
-        if (path != null)
-            Files.deleteIfExists(path)
-    }
+    private suspend fun writeTextNoteFile(content: TextNote.Content) = withContext(Dispatchers.IO) {
+        val file = root.toFile()
+        val noteFile = File(file, "${DUMMY_FILENAME}.${NOTE_EXT}")
+        if (!noteFile.exists()) {
+            try {
+                val fileWriter = FileWriter(noteFile)
+                val bufferedWriter = BufferedWriter(fileWriter)
+                writeToFile(bufferedWriter, content.data)
 
-    private fun getPath(): Path? {
-        val prefs = MemoPreferences.getInstance(context)
-        val pathString = prefs.getPath()
-        var path: Path? = null
-        try {
-            val file = File(pathString!!)
-            file.mkdir()
-            path = file.toPath()
-        } catch (e: Exception) {
-            e.printStackTrace()
+                val id = computeId(Files.size(noteFile.toPath()), noteFile.toPath())
+
+                val properties = Properties(setOf(content.title), setOf())
+
+                Log.d("notes-repo", "filename ${noteFile.name}")
+
+                propertiesStorage.setProperties(id, properties)
+                propertiesStorage.persist()
+
+                with(noteFile) {
+                    val newFile = File(file, "${id.crc32}.${NOTE_EXT}")
+
+                    if (!newFile.exists())
+                        if (renameTo(newFile))
+                            Log.d("notes-repo", "new filename ${newFile.name}")
+                        else
+                            removeFileFromMemory(this.toPath())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
-        return path
+    }
+
+    private fun writeToFile(bufferedWriter: BufferedWriter, string: String) {
+        with(bufferedWriter) {
+            write(string)
+            close()
+        }
+    }
+
+    private fun removeFileFromMemory(filePath: Path) {
+        Files.deleteIfExists(filePath)
     }
 
     companion object {

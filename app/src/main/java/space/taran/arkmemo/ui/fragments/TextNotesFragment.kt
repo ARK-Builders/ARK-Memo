@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,7 +33,8 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
-    private val textNotesViewModel: TextNotesViewModel by viewModels()
+
+    private val textNotesViewModel: TextNotesViewModel by activityViewModels()
 
     private lateinit var newNoteButton: FloatingActionButton
     private lateinit var pasteNoteButton: Button
@@ -53,6 +55,11 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        textNotesViewModel.init()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = binding.include.recyclerView
@@ -65,7 +72,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         lifecycleScope.launch {
             viewLifecycleOwner.apply{
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    textNotesViewModel.getAllNotes().collect {
+                    textNotesViewModel.getAllLatestNotes {
                         val adapter = TextNotesListAdapter(it)
                         val layoutManager = LinearLayoutManager(requireContext())
                         adapter.setActivity(activity)

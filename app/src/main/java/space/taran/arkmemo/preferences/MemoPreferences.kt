@@ -2,6 +2,8 @@ package space.taran.arkmemo.preferences
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import java.io.File
+import java.nio.file.Path
 
 class MemoPreferences private constructor(context: Context) {
     private val sharedPreferences = context.getSharedPreferences(NAME, MODE_PRIVATE)
@@ -14,7 +16,20 @@ class MemoPreferences private constructor(context: Context) {
         }
     }
 
-    fun getPath() = sharedPreferences.getString(CURRENT_NOTES_PATH, null)
+    fun getPathString() = sharedPreferences.getString(CURRENT_NOTES_PATH, null)
+
+    fun getPath(): Path? {
+        val pathString = getPathString()
+        var path: Path? = null
+        try {
+            val file = File(pathString!!)
+            file.mkdir()
+            path = file.toPath()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return path
+    }
 
     companion object{
         private const val NAME = "memo_prefs"
@@ -26,5 +41,7 @@ class MemoPreferences private constructor(context: Context) {
                 preferences = MemoPreferences(context)
             return preferences!!
         }
+
+        fun getInstance() = preferences!!
     }
 }
