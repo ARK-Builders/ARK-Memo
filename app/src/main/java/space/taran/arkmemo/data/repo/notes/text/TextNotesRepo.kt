@@ -5,6 +5,8 @@ import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.computeId
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import space.taran.arkmemo.data.ResourceMeta
 import space.taran.arkmemo.files.parsers.JsonParser
 import space.taran.arkmemo.data.models.TextNote
@@ -13,13 +15,17 @@ import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.io.path.*
 
+@Singleton
 class TextNotesRepo @Inject constructor() {
 
     @Inject @ApplicationContext lateinit var context: Context
 
-    fun saveNote(note: TextNote): ResourceId {
+    private val _textNotes = MutableStateFlow(listOf<TextNote>())
+    val textNotes: StateFlow<List<TextNote>> = _textNotes
+    suspend fun saveNote(note: TextNote): ResourceId {
         var id: ResourceId? = null
         val path = MemoPreferences.getInstance(context)
             .getPath()
@@ -30,13 +36,15 @@ class TextNotesRepo @Inject constructor() {
                 note
             )
         }
+        _textNotes.emit(getAllNotes())
         return id!!
     }
 
-    fun deleteNote(note: TextNote) {
+    suspend fun deleteNote(note: TextNote) {
         val filePath = MemoPreferences.getInstance(context)
             .getPath()?.resolve("${note.meta?.name}")
         removeFileFromMemory(filePath)
+        _textNotes.emit(getAllNotes())
         Log.d("text-notes-repo", "deleted ${note.meta?.name!!}")
     }
 
