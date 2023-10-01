@@ -62,10 +62,8 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         }
         val editNote = binding.editNote
         val saveNoteButton = binding.saveNote
-
         if(arguments != null) {
             this.note = requireArguments().getParcelable(NOTE_KEY)
-            //Log.d("Note", "${this.note?.content}")
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
         }
 
