@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -62,6 +63,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         }
         val editNote = binding.editNote
         val saveNoteButton = binding.saveNote
+        editNote.isVisible = true
         if(arguments != null) {
             this.note = requireArguments().getParcelable(NOTE_KEY)
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
@@ -82,13 +84,13 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
         saveNoteButton.setOnClickListener {
             if(note != null) {
-                with(editViewModel){
-                    saveNote(note!!)
-                    Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
-                        Toast.LENGTH_SHORT)
-                        .show()
-                    activity.onBackPressed()
-                }
+                editViewModel.saveNote(note!!)
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.ark_memo_note_saved),
+                    Toast.LENGTH_SHORT
+                ).show()
+                activity.onBackPressedDispatcher.onBackPressed()
             }
         }
     }

@@ -16,10 +16,21 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="20dp"
+        android:layout_marginBottom="90dp"
+        android:clickable="true"
+        android:contentDescription="@string/new_note"
+        android:src="@drawable/ic_create" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newGraphicNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:clickable="true"
         android:contentDescription="@string/new_note"
-        android:src="@drawable/add" />
+        android:src="@drawable/ic_brush" />
 
     <Button
         android:id="@+id/pasteNote"

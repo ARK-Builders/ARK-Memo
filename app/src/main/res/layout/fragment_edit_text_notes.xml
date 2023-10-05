@@ -5,6 +5,10 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/editView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <EditText
         android:id="@+id/editNote"
         android:layout_width="match_parent"
@@ -16,6 +20,7 @@
         android:ems="10"
         android:focusedByDefault="true"
         android:gravity="start|top"
+        android:visibility="gone"
         android:hint="@string/start_text_note"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
@@ -24,7 +29,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
+    <space.taran.arkmemo.ui.views.NotesCanvas
+        android:id="@+id/notesCanvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="80dp"
+        android:paddingTop="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/saveNote"
         android:layout_width="150dp"
@@ -33,7 +51,7 @@
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="@string/save"
-        app:layout_constraintBottom_toBottomOf="@id/editNote"
+        app:layout_constraintBottom_toBottomOf="@id/editView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

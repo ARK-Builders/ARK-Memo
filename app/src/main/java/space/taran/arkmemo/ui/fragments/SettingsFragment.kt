@@ -3,7 +3,7 @@ package space.taran.arkmemo.ui.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.preference.PreferenceFragmentCompat
-import space.taran.arkfilepicker.onArkPathPicked
+import space.taran.arkfilepicker.presentation.onArkPathPicked
 import space.taran.arkmemo.R
 import space.taran.arkmemo.files.FilePicker
 import space.taran.arkmemo.preferences.MemoPreferences

@@ -35,6 +35,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     private val textNotesViewModel: TextNotesViewModel by viewModels()
 
     private lateinit var newNoteButton: FloatingActionButton
+    private lateinit var newGraphicalNoteButton: FloatingActionButton
     private lateinit var pasteNoteButton: Button
 
     private lateinit var recyclerView: RecyclerView
@@ -42,6 +43,11 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     private val newNoteClickListener = View.OnClickListener{
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+    }
+
+    private val newGraphicalNoteClickListener = View.OnClickListener{
+        activity.fragment = EditGraphicalNotes.newInstance()
+        activity.replaceFragment(activity.fragment, EditGraphicalNotes.TAG)
     }
 
     private val pasteNoteClickListener = View.OnClickListener {
@@ -60,7 +66,9 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         newNoteButton = binding.newNote
         pasteNoteButton = binding.pasteNote
+        newGraphicalNoteButton = binding.newGraphicNote
         newNoteButton.setOnClickListener(newNoteClickListener)
+        newGraphicalNoteButton.setOnClickListener(newGraphicalNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
         lifecycleScope.launch {
             viewLifecycleOwner.apply{

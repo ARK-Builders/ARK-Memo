@@ -3,7 +3,7 @@ package space.taran.arkmemo.data.repositories
 import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
-import space.taran.arklib.computeId
+import dev.arkbuilders.arklib.computeId
 import space.taran.arkmemo.data.ResourceMeta
 import space.taran.arkmemo.files.parsers.JsonParser
 import space.taran.arkmemo.models.TextNote
