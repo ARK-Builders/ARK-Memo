@@ -5,26 +5,10 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/editView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-    <EditText
-        android:id="@+id/noteTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:ems="10"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:inputType="text"
-        android:gravity="start"
-        android:hint="@string/note_title"
-        android:importantForAutofill="no"
-        android:textColorHint="@color/gray"/>
+        android:layout_height="match_parent">
     <EditText
         android:id="@+id/editNote"
         android:layout_width="match_parent"
@@ -40,8 +24,12 @@
         android:hint="@string/start_text_note"
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
-        android:textColorHint="#757575"/>
-    <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
+        android:textColorHint="#757575"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <space.taran.arkmemo.ui.views.NotesCanvas
         android:id="@+id/notesCanvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -49,8 +37,12 @@
         android:paddingTop="10dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:visibility="gone"/>
-    </LinearLayout>
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/saveNote"
         android:layout_width="150dp"
