@@ -41,7 +41,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
 
     private lateinit var recyclerView: RecyclerView
 
-    private val newNoteClickListener = View.OnClickListener{
+    private val newNoteClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
     }
@@ -70,17 +70,15 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         newNoteButton.setOnClickListener(newNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
         lifecycleScope.launch {
-            viewLifecycleOwner.apply{
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    textNotesViewModel.getAllLatestNotes {
-                        val adapter = TextNotesListAdapter(it)
-                        val layoutManager = LinearLayoutManager(requireContext())
-                        adapter.setActivity(activity)
-                        adapter.setFragmentManager(childFragmentManager)
-                        recyclerView.apply {
-                            this.layoutManager = layoutManager
-                            this.adapter = adapter
-                        }
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                textNotesViewModel.getTextNotes {
+                    val adapter = TextNotesListAdapter(it)
+                    val layoutManager = LinearLayoutManager(requireContext())
+                    adapter.setActivity(activity)
+                    adapter.setFragmentManager(childFragmentManager)
+                    recyclerView.apply {
+                        this.layoutManager = layoutManager
+                        this.adapter = adapter
                     }
                 }
             }
@@ -92,12 +90,12 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         activity.fragment = this
     }
 
-    companion object{
+    companion object {
         const val TAG = "Text Notes Fragment"
     }
 }
 
 fun Fragment.deleteTextNote(note: TextNote){
     val viewModel: TextNotesViewModel by viewModels()
-    viewModel.deleteNote(note)
+    viewModel.onDelete(note)
 }

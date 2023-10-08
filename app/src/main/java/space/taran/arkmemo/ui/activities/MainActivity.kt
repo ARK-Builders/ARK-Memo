@@ -10,6 +10,7 @@ import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -124,10 +125,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
     }
 
-    fun showFragment(){
-
+    fun showProgressBar(show: Boolean) {
+        binding.progressBar.isVisible = show
     }
-
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }

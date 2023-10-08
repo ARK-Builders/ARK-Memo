@@ -84,12 +84,14 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
             editNote.setText(noteStr)
 
         saveNoteButton.setOnClickListener {
-            with(editViewModel){
-                onSaveNoteClick(note)
-                Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
-                    Toast.LENGTH_SHORT)
-                    .show()
-                activity.onBackPressed()
+            editViewModel.onSaveClick(note) { show ->
+                activity.showProgressBar(show)
+                if (!show) {
+                    Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
+                        Toast.LENGTH_SHORT)
+                        .show()
+                    activity.onBackPressedDispatcher.onBackPressed()
+                }
             }
         }
     }

@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import space.taran.arkmemo.data.repositories.TextNotesRepository
+import kotlinx.coroutines.withContext
+import space.taran.arkmemo.data.repositories.TextNotesRepo
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
@@ -14,27 +14,32 @@ import javax.inject.Inject
 @HiltViewModel
 class TextNotesViewModel @Inject constructor(): ViewModel() {
 
-    @Inject lateinit var textNotesRepo: TextNotesRepository
+    @Inject lateinit var textNotesRepo: TextNotesRepo
 
     private val iODispatcher = Dispatchers.IO
 
     fun init() {
-        textNotesRepo.init(
-            MemoPreferences.getInstance().getPath()!!,
-            viewModelScope
-        )
-    }
-
-    fun deleteNote(note: TextNote){
         viewModelScope.launch(iODispatcher) {
-            textNotesRepo.deleteNote(note)
+            textNotesRepo.init(
+                MemoPreferences.getInstance().getPath()!!,
+                viewModelScope
+            )
+            textNotesRepo.read()
         }
     }
 
-    fun getAllLatestNotes(emit: (List<TextNote>) -> Unit){
-        viewModelScope.launch(Dispatchers.Main) {
-            textNotesRepo.textNotes.collectLatest {
-                emit(it)
+    fun onDelete(note: TextNote) {
+        viewModelScope.launch(iODispatcher) {
+            textNotesRepo.delete(note)
+        }
+    }
+
+    fun getTextNotes(emit: (List<TextNote>) -> Unit) {
+        viewModelScope.launch(iODispatcher) {
+            textNotesRepo.textNotes.collect {
+                withContext(Dispatchers.Main) {
+                    emit(it)
+                }
             }
         }
     }
