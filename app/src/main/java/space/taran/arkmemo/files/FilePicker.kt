@@ -1,4 +1,4 @@
-package space.taran.arkmemo.files
+package dev.arkbuilders.arkmemo.files
 
 import android.Manifest
 import android.content.Context
@@ -10,11 +10,11 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
-import space.taran.arkfilepicker.ArkFilePickerConfig
-import space.taran.arkfilepicker.ArkFilePickerFragment
-import space.taran.arkfilepicker.ArkFilePickerMode
-import space.taran.arkmemo.BuildConfig
-import space.taran.arkmemo.R
+import dev.arkbuilders.arkfilepicker.ArkFilePickerConfig
+import dev.arkbuilders.arkfilepicker.ArkFilePickerFragment
+import dev.arkbuilders.arkfilepicker.ArkFilePickerMode
+import dev.arkbuilders.arkmemo.BuildConfig
+import dev.arkbuilders.arkmemo.R
 
 class FilePicker private constructor(){
     companion object{

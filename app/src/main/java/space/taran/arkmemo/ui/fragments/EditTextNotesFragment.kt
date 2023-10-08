@@ -1,4 +1,4 @@
-package space.taran.arkmemo.ui.fragments
+package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
 import android.text.Editable
@@ -11,12 +11,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import space.taran.arkmemo.R
-import space.taran.arkmemo.data.viewmodels.EditTextNotesViewModel
-import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
-import space.taran.arkmemo.databinding.FragmentEditTextNotesBinding
-import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.data.viewmodels.EditTextNotesViewModel
+import dev.arkbuilders.arkmemo.data.viewmodels.TextNotesViewModel
+import dev.arkbuilders.arkmemo.databinding.FragmentEditTextNotesBinding
+import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 
 @AndroidEntryPoint
 class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {

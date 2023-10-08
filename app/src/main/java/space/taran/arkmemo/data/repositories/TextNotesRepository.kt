@@ -1,13 +1,13 @@
-package space.taran.arkmemo.data.repositories
+package dev.arkbuilders.arkmemo.data.repositories
 
 import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
-import space.taran.arklib.computeId
-import space.taran.arkmemo.data.ResourceMeta
-import space.taran.arkmemo.files.parsers.JsonParser
-import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arklib.computeId
+import dev.arkbuilders.arkmemo.data.ResourceMeta
+import dev.arkbuilders.arkmemo.files.parsers.JsonParser
+import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Path

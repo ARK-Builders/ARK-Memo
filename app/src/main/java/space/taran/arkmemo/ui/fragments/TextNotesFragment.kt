@@ -1,4 +1,4 @@
-package space.taran.arkmemo.ui.fragments
+package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
 import android.view.View
@@ -15,14 +15,14 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import space.taran.arkmemo.R
-import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
-import space.taran.arkmemo.databinding.FragmentTextNotesBinding
-import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.ui.activities.MainActivity
-import space.taran.arkmemo.ui.activities.getTextFromClipBoard
-import space.taran.arkmemo.ui.activities.replaceFragment
-import space.taran.arkmemo.ui.adapters.TextNotesListAdapter
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.data.viewmodels.TextNotesViewModel
+import dev.arkbuilders.arkmemo.databinding.FragmentTextNotesBinding
+import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.activities.getTextFromClipBoard
+import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
+import dev.arkbuilders.arkmemo.ui.adapters.TextNotesListAdapter
 
 @AndroidEntryPoint
 class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {

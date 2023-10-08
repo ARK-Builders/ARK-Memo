@@ -1,4 +1,4 @@
-package space.taran.arkmemo.space.taran.arkmemo.utils
+package dev.arkbuilders.arkmemo.dev.arkbuilders.arkmemo.utils
 
 import android.content.Context
 import com.simplemobiletools.commons.helpers.BaseConfig

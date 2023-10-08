@@ -1,14 +1,14 @@
-package space.taran.arkmemo.ui.fragments
+package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
 import android.view.View
 import androidx.preference.PreferenceFragmentCompat
-import space.taran.arkfilepicker.onArkPathPicked
-import space.taran.arkmemo.R
-import space.taran.arkmemo.files.FilePicker
-import space.taran.arkmemo.preferences.MemoPreferences
-import space.taran.arkmemo.ui.activities.MainActivity
-import space.taran.arkmemo.ui.views.PathPreference
+import dev.arkbuilders.arkfilepicker.onArkPathPicked
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.files.FilePicker
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.views.PathPreference
 
 class SettingsFragment : PreferenceFragmentCompat() {
 

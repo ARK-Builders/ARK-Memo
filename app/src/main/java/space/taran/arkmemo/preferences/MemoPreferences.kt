@@ -1,4 +1,4 @@
-package space.taran.arkmemo.preferences
+package dev.arkbuilders.arkmemo.preferences
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE

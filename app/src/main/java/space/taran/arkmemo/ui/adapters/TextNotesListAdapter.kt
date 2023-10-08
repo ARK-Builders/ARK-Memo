@@ -1,4 +1,4 @@
-package space.taran.arkmemo.ui.adapters
+package dev.arkbuilders.arkmemo.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,13 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import space.taran.arkmemo.R
-import space.taran.arkmemo.databinding.TextNoteBinding
-import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.ui.activities.MainActivity
-import space.taran.arkmemo.ui.activities.replaceFragment
-import space.taran.arkmemo.ui.dialogs.NoteDeleteDialogFragment
-import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.databinding.TextNoteBinding
+import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
+import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialogFragment
+import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 
 class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
 

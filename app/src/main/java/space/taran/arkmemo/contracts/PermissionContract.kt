@@ -1,4 +1,4 @@
-package space.taran.arkmemo.contracts
+package dev.arkbuilders.arkmemo.contracts
 
 import android.app.Activity
 import android.content.Context
@@ -9,7 +9,7 @@ import android.os.Environment
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.RequiresApi
-import space.taran.arkmemo.files.FilePicker
+import dev.arkbuilders.arkmemo.files.FilePicker
 
 class PermissionContract: ActivityResultContract<String, Boolean>() {
 

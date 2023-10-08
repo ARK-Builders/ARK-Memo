@@ -1,13 +1,13 @@
-package space.taran.arkmemo.ui.dialogs
+package dev.arkbuilders.arkmemo.ui.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import space.taran.arkmemo.R
-import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.ui.fragments.deleteTextNote
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.ui.fragments.deleteTextNote
 
 class NoteDeleteDialogFragment: DialogFragment() {
 
