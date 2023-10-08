@@ -10,7 +10,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "space.taran.arkmemo"
+        applicationId "dev.arkbuilders.arkmemo"
         minSdk 26
         targetSdk 33
         versionCode 1
@@ -87,7 +87,7 @@ dependencies {
     //implementation 'com.github.ARK-Builders:ark-filepicker:b2bfa01ea7'
 
     implementation 'com.github.ark-builders:ark-filepicker:b2bfa01ea7'
-    implementation 'space.taran:arklib:0.1.0-SNAPSHOT-7df9a4e581'
+    implementation 'dev.arkbuilders:arklib:0.1.0-SNAPSHOT-7df9a4e581'
 
     implementation 'ch.acra:acra-http:5.9.5'
     implementation 'ch.acra:acra-dialog:5.9.5'

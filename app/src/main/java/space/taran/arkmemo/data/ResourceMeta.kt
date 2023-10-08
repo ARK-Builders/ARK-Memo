@@ -1,4 +1,4 @@
-package space.taran.arkmemo.data
+package dev.arkbuilders.arkmemo.data
 
 import java.nio.file.attribute.FileTime
 

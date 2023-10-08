@@ -1,4 +1,4 @@
-package space.taran.arkmemo.ui.activities
+package dev.arkbuilders.arkmemo.ui.activities
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -13,15 +13,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import space.taran.arkfilepicker.onArkPathPicked
-import space.taran.arkmemo.R
-import space.taran.arkmemo.contracts.PermissionContract
-import space.taran.arkmemo.databinding.ActivityMainBinding
-import space.taran.arkmemo.files.FilePicker
-import space.taran.arkmemo.preferences.MemoPreferences
-import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
-import space.taran.arkmemo.ui.fragments.SettingsFragment
-import space.taran.arkmemo.ui.fragments.TextNotesFragment
+import dev.arkbuilders.arkfilepicker.onArkPathPicked
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.contracts.PermissionContract
+import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
+import dev.arkbuilders.arkmemo.files.FilePicker
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
+import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
+import dev.arkbuilders.arkmemo.ui.fragments.TextNotesFragment
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {

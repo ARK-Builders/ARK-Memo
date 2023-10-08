@@ -1,12 +1,12 @@
-package space.taran.arkmemo.ui.views
+package dev.arkbuilders.arkmemo.ui.views
 
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
-import space.taran.arkmemo.R
-import space.taran.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 
 class PathPreference(context: Context, attrs: AttributeSet): Preference(context, attrs) {
     private var title: TextView? = null

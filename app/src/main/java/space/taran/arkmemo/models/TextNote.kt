@@ -1,9 +1,9 @@
-package space.taran.arkmemo.models
+package dev.arkbuilders.arkmemo.models
 
 import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.parcelize.IgnoredOnParcel
-import space.taran.arkmemo.data.ResourceMeta
+import dev.arkbuilders.arkmemo.data.ResourceMeta
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

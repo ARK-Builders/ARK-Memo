@@ -1,4 +1,4 @@
-package space.taran.arkmemo
+package dev.arkbuilders.arkmemo
 
 import android.app.Application
 import android.content.Context
@@ -11,7 +11,7 @@ import org.acra.config.httpSender
 import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
-import space.taran.arkmemo.space.taran.arkmemo.utils.Config
+import dev.arkbuilders.arkmemo.dev.arkbuilders.arkmemo.utils.Config
 
 @HiltAndroidApp
 class App: Application() {

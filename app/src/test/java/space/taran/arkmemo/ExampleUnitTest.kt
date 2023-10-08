@@ -1,4 +1,4 @@
-package space.taran.arkmemo
+package dev.arkbuilders.arkmemo
 
 import org.junit.Test
 
