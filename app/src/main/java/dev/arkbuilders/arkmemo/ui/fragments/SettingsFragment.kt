@@ -8,7 +8,7 @@ import dev.arkbuilders.arkmemo.files.FilePicker
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.views.PathPreference
-import space.taran.arkfilepicker.presentation.onArkPathPicked
+import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
