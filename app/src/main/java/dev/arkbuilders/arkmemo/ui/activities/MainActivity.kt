@@ -21,7 +21,7 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
 import dev.arkbuilders.arkmemo.ui.fragments.TextNotesFragment
-import space.taran.arkfilepicker.presentation.onArkPathPicked
+import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
