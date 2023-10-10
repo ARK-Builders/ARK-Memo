@@ -1,16 +1,14 @@
 package dev.arkbuilders.arkmemo.data.viewmodels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arkmemo.data.repositories.TextNotesRepository
+import dev.arkbuilders.arkmemo.models.TextNote
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import dev.arkbuilders.arkmemo.data.repositories.TextNotesRepository
-import dev.arkbuilders.arkmemo.models.TextNote
 import javax.inject.Inject
 
 @HiltViewModel
