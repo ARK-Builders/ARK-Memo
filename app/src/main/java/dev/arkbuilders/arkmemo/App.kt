@@ -1,7 +1,6 @@
 package dev.arkbuilders.arkmemo
 
 import android.app.Application
-import android.content.Context
 import dagger.hilt.android.HiltAndroidApp
 import dev.arkbuilders.arklib.initArkLib
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +12,7 @@ import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
 import dev.arkbuilders.arkmemo.dev.arkbuilders.arkmemo.utils.Config
-import space.taran.arkfilepicker.folders.FoldersRepo
+import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
 
 @HiltAndroidApp
 class App: Application() {
