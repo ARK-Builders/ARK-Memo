@@ -87,9 +87,6 @@ dependencies {
     implementation 'dev.arkbuilders:arkfilepicker:0.1.1'
     implementation 'dev.arkbuilders:arklib:0.3.2'
 
-    implementation 'ch.acra:acra-http:5.9.5'
-    implementation 'ch.acra:acra-dialog:5.9.5'
-
     implementation 'androidx.preference:preference:1.2.0'
     implementation "com.google.dagger:hilt-android:2.42"
     kapt "com.google.dagger:hilt-compiler:2.42"
@@ -105,5 +102,4 @@ dependencies {
 
     implementation 'ch.acra:acra-http:5.9.6'
     implementation 'ch.acra:acra-dialog:5.9.6'
-    implementation 'com.simplemobiletools:commons:5.29.20'
 }
