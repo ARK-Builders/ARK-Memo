@@ -143,10 +143,9 @@ class TextNotesRepo @Inject constructor() {
         notes.remove(note)
         _textNotes.value = notes
     }
-
-    companion object {
-        private const val NOTE_EXT = "note"
-        private const val DUMMY_FILENAME =  "Note"
-        private const val NEWLINE = "\n"
-    }
 }
+
+private const val NOTE_EXT = "note"
+private const val DUMMY_FILENAME =  "Note"
+private const val NEWLINE = "\n"
+
