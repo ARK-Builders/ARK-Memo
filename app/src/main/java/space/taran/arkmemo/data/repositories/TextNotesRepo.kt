@@ -46,11 +46,9 @@ class TextNotesRepo @Inject constructor() {
         propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
     }
 
-    suspend fun save(note: TextNote?) {
-        if (note != null) {
-            add(note)
-            write(note)
-        }
+    suspend fun save(note: TextNote) {
+        add(note)
+        write(note)
     }
 
     suspend fun delete(note: TextNote) = withContext(iODispatcher) {
