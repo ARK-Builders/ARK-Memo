@@ -91,7 +91,60 @@ class TextNotesRepo @Inject constructor() {
         _textNotes.value = notes
     }
 
-    private suspend fun write(note: TextNote) = withContext(Dispatchers.IO) {
+
+    private suspend fun write(note: TextNote) {
+        withContext(Dispatchers.IO) {
+            val path = root.resolve("${DUMMY_FILENAME}.${NOTE_EXT}")
+            if (path.exists()) return@withContext
+            try {
+                val lines = note.content.data.split(NEWLINE)
+                path.writeLines(lines)
+                val size = path.fileSize()
+                val id = computeId(size, path)
+                Log.d("text-repo", "initial resource name ${path.name}")
+                persistNoteProperties(resourceId = id, noteTitle = note.content.title)
+
+                val newPath = root.resolve("$id.$NOTE_EXT")
+                if (!newPath.exists()) {
+                    renameResourceWithNewResourceMeta(
+                        note = note,
+                        path = path,
+                        newPath = newPath,
+                        resourceId = id,
+                        size = size
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private suspend fun persistNoteProperties(resourceId: ResourceId, noteTitle: String) {
+        with(propertiesStorage) {
+            val properties = Properties(setOf(noteTitle), setOf())
+            setProperties(resourceId, properties)
+            persist()
+        }
+    }
+    private fun renameResourceWithNewResourceMeta(
+        note: TextNote,
+        path: Path,
+        newPath: Path,
+        resourceId: ResourceId,
+        size: Long
+    ) {
+        if (path.toFile().renameTo(newPath.toFile())) {
+            note.meta = ResourceMeta(
+                id = resourceId,
+                name = newPath.fileName.name,
+                extension = newPath.extension,
+                modified = newPath.getLastModifiedTime(),
+                size = size
+            )
+            Log.d("notes-repo", "resource renamed to ${newPath.name} successfully")
+        } else delete(path)
+    }
         val path = root.resolve("${DUMMY_FILENAME}.${NOTE_EXT}")
         if (!path.exists()) {
             try {
