@@ -6,7 +6,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,7 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
-import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
+import space.taran.arkmemo.ui.viewmodels.NotesViewModel
 import space.taran.arkmemo.databinding.FragmentTextNotesBinding
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.ui.activities.MainActivity
@@ -34,7 +33,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         requireActivity() as MainActivity
     }
 
-    private val textNotesViewModel: TextNotesViewModel by activityViewModels()
+    private val textNotesViewModel: NotesViewModel by activityViewModels()
 
     private lateinit var newNoteButton: FloatingActionButton
     private lateinit var pasteNoteButton: Button
@@ -95,7 +94,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     }
 }
 
-fun Fragment.deleteTextNote(note: TextNote){
-    val viewModel: TextNotesViewModel by viewModels()
+fun Fragment.deleteNote(note: TextNote){
+    val viewModel: NotesViewModel by activityViewModels()
     viewModel.onDelete(note)
 }

@@ -1,6 +1,7 @@
 package space.taran.arkmemo.data.repositories
 
 import android.util.Log
+import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.RootIndex
 import dev.arkbuilders.arklib.user.properties.Properties
@@ -24,14 +25,12 @@ import kotlin.io.path.extension
 import kotlin.io.path.fileSize
 import kotlin.io.path.forEachLine
 import kotlin.io.path.getLastModifiedTime
+import kotlin.io.path.moveTo
 import kotlin.io.path.name
 import kotlin.io.path.writeLines
 
 @Singleton
 class TextNotesRepo @Inject constructor() {
-
-    private val _textNotes = MutableStateFlow(listOf<TextNote>())
-    val textNotes: StateFlow<List<TextNote>> = _textNotes
 
     private val iODispatcher = Dispatchers.IO
 
@@ -47,77 +46,61 @@ class TextNotesRepo @Inject constructor() {
     }
 
     suspend fun save(note: TextNote) {
-        add(note)
         write(note)
     }
 
     suspend fun delete(note: TextNote) = withContext(iODispatcher) {
         val path = root.resolve("${note.meta?.name}")
-        remove(note)
         delete(path)
         propertiesStorage.remove(note.meta?.id!!)
         propertiesStorage.persist()
         Log.d("text-repo", "${note.meta?.name!!} has been deleted")
     }
 
-    suspend fun read() = withContext(Dispatchers.IO) {
+    suspend fun read(): List<TextNote> = withContext(Dispatchers.IO) {
         val notes = mutableListOf<TextNote>()
         Files.list(root).forEach { path ->
             if (path.fileName.extension == NOTE_EXT) {
-                try {
-                    val data = StringBuilder()
-                    path.forEachLine {
-                        data.appendLine(it)
-                    }
-                    val size = path.fileSize()
-                    val id = computeId(size, path)
-                    val meta = ResourceMeta(
-                        id,
-                        path.fileName.name,
-                        path.extension,
-                        path.getLastModifiedTime(),
-                        size
-                    )
-                    val titles = propertiesStorage.getProperties(id).titles
-                    val content = TextNote.Content(titles.elementAt(0), data.toString())
-                    val note = TextNote(content, meta)
-                    notes.add(note)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                val data = StringBuilder()
+                path.forEachLine {
+                    data.appendLine(it)
                 }
+                val size = path.fileSize()
+                val id = computeId(size, path)
+                val meta = ResourceMeta(
+                    id,
+                    path.fileName.name,
+                    path.extension,
+                    path.getLastModifiedTime(),
+                    size
+                )
+                val titles = propertiesStorage.getProperties(id).titles
+                val content = TextNote.Content(titles.elementAt(0), data.toString())
+                val note = TextNote(content, meta)
+                notes.add(note)
             }
         }
         Log.d("text-repo", "${notes.size} text note resources found")
-        _textNotes.value = notes
+        notes
     }
 
+    private suspend fun write(note: TextNote) = withContext(Dispatchers.IO) {
+        val tempPath = kotlin.io.path.createTempFile()
+        val lines = note.content.data.split('\n')
+        tempPath.writeLines(lines)
+        val size = tempPath.fileSize()
+        val id = computeId(size, tempPath)
+        Log.d("text-repo", "initial resource name ${tempPath.name}")
+        persistNoteProperties(resourceId = id, noteTitle = note.content.title)
 
-    private suspend fun write(note: TextNote) {
-        withContext(Dispatchers.IO) {
-            val path = root.resolve("${DUMMY_FILENAME}.${NOTE_EXT}")
-            if (path.exists()) return@withContext
-            try {
-                val lines = note.content.data.split(NEWLINE)
-                path.writeLines(lines)
-                val size = path.fileSize()
-                val id = computeId(size, path)
-                Log.d("text-repo", "initial resource name ${path.name}")
-                persistNoteProperties(resourceId = id, noteTitle = note.content.title)
-
-                val newPath = root.resolve("$id.$NOTE_EXT")
-                if (!newPath.exists()) {
-                    renameResourceWithNewResourceMeta(
-                        note = note,
-                        path = path,
-                        newPath = newPath,
-                        resourceId = id,
-                        size = size
-                    )
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        val resourcePath = root.resolve("$id.$NOTE_EXT")
+        renameResourceWithNewResourceMeta(
+            note = note,
+            tempPath = tempPath,
+            resourcePath = resourcePath,
+            resourceId = id,
+            size = size
+        )
     }
 
     private suspend fun persistNoteProperties(resourceId: ResourceId, noteTitle: String) {
@@ -127,76 +110,29 @@ class TextNotesRepo @Inject constructor() {
             persist()
         }
     }
+
     private fun renameResourceWithNewResourceMeta(
         note: TextNote,
-        path: Path,
-        newPath: Path,
+        tempPath: Path,
+        resourcePath: Path,
         resourceId: ResourceId,
         size: Long
     ) {
-        if (path.toFile().renameTo(newPath.toFile())) {
-            note.meta = ResourceMeta(
-                id = resourceId,
-                name = newPath.fileName.name,
-                extension = newPath.extension,
-                modified = newPath.getLastModifiedTime(),
-                size = size
-            )
-            Log.d("notes-repo", "resource renamed to ${newPath.name} successfully")
-        } else delete(path)
-    }
-        val path = root.resolve("${DUMMY_FILENAME}.${NOTE_EXT}")
-        if (!path.exists()) {
-            try {
-                val lines = note.content.data.split(NEWLINE)
-                path.writeLines(lines)
-                val size = path.fileSize()
-                val id = computeId(size, path)
-                val properties = Properties(setOf(note.content.title), setOf())
-
-                Log.d("text-repo", "initial resource name ${path.name}")
-
-                propertiesStorage.setProperties(id, properties)
-                propertiesStorage.persist()
-
-                val newPath = root.resolve("$id.$NOTE_EXT")
-                if (!newPath.exists()) {
-                    if (path.toFile().renameTo(newPath.toFile())) {
-                        note.meta = ResourceMeta(
-                            id,
-                            newPath.fileName.name,
-                            newPath.extension,
-                            newPath.getLastModifiedTime(),
-                            size
-                        )
-                        Log.d("notes-repo", "resource renamed to ${newPath.name} successfully")
-                    } else delete(path)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        this.coroutineContext.job
+        tempPath.moveTo(resourcePath)
+        note.meta = ResourceMeta(
+            id = resourceId,
+            name = resourcePath.fileName.name,
+            extension = resourcePath.extension,
+            modified = resourcePath.getLastModifiedTime(),
+            size = size
+        )
+        Log.d("notes-repo", "resource renamed to ${resourcePath.name} successfully")
     }
 
     private fun delete(path: Path) {
         path.deleteIfExists()
     }
-
-    private fun add(note: TextNote) {
-        val notes = textNotes.value.toMutableList()
-        notes.add(note)
-        _textNotes.value = notes
-    }
-
-    private fun remove(note: TextNote) {
-        val notes = textNotes.value.toMutableList()
-        notes.remove(note)
-        _textNotes.value = notes
-    }
 }
 
 private const val NOTE_EXT = "note"
-private const val DUMMY_FILENAME =  "Note"
-private const val NEWLINE = "\n"
 

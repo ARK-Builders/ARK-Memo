@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkmemo.R
-import space.taran.arkmemo.data.viewmodels.EditTextNotesViewModel
+import space.taran.arkmemo.ui.viewmodels.NotesViewModel
 import space.taran.arkmemo.databinding.FragmentEditTextNotesBinding
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.ui.activities.MainActivity
@@ -22,7 +22,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         requireActivity() as MainActivity
     }
 
-    private val editViewModel: EditTextNotesViewModel by activityViewModels()
+    private val notesViewModel: NotesViewModel by activityViewModels()
 
     private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
 
@@ -31,7 +31,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        editViewModel.init()
+        notesViewModel.init()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,7 +84,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
             editNote.setText(noteStr)
 
         saveNoteButton.setOnClickListener {
-            editViewModel.onSaveClick(note) { show ->
+            notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)
                 if (!show) {
                     Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
