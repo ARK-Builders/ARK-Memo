@@ -13,9 +13,9 @@ import space.taran.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
 
 @HiltViewModel
-class NotesViewModel @Inject constructor(
-    @Inject var textNotesRepo: TextNotesRepo
-): ViewModel() {
+class NotesViewModel @Inject constructor(): ViewModel() {
+
+    @Inject lateinit var textNotesRepo: TextNotesRepo
 
     private val iODispatcher = Dispatchers.IO
 
