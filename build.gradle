@@ -5,33 +5,12 @@ buildscript {
     ext.kotlin_version="1.7.10"
 }
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven{url 'https://jitpack.io'}
-        maven { url "https://plugins.gradle.org/m2/" }
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10'
-        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.42'
-        classpath 'io.github.0ffz:gpr-for-gradle:1.2.1'
-    }
+plugins {
+    id 'com.android.application' version '7.4.2' apply false
+    id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
+    id 'com.google.dagger.hilt.android' version '2.42' apply false
 }
 
-allprojects {
-    apply plugin: "io.github.0ffz.github-packages"
-    repositories{
-        google()
-        mavenCentral()
-        maven{url 'https://jitpack.io'}
-        maven { url "https://plugins.gradle.org/m2/" }
-        gradlePluginPortal()
-        maven githubPackage.invoke("ARK-Builders/arklib-android")
-    }
-}
 
 task clean(type: Delete) {
     delete rootProject.buildDir

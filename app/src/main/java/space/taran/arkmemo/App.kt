@@ -3,6 +3,7 @@ package space.taran.arkmemo
 import android.app.Application
 import android.content.Context
 import dagger.hilt.android.HiltAndroidApp
+import dev.arkbuilders.arklib.initArkLib
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,13 +12,17 @@ import org.acra.config.httpSender
 import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
+import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
 import space.taran.arkmemo.space.taran.arkmemo.utils.Config
 
 @HiltAndroidApp
 class App: Application() {
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
+    override fun onCreate() {
+        super.onCreate()
+        System.loadLibrary("arklib")
+        initArkLib()
+        FoldersRepo.init(this)
         initAcra()
     }
 

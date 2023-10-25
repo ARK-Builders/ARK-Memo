@@ -35,7 +35,7 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         holder.title.text = notes[position].content.title
-        holder.date.text = notes[position].meta?.modified.toString()
+        holder.date.text = notes[position].meta?.modified?.toString() ?: "Just now"
     }
 
     override fun getItemCount() = notes.size
