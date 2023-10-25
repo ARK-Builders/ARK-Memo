@@ -3,18 +3,14 @@ package space.taran.arkmemo.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkmemo.R
-import space.taran.arkmemo.data.viewmodels.EditTextNotesViewModel
-import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
+import space.taran.arkmemo.ui.viewmodels.NotesViewModel
 import space.taran.arkmemo.databinding.FragmentEditTextNotesBinding
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.ui.activities.MainActivity
@@ -26,16 +22,21 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         requireActivity() as MainActivity
     }
 
-    private val editViewModel: EditTextNotesViewModel by viewModels()
+    private val notesViewModel: NotesViewModel by activityViewModels()
 
     private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
 
-    private var note: TextNote? = null
+    private var note = TextNote(TextNote.Content("", ""))
     private var noteStr: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        notesViewModel.init()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var note:TextNote? = null
+        var note = this.note
         val editTextListener = object: TextWatcher{
             override fun afterTextChanged(s: Editable?) = Unit
 
@@ -43,9 +44,9 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val noteString = s?.toString()
-                var title = ""
+                var title = this@EditTextNotesFragment.note.content.title
                 if(noteString != null){
-                    for(char in noteString){
+                    if (title == "") for(char in noteString){
                         if(char != '\n'){
                             title += char
                         }
@@ -63,9 +64,11 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         }
         val editNote = binding.editNote
         val saveNoteButton = binding.saveNote
-        editNote.isVisible = true
+
         if(arguments != null) {
-            this.note = requireArguments().getParcelable(NOTE_KEY)
+            requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
+                this.note = it
+            }
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
         }
 
@@ -75,22 +78,20 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
         editNote.requestFocus()
         editNote.addTextChangedListener(editTextListener)
-
-        if(this.note != null)
-            editNote.setText(this.note?.content?.data!!)
+        editNote.setText(this.note.content.data)
 
         if(noteStr != null)
             editNote.setText(noteStr)
 
         saveNoteButton.setOnClickListener {
-            if(note != null) {
-                editViewModel.saveNote(note!!)
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.ark_memo_note_saved),
-                    Toast.LENGTH_SHORT
-                ).show()
-                activity.onBackPressedDispatcher.onBackPressed()
+            notesViewModel.onSaveClick(note) { show ->
+                activity.showProgressBar(show)
+                if (!show) {
+                    Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
+                        Toast.LENGTH_SHORT)
+                        .show()
+                    activity.onBackPressedDispatcher.onBackPressed()
+                }
             }
         }
     }

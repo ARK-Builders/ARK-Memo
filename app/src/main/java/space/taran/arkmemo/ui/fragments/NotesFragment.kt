@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -16,7 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
-import space.taran.arkmemo.data.viewmodels.TextNotesViewModel
+import space.taran.arkmemo.ui.viewmodels.NotesViewModel
 import space.taran.arkmemo.databinding.FragmentTextNotesBinding
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.ui.activities.MainActivity
@@ -32,7 +32,8 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
-    private val textNotesViewModel: TextNotesViewModel by viewModels()
+
+    private val textNotesViewModel: NotesViewModel by activityViewModels()
 
     private lateinit var newNoteButton: FloatingActionButton
     private lateinit var newGraphicalNoteButton: FloatingActionButton
@@ -40,7 +41,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
 
     private lateinit var recyclerView: RecyclerView
 
-    private val newNoteClickListener = View.OnClickListener{
+    private val newNoteClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
     }
@@ -59,6 +60,11 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        textNotesViewModel.init()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = binding.include.recyclerView
@@ -71,17 +77,15 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         newGraphicalNoteButton.setOnClickListener(newGraphicalNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
         lifecycleScope.launch {
-            viewLifecycleOwner.apply{
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    textNotesViewModel.getAllNotes().collect {
-                        val adapter = TextNotesListAdapter(it)
-                        val layoutManager = LinearLayoutManager(requireContext())
-                        adapter.setActivity(activity)
-                        adapter.setFragmentManager(childFragmentManager)
-                        recyclerView.apply {
-                            this.layoutManager = layoutManager
-                            this.adapter = adapter
-                        }
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                textNotesViewModel.getTextNotes {
+                    val adapter = TextNotesListAdapter(it)
+                    val layoutManager = LinearLayoutManager(requireContext())
+                    adapter.setActivity(activity)
+                    adapter.setFragmentManager(childFragmentManager)
+                    recyclerView.apply {
+                        this.layoutManager = layoutManager
+                        this.adapter = adapter
                     }
                 }
             }
@@ -93,12 +97,12 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         activity.fragment = this
     }
 
-    companion object{
+    companion object {
         const val TAG = "Text Notes Fragment"
     }
 }
 
-fun Fragment.deleteTextNote(note: TextNote){
-    val viewModel: TextNotesViewModel by viewModels()
-    viewModel.deleteNote(note)
+fun Fragment.deleteNote(note: TextNote){
+    val viewModel: NotesViewModel by activityViewModels()
+    viewModel.onDelete(note)
 }

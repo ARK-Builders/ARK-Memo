@@ -26,6 +26,6 @@ class PathPreference(context: Context, attrs: AttributeSet): Preference(context,
         super.onBindViewHolder(holder)
         title = holder.findViewById(R.id.title) as TextView
         path = holder.findViewById(R.id.pathValue) as TextView
-        setPath(MemoPreferences.getInstance(context).getPath())
+        setPath(MemoPreferences.getInstance(context).getPathString())
     }
 }
