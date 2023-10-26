@@ -18,14 +18,14 @@ import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
 import space.taran.arkmemo.ui.viewmodels.NotesViewModel
 import space.taran.arkmemo.databinding.FragmentTextNotesBinding
-import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.models.BaseNote
 import space.taran.arkmemo.ui.activities.MainActivity
 import space.taran.arkmemo.ui.activities.getTextFromClipBoard
 import space.taran.arkmemo.ui.activities.replaceFragment
-import space.taran.arkmemo.ui.adapters.TextNotesListAdapter
+import space.taran.arkmemo.ui.adapters.NotesListAdapter
 
 @AndroidEntryPoint
-class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
+class TextNotesFragment: Fragment(R.layout.fragment_notes) {
 
     private val binding by viewBinding(FragmentTextNotesBinding::bind)
 
@@ -33,22 +33,22 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         requireActivity() as MainActivity
     }
 
-    private val textNotesViewModel: NotesViewModel by activityViewModels()
+    private val notesViewModel: NotesViewModel by activityViewModels()
 
-    private lateinit var newNoteButton: FloatingActionButton
-    private lateinit var newGraphicalNoteButton: FloatingActionButton
+    private lateinit var newTextNoteButton: FloatingActionButton
+    private lateinit var newGraphicNoteButton: FloatingActionButton
     private lateinit var pasteNoteButton: Button
 
     private lateinit var recyclerView: RecyclerView
 
-    private val newNoteClickListener = View.OnClickListener {
+    private val newTextNoteClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
     }
 
-    private val newGraphicalNoteClickListener = View.OnClickListener{
-        activity.fragment = EditGraphicalNotes.newInstance()
-        activity.replaceFragment(activity.fragment, EditGraphicalNotes.TAG)
+    private val newGraphicNoteClickListener = View.OnClickListener{
+        activity.fragment = EditGraphicNotesFragment.newInstance()
+        activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
     }
 
     private val pasteNoteClickListener = View.OnClickListener {
@@ -62,7 +62,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        textNotesViewModel.init()
+        notesViewModel.init()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,16 +70,16 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         recyclerView = binding.include.recyclerView
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        newNoteButton = binding.newNote
+        newTextNoteButton = binding.newNote
         pasteNoteButton = binding.pasteNote
-        newGraphicalNoteButton = binding.newGraphicNote
-        newNoteButton.setOnClickListener(newNoteClickListener)
-        newGraphicalNoteButton.setOnClickListener(newGraphicalNoteClickListener)
+        newGraphicNoteButton = binding.newGraphicNote
+        newTextNoteButton.setOnClickListener(newTextNoteClickListener)
+        newGraphicNoteButton.setOnClickListener(newGraphicNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                textNotesViewModel.getTextNotes {
-                    val adapter = TextNotesListAdapter(it)
+                notesViewModel.getTextNotes {
+                    val adapter = NotesListAdapter(it)
                     val layoutManager = LinearLayoutManager(requireContext())
                     adapter.setActivity(activity)
                     adapter.setFragmentManager(childFragmentManager)
@@ -102,7 +102,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     }
 }
 
-fun Fragment.deleteNote(note: TextNote){
+fun Fragment.deleteNote(note: BaseNote){
     val viewModel: NotesViewModel by activityViewModels()
-    viewModel.onDelete(note)
+    viewModel.onDeleteClick(note)
 }

@@ -7,7 +7,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import space.taran.arkmemo.data.repositories.GraphicNotesRepo
 import space.taran.arkmemo.data.repositories.TextNotesRepo
+import space.taran.arkmemo.models.BaseNote
+import space.taran.arkmemo.models.GraphicNote
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
@@ -17,9 +20,11 @@ class NotesViewModel @Inject constructor(): ViewModel() {
 
     @Inject lateinit var textNotesRepo: TextNotesRepo
 
+    @Inject lateinit var graphicNotesRepo: GraphicNotesRepo
+
     private val iODispatcher = Dispatchers.IO
 
-    private val notes = MutableStateFlow(listOf<TextNote>())
+    private val notes = MutableStateFlow(listOf<BaseNote>())
 
     fun init() {
         viewModelScope.launch(iODispatcher) {
@@ -31,13 +36,20 @@ class NotesViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    fun onSaveClick(note: TextNote, showProgress: (Boolean) -> Unit) {
+    fun onSaveClick(note: BaseNote, showProgress: (Boolean) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             withContext(Dispatchers.Main) {
                 showProgress(true)
 
             }
-            textNotesRepo.save(note)
+            when (note) {
+                is TextNote -> {
+                    textNotesRepo.save(note)
+                }
+                is GraphicNote -> {
+                    graphicNotesRepo.save(note)
+                }
+            }
             add(note)
             withContext(Dispatchers.Main) {
                 showProgress(false)
@@ -45,14 +57,17 @@ class NotesViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    fun onDelete(note: TextNote) {
+    fun onDeleteClick(note: BaseNote) {
         viewModelScope.launch(iODispatcher) {
             remove(note)
-            textNotesRepo.delete(note)
+            when (note) {
+                is TextNote -> textNotesRepo.delete(note)
+                is GraphicNote -> graphicNotesRepo.delete(note)
+            }
         }
     }
 
-    fun getTextNotes(emit: (List<TextNote>) -> Unit) {
+    fun getTextNotes(emit: (List<BaseNote>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             notes.collect {
                 withContext(Dispatchers.Main) {
@@ -62,13 +77,13 @@ class NotesViewModel @Inject constructor(): ViewModel() {
         }
     }
 
-    private fun add(note: TextNote) {
+    private fun add(note: BaseNote) {
         val notes = this.notes.value.toMutableList()
         notes.add(note)
         this.notes.value = notes
     }
 
-    private fun remove(note: TextNote) {
+    private fun remove(note: BaseNote) {
         val notes = this.notes.value.toMutableList()
         notes.remove(note)
         this.notes.value = notes

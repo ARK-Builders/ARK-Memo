@@ -6,8 +6,14 @@ import kotlinx.parcelize.Parcelize
 import space.taran.arkmemo.data.ResourceMeta
 
 @Parcelize
-data class GraphicalNote(
-    val svgData: String,
+open class BaseNote(
+    val resourceContent: Content,
     @IgnoredOnParcel
-    val meta: ResourceMeta? = null
+    var resourceMeta: ResourceMeta? = null
 ) : Parcelable
+
+@Parcelize
+data class Content(
+    val title: String,
+    val data: String
+): Parcelable

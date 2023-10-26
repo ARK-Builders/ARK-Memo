@@ -2,16 +2,12 @@ package space.taran.arkmemo.ui.views
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import space.taran.arkmemo.data.viewmodels.DrawPath
-import space.taran.arkmemo.data.viewmodels.GraphicalNotesViewModel
-import space.taran.arkmemo.utils.SVG
-import java.util.Stack
+import space.taran.arkmemo.ui.viewmodels.DrawPath
+import space.taran.arkmemo.ui.viewmodels.GraphicalNotesViewModel
 
 class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
 

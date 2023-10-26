@@ -4,19 +4,19 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import space.taran.arkmemo.R
 import space.taran.arkmemo.ui.viewmodels.NotesViewModel
-import space.taran.arkmemo.databinding.FragmentEditTextNotesBinding
+import space.taran.arkmemo.databinding.FragmentEditNotesBinding
+import space.taran.arkmemo.models.Content
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.ui.activities.MainActivity
 
 @AndroidEntryPoint
-class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
+class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     private val activity: MainActivity by lazy{
         requireActivity() as MainActivity
@@ -24,9 +24,9 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
     private val notesViewModel: NotesViewModel by activityViewModels()
 
-    private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
+    private val binding by viewBinding(FragmentEditNotesBinding::bind)
 
-    private var note = TextNote(TextNote.Content("", ""))
+    private var note = TextNote(Content("", ""))
     private var noteStr: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +52,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
                         }
                         else break
                     }
-                    val content = TextNote.Content(
+                    val content = Content(
                         title = title,
                         data = noteString
                     )
@@ -86,12 +86,6 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         saveNoteButton.setOnClickListener {
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)
-                if (!show) {
-                    Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
-                        Toast.LENGTH_SHORT)
-                        .show()
-                    activity.onBackPressedDispatcher.onBackPressed()
-                }
             }
         }
     }

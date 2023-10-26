@@ -9,13 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import space.taran.arkmemo.R
 import space.taran.arkmemo.databinding.TextNoteBinding
+import space.taran.arkmemo.models.BaseNote
+import space.taran.arkmemo.models.GraphicNote
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.ui.activities.MainActivity
 import space.taran.arkmemo.ui.activities.replaceFragment
 import space.taran.arkmemo.ui.dialogs.NoteDeleteDialogFragment
+import space.taran.arkmemo.ui.fragments.EditGraphicNotesFragment
 import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
 
-class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
+class NotesListAdapter(private val notes: List<BaseNote>): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private var activity: MainActivity? = null
     private var fragmentManager: FragmentManager? = null
@@ -29,13 +32,13 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.text_note, parent, false)
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.note, parent, false)
         return NoteViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].content.title
-        holder.date.text = notes[position].meta?.modified?.toString() ?: "Just now"
+        holder.title.text = notes[position].resourceContent.title
+        holder.date.text = notes[position].resourceMeta?.modified?.toString() ?: "Just now"
     }
 
     override fun getItemCount() = notes.size
@@ -49,8 +52,11 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
         val date = binding.noteDate
 
         private val clickNoteToEditListener = View.OnClickListener {
-            val selectedNote = notes[bindingAdapterPosition]
-            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
+            when (val selectedNote = notes[bindingAdapterPosition]) {
+                is TextNote -> activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
+                is GraphicNote ->
+                    activity?.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
+            }
             activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
         }
 

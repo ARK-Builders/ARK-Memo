@@ -1,4 +1,4 @@
-package space.taran.arkmemo.data.viewmodels
+package space.taran.arkmemo.ui.viewmodels
 
 import android.graphics.Color
 import android.graphics.Paint
@@ -7,8 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import space.taran.arkmemo.data.repositories.GraphicalNotesRepo
-import space.taran.arkmemo.models.GraphicalNote
+import space.taran.arkmemo.data.repositories.GraphicNotesRepo
+import space.taran.arkmemo.models.GraphicNote
 import space.taran.arkmemo.utils.SVG
 import java.util.Stack
 import javax.inject.Inject
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GraphicalNotesViewModel @Inject constructor(): ViewModel() {
 
-    @Inject lateinit var repo: GraphicalNotesRepo
+    @Inject lateinit var repo: GraphicNotesRepo
 
     private var paintColor = Color.BLACK
 
@@ -39,15 +39,9 @@ class GraphicalNotesViewModel @Inject constructor(): ViewModel() {
         if (editPaths.isNotEmpty()) editPaths.clear()
     }
 
-    fun onSaveClick(note: GraphicalNote) {
+    fun onSaveClick(note: GraphicNote) {
         viewModelScope.launch {
             repo.save(note)
-        }
-    }
-
-    fun onDeleteClick(note: GraphicalNote) {
-        viewModelScope.launch {
-            repo.delete(note)
         }
     }
 

@@ -9,9 +9,6 @@ import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import space.taran.arkmemo.data.ResourceMeta
 import space.taran.arkmemo.models.TextNote
@@ -20,7 +17,6 @@ import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.io.path.deleteIfExists
-import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.fileSize
 import kotlin.io.path.forEachLine

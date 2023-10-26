@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         }
 
-        if (MemoPreferences.getInstance(this).getPathString() == null) {
+        if (MemoPreferences.getInstance(this).getPath() == null) {
             FilePicker.show(this, supportFragmentManager)
 
             supportFragmentManager.onArkPathPicked(this) {
@@ -127,6 +128,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     fun showProgressBar(show: Boolean) {
         binding.progressBar.isVisible = show
+        if (!show) {
+            Toast.makeText(this, getString(R.string.ark_memo_note_saved),
+                Toast.LENGTH_SHORT)
+                .show()
+            onBackPressedDispatcher.onBackPressed()
+        }
     }
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
