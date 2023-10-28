@@ -2,23 +2,30 @@ package space.taran.arkmemo.preferences
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.nio.file.Path
+import javax.inject.Inject
 
-class MemoPreferences private constructor(context: Context) {
+
+private const val NAME = "memo_prefs"
+private const val CURRENT_NOTES_PATH = "current_notes_path"
+
+class MemoPreferencesImpl @Inject constructor(@ApplicationContext context: Context) :
+    MemoPreferences {
     private val sharedPreferences = context.getSharedPreferences(NAME, MODE_PRIVATE)
     private val prefEditor = sharedPreferences.edit()
 
-    fun storePath(path: String){
-        prefEditor.apply{
+    override fun storePath(path: String) {
+        prefEditor.apply {
             putString(CURRENT_NOTES_PATH, path)
             apply()
         }
     }
 
-    fun getPathString() = sharedPreferences.getString(CURRENT_NOTES_PATH, null)
+    override fun getPathString() = sharedPreferences.getString(CURRENT_NOTES_PATH, null)
 
-    fun getPath(): Path? {
+    override fun getPath(): Path? {
         val pathString = getPathString()
         var path: Path? = null
         try {
@@ -29,19 +36,5 @@ class MemoPreferences private constructor(context: Context) {
             e.printStackTrace()
         }
         return path
-    }
-
-    companion object{
-        private const val NAME = "memo_prefs"
-        private const val CURRENT_NOTES_PATH = "current_notes_path"
-        private var preferences: MemoPreferences? = null
-
-        fun getInstance(context: Context): MemoPreferences{
-            if(preferences == null)
-                preferences = MemoPreferences(context)
-            return preferences!!
-        }
-
-        fun getInstance() = preferences!!
     }
 }
