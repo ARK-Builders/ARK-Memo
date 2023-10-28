@@ -9,18 +9,13 @@ import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import space.taran.arkmemo.data.ResourceMeta
 import space.taran.arkmemo.models.TextNote
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.io.path.deleteIfExists
-import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.fileSize
 import kotlin.io.path.forEachLine
@@ -29,8 +24,7 @@ import kotlin.io.path.moveTo
 import kotlin.io.path.name
 import kotlin.io.path.writeLines
 
-@Singleton
-class TextNotesRepo @Inject constructor() {
+class TextNotesRepoImpl @Inject constructor(): TextNotesRepo {
 
     private val iODispatcher = Dispatchers.IO
 
@@ -39,17 +33,17 @@ class TextNotesRepo @Inject constructor() {
 
     private lateinit var root: Path
 
-    suspend fun init(root: Path, scope: CoroutineScope) {
+    override suspend fun init(root: Path, scope: CoroutineScope) {
         this.root = root
         propertiesStorageRepo = PropertiesStorageRepo(scope)
         propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
     }
 
-    suspend fun save(note: TextNote) {
+   override suspend fun save(note: TextNote) {
         write(note)
     }
 
-    suspend fun delete(note: TextNote) = withContext(iODispatcher) {
+    override suspend fun delete(note: TextNote) = withContext(iODispatcher) {
         val path = root.resolve("${note.meta?.name}")
         delete(path)
         propertiesStorage.remove(note.meta?.id!!)
@@ -57,7 +51,7 @@ class TextNotesRepo @Inject constructor() {
         Log.d("text-repo", "${note.meta?.name!!} has been deleted")
     }
 
-    suspend fun read(): List<TextNote> = withContext(Dispatchers.IO) {
+    override  suspend fun read(): List<TextNote> = withContext(Dispatchers.IO) {
         val notes = mutableListOf<TextNote>()
         Files.list(root).forEach { path ->
             if (path.fileName.extension == NOTE_EXT) {
