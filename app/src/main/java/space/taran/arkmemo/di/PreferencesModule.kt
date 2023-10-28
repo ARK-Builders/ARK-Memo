@@ -11,5 +11,5 @@ import space.taran.arkmemo.preferences.MemoPreferencesImpl
 @Module
 abstract class PreferencesModule {
     @Binds
-    abstract fun bindRepository(impl: MemoPreferencesImpl): MemoPreferences
+    abstract fun bindMemoPreferences(impl: MemoPreferencesImpl): MemoPreferences
 }
