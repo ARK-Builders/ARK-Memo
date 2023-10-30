@@ -16,9 +16,11 @@ import space.taran.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
 
 @HiltViewModel
-class NotesViewModel @Inject constructor(): ViewModel() {
+class NotesViewModel @Inject constructor(
+    private val textNotesRepo: TextNotesRepo,
+    private val memoPreferences: MemoPreferences
+) : ViewModel() {
 
-    @Inject lateinit var textNotesRepo: TextNotesRepo
 
     @Inject lateinit var graphicNotesRepo: GraphicNotesRepo
 
@@ -29,7 +31,7 @@ class NotesViewModel @Inject constructor(): ViewModel() {
     fun init() {
         viewModelScope.launch(iODispatcher) {
             textNotesRepo.init(
-                MemoPreferences.getNotesStorage()!!,
+                memoPreferences.getPath()!!,
                 viewModelScope
             )
             graphicNotesRepo.init(

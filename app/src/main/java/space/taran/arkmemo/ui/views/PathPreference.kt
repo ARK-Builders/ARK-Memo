@@ -6,11 +6,11 @@ import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import space.taran.arkmemo.R
-import space.taran.arkmemo.preferences.MemoPreferences
 
 class PathPreference(context: Context, attrs: AttributeSet): Preference(context, attrs) {
     private var title: TextView? = null
     private var path: TextView? = null
+    var onBindView: () -> Unit = {}
 
     fun setPath(path: String?){
         if(path != null)
@@ -26,6 +26,6 @@ class PathPreference(context: Context, attrs: AttributeSet): Preference(context,
         super.onBindViewHolder(holder)
         title = holder.findViewById(R.id.title) as TextView
         path = holder.findViewById(R.id.pathValue) as TextView
-        setPath(MemoPreferences.getInstance(context).getPathString())
+        onBindView()
     }
 }
