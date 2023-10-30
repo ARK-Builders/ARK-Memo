@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import space.taran.arkmemo.R
-import space.taran.arkmemo.databinding.TextNoteBinding
+import space.taran.arkmemo.databinding.NoteBinding
 import space.taran.arkmemo.models.BaseNote
 import space.taran.arkmemo.models.GraphicNote
 import space.taran.arkmemo.models.TextNote
@@ -37,7 +37,7 @@ class NotesListAdapter(private val notes: List<BaseNote>): RecyclerView.Adapter<
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].resourceContent.title
+        holder.title.text = notes[position].title
         holder.date.text = notes[position].resourceMeta?.modified?.toString() ?: "Just now"
     }
 
@@ -45,7 +45,7 @@ class NotesListAdapter(private val notes: List<BaseNote>): RecyclerView.Adapter<
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         private val binding by viewBinding{
-            TextNoteBinding.bind(itemView)
+            NoteBinding.bind(itemView)
         }
 
         val title = binding.noteTitle

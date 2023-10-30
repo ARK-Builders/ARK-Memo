@@ -8,9 +8,11 @@ import space.taran.arkmemo.utils.SVG
 
 @Parcelize
 data class GraphicNote(
+    val title: String,
+    val description: String = "",
     val content: Content,
     @IgnoredOnParcel
     val svg: SVG? = null,
     @IgnoredOnParcel
     var meta: ResourceMeta? = null
-) : BaseNote(content, meta), Parcelable
+) : BaseNote(title, description, content, meta), Parcelable

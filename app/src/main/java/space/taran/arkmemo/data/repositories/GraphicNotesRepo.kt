@@ -2,6 +2,10 @@ package space.taran.arkmemo.data.repositories
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
+import dev.arkbuilders.arklib.data.index.RootIndex
+import dev.arkbuilders.arklib.user.properties.PropertiesStorage
+import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import space.taran.arkmemo.data.ResourceMeta
@@ -21,70 +25,62 @@ import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.moveTo
 
-class GraphicNotesRepo @Inject constructor() {
+class GraphicNotesRepo @Inject constructor(): NotesRepoImpl(), NotesRepo<GraphicNote> {
 
     private val iODispatcher = Dispatchers.IO
-    private val root = MemoPreferences.getNotesStorage()
 
-    suspend fun save(note: GraphicNote) = withContext(iODispatcher) {
+    override suspend fun save(note: GraphicNote) = withContext(iODispatcher) {
         write(note.svg!!)
     }
 
-    suspend fun delete(note: GraphicNote) = withContext(iODispatcher) {
-        if (root != null && note.meta != null) {
-            val path = root.resolve(note.meta.name)
-            delete(path)
-        }
+    override suspend fun delete(note: GraphicNote) = withContext(iODispatcher) {
+       deleteNote(note)
     }
 
-    suspend fun read(): List<GraphicNote> = withContext(Dispatchers.IO) {
+    override suspend fun read(): List<GraphicNote> = withContext(iODispatcher) {
         readStorage()
     }
 
     private fun write(svg: SVG) {
-        if (root != null) {
-            val tempPath = createTempFile()
-            svg.generate(tempPath)
-            val id = computeId(tempPath.fileSize(), tempPath)
-            val resourcePath = root.resolve("${id}.$GRAPHICAL_NOTE_EXT")
-            tempPath.moveTo(resourcePath)
+        val tempPath = createTempFile()
+        svg.generate(tempPath)
+        val id = computeId(tempPath.fileSize(), tempPath)
+        val resourcePath = root.resolve("${id}.$GRAPHICAL_NOTE_EXT")
+        tempPath.moveTo(resourcePath)
 
-            Log.d("graphics-repo", "file renamed to $resourcePath successfully")
-        }
+        Log.d("graphics-repo", "file renamed to $resourcePath successfully")
     }
 
-    private fun delete(path: Path) {
-        path.deleteIfExists()
-    }
-
-    private suspend fun readStorage() = withContext(Dispatchers.IO) {
+    private suspend fun readStorage() = withContext(iODispatcher) {
         val notes = mutableListOf<GraphicNote>()
-        if (root != null) {
-            var i = 0
-            Files.list(root).forEach { path ->
-                if (path.extension == GRAPHICAL_NOTE_EXT) {
-                    val svg = SVG.parse(path)
-                    val size = path.fileSize()
-                    val meta = ResourceMeta(
-                        computeId(size, path),
-                        path.fileName.name,
-                        path.extension,
-                        path.getLastModifiedTime(),
-                        size
-                    )
-                    val note = GraphicNote(
-                        content = Content("Note ${i++}", svg.pathData),
-                        svg = svg,
-                        meta = meta
-                    )
-                    notes.add(note)
-                }
+        Files.list(root).forEach { path ->
+            if (path.extension == GRAPHICAL_NOTE_EXT) {
+                val svg = SVG.parse(path)
+                val size = path.fileSize()
+                val id = computeId(size, path)
+                val meta = ResourceMeta(
+                    id,
+                    path.fileName.name,
+                    path.extension,
+                    path.getLastModifiedTime(),
+                    size
+                )
+
+                val titles = propertiesStorage.getProperties(id).titles
+                val descriptions = propertiesStorage.getProperties(id).descriptions
+
+                val note = GraphicNote(
+                    titles.elementAt(0),
+                    descriptions.elementAt(0),
+                    Content(svg.pathData),
+                    svg,
+                    meta
+                )
+                notes.add(note)
             }
         }
         notes
     }
-
-    companion object {
-        private const val GRAPHICAL_NOTE_EXT = "note.svg"
-    }
 }
+
+private const val GRAPHICAL_NOTE_EXT = "note.svg"

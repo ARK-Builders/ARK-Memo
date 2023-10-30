@@ -7,7 +7,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TextNote (
+    val title: String,
+    val description: String = "",
     val content: Content,
     @IgnoredOnParcel
     var meta: ResourceMeta? = null
-): BaseNote(content, meta), Parcelable
+): BaseNote(title, description, content, meta), Parcelable

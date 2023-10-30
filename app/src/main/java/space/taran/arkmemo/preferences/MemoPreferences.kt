@@ -28,7 +28,6 @@ class MemoPreferences private constructor(context: Context) {
                 preferences = MemoPreferences(context)
             return preferences!!
         }
-
         fun getNotesStorage(): Path? {
             var path: Path? = null
             try {

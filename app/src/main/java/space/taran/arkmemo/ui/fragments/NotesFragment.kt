@@ -17,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import space.taran.arkmemo.R
 import space.taran.arkmemo.ui.viewmodels.NotesViewModel
-import space.taran.arkmemo.databinding.FragmentTextNotesBinding
+import space.taran.arkmemo.databinding.FragmentNotesBinding
 import space.taran.arkmemo.models.BaseNote
 import space.taran.arkmemo.ui.activities.MainActivity
 import space.taran.arkmemo.ui.activities.getTextFromClipBoard
@@ -27,7 +27,7 @@ import space.taran.arkmemo.ui.adapters.NotesListAdapter
 @AndroidEntryPoint
 class TextNotesFragment: Fragment(R.layout.fragment_notes) {
 
-    private val binding by viewBinding(FragmentTextNotesBinding::bind)
+    private val binding by viewBinding(FragmentNotesBinding::bind)
 
     private val activity: MainActivity by lazy {
         requireActivity() as MainActivity

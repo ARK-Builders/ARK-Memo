@@ -26,7 +26,11 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     private val binding by viewBinding(FragmentEditNotesBinding::bind)
 
-    private var note = TextNote(Content("", ""))
+    private var note = TextNote(
+        "",
+        "",
+        Content( "")
+    )
     private var noteStr: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,34 +40,31 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var note = this.note
+        var title = this.note.title
+        var data = note.content.data
         val editTextListener = object: TextWatcher{
             override fun afterTextChanged(s: Editable?) = Unit
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val noteString = s?.toString()
-                var title = this@EditTextNotesFragment.note.content.title
-                if(noteString != null){
-                    if (title == "") for(char in noteString){
-                        if(char != '\n'){
-                            title += char
-                        }
-                        else break
-                    }
-                    val content = Content(
-                        title = title,
-                        data = noteString
-                    )
-                    note = TextNote(
-                        content = content
-                    )
-                }
+                data = s?.toString() ?: ""
             }
         }
+        val noteTitle = binding.noteTitle
         val editNote = binding.editNote
         val saveNoteButton = binding.saveNote
+        val noteTitleChangeListener = object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                title = s?.toString() ?: ""
+                saveNoteButton.isEnabled = !s.isNullOrEmpty()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+
+        }
 
         if(arguments != null) {
             requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
@@ -76,6 +77,8 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
+        noteTitle.setText(this.note.title)
+        noteTitle.addTextChangedListener(noteTitleChangeListener)
         editNote.requestFocus()
         editNote.addTextChangedListener(editTextListener)
         editNote.setText(this.note.content.data)
@@ -84,6 +87,10 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
             editNote.setText(noteStr)
 
         saveNoteButton.setOnClickListener {
+            val note = TextNote(
+                title,
+                content = Content(data)
+            )
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)
             }

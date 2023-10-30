@@ -1,6 +1,8 @@
 package space.taran.arkmemo.ui.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
@@ -31,19 +33,41 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var title = ""
         val notesCanvas = binding.notesCanvas
         val saveButton = binding.saveNote
+        val noteTitle = binding.noteTitle
+        val noteTitleChangeListener = object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                title = s?.toString() ?: ""
+                saveButton.isEnabled = !s.isNullOrEmpty()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+
+        }
 
         activity.title = getString(R.string.edit_note)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
+        if (arguments != null) {
+            requireArguments().getParcelable<GraphicNote>(GRAPHICAL_NOTE_KEY)?.let {
+                title = it.title
+            }
+        }
+
+        noteTitle.setText(title)
+        noteTitle.addTextChangedListener(noteTitleChangeListener)
         notesCanvas.isVisible = true
         notesCanvas.setViewModel(graphicNotesViewModel)
         saveButton.setOnClickListener {
             val svg = graphicNotesViewModel.svg()
             val note = GraphicNote(
-                content = Content("", svg.pathData),
+                title,
+                content = Content(svg.pathData),
                 svg = svg
             )
             notesViewModel.onSaveClick(note) { show ->

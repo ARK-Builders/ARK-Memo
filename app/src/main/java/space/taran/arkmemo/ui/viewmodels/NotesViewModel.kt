@@ -29,10 +29,14 @@ class NotesViewModel @Inject constructor(): ViewModel() {
     fun init() {
         viewModelScope.launch(iODispatcher) {
             textNotesRepo.init(
-                MemoPreferences.getInstance().getPath()!!,
+                MemoPreferences.getNotesStorage()!!,
                 viewModelScope
             )
-            notes.value = textNotesRepo.read()
+            graphicNotesRepo.init(
+                MemoPreferences.getNotesStorage()!!,
+                viewModelScope
+            )
+            notes.value = textNotesRepo.read() + graphicNotesRepo.read()
         }
     }
 

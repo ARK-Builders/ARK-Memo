@@ -7,6 +7,8 @@ import space.taran.arkmemo.data.ResourceMeta
 
 @Parcelize
 open class BaseNote(
+    val resourceTitle: String,
+    val resourceDesc: String = "",
     val resourceContent: Content,
     @IgnoredOnParcel
     var resourceMeta: ResourceMeta? = null
@@ -14,6 +16,5 @@ open class BaseNote(
 
 @Parcelize
 data class Content(
-    val title: String,
     val data: String
 ): Parcelable
