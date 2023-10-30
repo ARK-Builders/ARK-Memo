@@ -23,11 +23,15 @@ import space.taran.arkmemo.preferences.MemoPreferences
 import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
 import space.taran.arkmemo.ui.fragments.SettingsFragment
 import space.taran.arkmemo.ui.fragments.TextNotesFragment
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private val binding by viewBinding(ActivityMainBinding::bind)
+
+    @Inject
+    lateinit var memoPreferences: MemoPreferences
 
     @IdRes
     private val fragContainer = R.id.container
@@ -84,11 +88,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         }
 
-        if (MemoPreferences.getInstance(this).getPathString() == null) {
+        if (memoPreferences.getPathString() == null) {
             FilePicker.show(this, supportFragmentManager)
 
             supportFragmentManager.onArkPathPicked(this) {
-                MemoPreferences.getInstance(this).storePath(it.toString())
+                memoPreferences.storePath(it.toString())
                 showFragment()
             }
         }

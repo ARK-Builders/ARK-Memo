@@ -13,9 +13,11 @@ import space.taran.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
 
 @HiltViewModel
-class NotesViewModel @Inject constructor(): ViewModel() {
+class NotesViewModel @Inject constructor(
+    private val textNotesRepo: TextNotesRepo,
+    private val memoPreferences: MemoPreferences
+) : ViewModel() {
 
-    @Inject lateinit var textNotesRepo: TextNotesRepo
 
     private val iODispatcher = Dispatchers.IO
 
@@ -24,7 +26,7 @@ class NotesViewModel @Inject constructor(): ViewModel() {
     fun init() {
         viewModelScope.launch(iODispatcher) {
             textNotesRepo.init(
-                MemoPreferences.getInstance().getPath()!!,
+                memoPreferences.getPath()!!,
                 viewModelScope
             )
             notes.value = textNotesRepo.read()
