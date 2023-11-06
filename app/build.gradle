@@ -10,7 +10,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "space.taran.arkmemo"
+        applicationId "dev.arkbuilders.arkmemo"
         minSdk 26
         targetSdk 33
         versionCode 1
