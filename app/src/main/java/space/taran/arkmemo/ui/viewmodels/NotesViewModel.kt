@@ -3,41 +3,43 @@ package space.taran.arkmemo.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import space.taran.arkmemo.data.repositories.GraphicNotesRepo
-import space.taran.arkmemo.data.repositories.TextNotesRepo
+import space.taran.arkmemo.data.repositories.NotesRepo
+import space.taran.arkmemo.di.IO_DISPATCHER
 import space.taran.arkmemo.models.BaseNote
 import space.taran.arkmemo.models.GraphicNote
 import space.taran.arkmemo.models.TextNote
 import space.taran.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val textNotesRepo: TextNotesRepo,
+    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
+    private val textNotesRepo: NotesRepo<TextNote>,
+    private val graphicNotesRepo: NotesRepo<GraphicNote>,
     private val memoPreferences: MemoPreferences
 ) : ViewModel() {
 
-
-    @Inject lateinit var graphicNotesRepo: GraphicNotesRepo
-
-    private val iODispatcher = Dispatchers.IO
-
     private val notes = MutableStateFlow(listOf<BaseNote>())
 
-    fun init() {
+    fun init(read: () -> Unit) {
+        val initJob = viewModelScope.launch(iODispatcher) {
+            textNotesRepo.init()
+            graphicNotesRepo.init()
+        }
+        viewModelScope.launch {
+            initJob.join()
+            read()
+        }
+    }
+
+    fun readAllNotes() {
         viewModelScope.launch(iODispatcher) {
-            textNotesRepo.init(
-                memoPreferences.getPath()!!,
-                viewModelScope
-            )
-            graphicNotesRepo.init(
-                MemoPreferences.getNotesStorage()!!,
-                viewModelScope
-            )
             notes.value = textNotesRepo.read() + graphicNotesRepo.read()
         }
     }
@@ -46,7 +48,6 @@ class NotesViewModel @Inject constructor(
         viewModelScope.launch(iODispatcher) {
             withContext(Dispatchers.Main) {
                 showProgress(true)
-
             }
             when (note) {
                 is TextNote -> {
@@ -85,6 +86,9 @@ class NotesViewModel @Inject constructor(
 
     private fun add(note: BaseNote) {
         val notes = this.notes.value.toMutableList()
+        note.resourceMeta?.let {
+            notes.removeIf { it.resourceMeta?.id == note.resourceMeta?.id }
+        }
         notes.add(note)
         this.notes.value = notes
     }

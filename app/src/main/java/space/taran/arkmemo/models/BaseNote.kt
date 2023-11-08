@@ -10,7 +10,6 @@ open class BaseNote(
     val resourceTitle: String,
     val resourceDesc: String = "",
     val resourceContent: Content,
-    @IgnoredOnParcel
     var resourceMeta: ResourceMeta? = null
 ) : Parcelable
 

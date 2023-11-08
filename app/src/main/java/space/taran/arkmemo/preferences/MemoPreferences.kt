@@ -5,7 +5,7 @@ import java.nio.file.Path
 interface MemoPreferences {
     fun storePath(path: String)
 
-    fun getPathString(): String?
+    fun getPath(): String?
 
-    fun getPath(): Path?
+    fun getNotesStorage(): Path
 }

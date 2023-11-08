@@ -7,13 +7,13 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import space.taran.arkmemo.ui.viewmodels.DrawPath
-import space.taran.arkmemo.ui.viewmodels.GraphicalNotesViewModel
+import space.taran.arkmemo.ui.viewmodels.GraphicNotesViewModel
 
 class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
 
     private var currentX = 0f
     private var currentY = 0f
-    private lateinit var viewModel: GraphicalNotesViewModel
+    private lateinit var viewModel: GraphicNotesViewModel
     private var path = Path()
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -63,7 +63,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
         return true
     }
 
-    fun setViewModel(viewModel: GraphicalNotesViewModel) {
+    fun setViewModel(viewModel: GraphicNotesViewModel) {
         this.viewModel = viewModel
     }
 }

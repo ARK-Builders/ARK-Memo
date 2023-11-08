@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -35,7 +36,13 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notesViewModel.init()
+        notesViewModel.init {}
+        if(arguments != null) {
+            requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
+                this.note = it
+            }
+            noteStr = requireArguments().getString(NOTE_STRING_KEY)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,14 +70,6 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
             }
 
             override fun afterTextChanged(s: Editable?) {}
-
-        }
-
-        if(arguments != null) {
-            requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
-                this.note = it
-            }
-            noteStr = requireArguments().getString(NOTE_STRING_KEY)
         }
 
         activity.title = getString(R.string.edit_note)
@@ -79,6 +78,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
         noteTitle.setText(this.note.title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
+        editNote.isVisible = true
         editNote.requestFocus()
         editNote.addTextChangedListener(editTextListener)
         editNote.setText(this.note.content.data)
@@ -86,10 +86,12 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         if(noteStr != null)
             editNote.setText(noteStr)
 
+        saveNoteButton.isEnabled = title.isNotEmpty()
         saveNoteButton.setOnClickListener {
             val note = TextNote(
                 title,
-                content = Content(data)
+                content = Content(data),
+                meta = this.note.resourceMeta
             )
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)

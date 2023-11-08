@@ -32,7 +32,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val pathKey = getString(R.string.path_pref_key)
         val pathPref: PathPreference? = findPreference<PathPreference?>(pathKey)?.apply {
             onBindView = {
-                setPath(memoPreferences.getPathString())
+                setPath(memoPreferences.getPath())
             }
         }
         activity.title = getString(R.string.settings)

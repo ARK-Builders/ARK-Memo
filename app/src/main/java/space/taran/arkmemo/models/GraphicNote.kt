@@ -13,6 +13,5 @@ data class GraphicNote(
     val content: Content,
     @IgnoredOnParcel
     val svg: SVG? = null,
-    @IgnoredOnParcel
-    var meta: ResourceMeta? = null
+    private val meta: ResourceMeta? = null
 ) : BaseNote(title, description, content, meta), Parcelable

@@ -8,26 +8,28 @@ import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import space.taran.arkmemo.data.ResourceMeta
 import space.taran.arkmemo.models.BaseNote
 import space.taran.arkmemo.models.TextNote
 import java.nio.file.Path
+import javax.inject.Inject
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.moveTo
 import kotlin.io.path.name
 
-open class NotesRepoImpl {
+abstract class NotesRepoImpl<Note> constructor(
+    protected val root: Path,
+    private val scope: CoroutineScope,
+    private val propertiesStorageRepo: PropertiesStorageRepo
+): NotesRepo<Note> {
 
-    protected lateinit var root: Path
     protected lateinit var propertiesStorage: PropertiesStorage
-    private lateinit var propertiesStorageRepo: PropertiesStorageRepo
 
-    suspend fun init(root: Path, scope: CoroutineScope) {
-        this.root = root
-        propertiesStorageRepo = PropertiesStorageRepo(scope)
+    override suspend fun init() {
         propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
     }
 
@@ -40,14 +42,14 @@ open class NotesRepoImpl {
     }
 
     protected fun renameResourceWithNewResourceMeta(
-        note: TextNote,
+        note: BaseNote,
         tempPath: Path,
         resourcePath: Path,
         resourceId: ResourceId,
         size: Long
     ) {
         tempPath.moveTo(resourcePath)
-        note.meta = ResourceMeta(
+        note.resourceMeta = ResourceMeta(
             id = resourceId,
             name = resourcePath.fileName.name,
             extension = resourcePath.extension,
@@ -57,6 +59,16 @@ open class NotesRepoImpl {
         Log.d("notes-repo", "resource renamed to ${resourcePath.name} successfully")
     }
 
+    protected fun readProperties(id: ResourceId): UserNoteProperties {
+        val title = propertiesStorage.getProperties(id).titles.let {
+            if (it.isNotEmpty()) it.elementAt(0) else throw NoteTitlesException()
+        }
+        val description = propertiesStorage.getProperties(id).descriptions.let {
+            if (it.isNotEmpty()) it.elementAt(0) else ""
+        }
+        return UserNoteProperties(title, description)
+    }
+
     protected suspend fun deleteNote(note: BaseNote): Unit = withContext(Dispatchers.IO) {
         val path = root.resolve("${note.resourceMeta?.name}")
         path.deleteIfExists()
@@ -64,4 +76,13 @@ open class NotesRepoImpl {
         propertiesStorage.persist()
         Log.d("repo", "${note.resourceMeta?.name!!} has been deleted")
     }
+
+    protected fun BaseNote.exists(id: ResourceId) = resourceMeta != null && resourceMeta?.id == id
 }
+
+data class UserNoteProperties(
+    val title: String,
+    val description: String
+)
+
+class NoteTitlesException: Exception("note resource missing at least one title")

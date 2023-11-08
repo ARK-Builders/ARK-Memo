@@ -62,7 +62,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_notes) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notesViewModel.init()
+        notesViewModel.apply {  init { readAllNotes() } }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

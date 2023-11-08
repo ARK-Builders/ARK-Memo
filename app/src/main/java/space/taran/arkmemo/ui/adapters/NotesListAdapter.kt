@@ -18,16 +18,17 @@ import space.taran.arkmemo.ui.dialogs.NoteDeleteDialogFragment
 import space.taran.arkmemo.ui.fragments.EditGraphicNotesFragment
 import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
 
-class NotesListAdapter(private val notes: List<BaseNote>): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
+class NotesListAdapter(private val notes: List<BaseNote>):
+    RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private var activity: MainActivity? = null
     private var fragmentManager: FragmentManager? = null
 
-    fun setActivity(activity: AppCompatActivity){
+    fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
     }
 
-    fun setFragmentManager(manager: FragmentManager){
+    fun setFragmentManager(manager: FragmentManager) {
         fragmentManager = manager
     }
 
@@ -37,14 +38,14 @@ class NotesListAdapter(private val notes: List<BaseNote>): RecyclerView.Adapter<
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].title
+        holder.title.text = notes[position].resourceTitle
         holder.date.text = notes[position].resourceMeta?.modified?.toString() ?: "Just now"
     }
 
     override fun getItemCount() = notes.size
 
-    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-        private val binding by viewBinding{
+    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+        private val binding by viewBinding {
             NoteBinding.bind(itemView)
         }
 
@@ -52,15 +53,18 @@ class NotesListAdapter(private val notes: List<BaseNote>): RecyclerView.Adapter<
         val date = binding.noteDate
 
         private val clickNoteToEditListener = View.OnClickListener {
+            var tag = EditTextNotesFragment.TAG
             when (val selectedNote = notes[bindingAdapterPosition]) {
                 is TextNote -> activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
-                is GraphicNote ->
+                is GraphicNote -> {
                     activity?.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
+                    tag = EditGraphicNotesFragment.TAG
+                }
             }
-            activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
+            activity?.replaceFragment(activity?.fragment!!, tag)
         }
 
-        private val deleteNoteClickListener = View.OnClickListener{
+        private val deleteNoteClickListener = View.OnClickListener {
             NoteDeleteDialogFragment()
                 .setNoteToBeDeleted(notes[bindingAdapterPosition])
                 .show(fragmentManager!!, NoteDeleteDialogFragment.TAG)
@@ -70,6 +74,5 @@ class NotesListAdapter(private val notes: List<BaseNote>): RecyclerView.Adapter<
             binding.theNote.setOnClickListener(clickNoteToEditListener)
             binding.deleteNote.setOnClickListener(deleteNoteClickListener)
         }
-
     }
 }

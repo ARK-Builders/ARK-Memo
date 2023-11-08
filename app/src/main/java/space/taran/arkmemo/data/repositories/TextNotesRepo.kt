@@ -2,13 +2,21 @@ package space.taran.arkmemo.data.repositories
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
+import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import space.taran.arkmemo.data.ResourceMeta
+import space.taran.arkmemo.di.IO_DISPATCHER
+import space.taran.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
 import space.taran.arkmemo.models.Content
 import space.taran.arkmemo.models.TextNote
+import space.taran.arkmemo.preferences.MemoPreferences
 import java.nio.file.Files
+import java.nio.file.Path
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.io.path.extension
 import kotlin.io.path.fileSize
@@ -18,7 +26,17 @@ import kotlin.io.path.name
 import kotlin.io.path.writeLines
 
 @Singleton
-class TextNotesRepo @Inject constructor(): NotesRepoImpl(), NotesRepo<TextNote> {
+class TextNotesRepo @Inject constructor(
+    private val memoPreferences: MemoPreferences,
+    @Named(IO_DISPATCHER)
+    private val iODispatcher: CoroutineDispatcher,
+    @Named(STORAGE_SCOPE) private val storageScope: CoroutineScope,
+    private val propertiesStorageRepo: PropertiesStorageRepo
+): NotesRepoImpl<TextNote>(
+    memoPreferences.getNotesStorage(),
+    storageScope,
+    propertiesStorageRepo
+) {
 
     override suspend fun save(note: TextNote) {
         write(note)
@@ -28,11 +46,11 @@ class TextNotesRepo @Inject constructor(): NotesRepoImpl(), NotesRepo<TextNote> 
         deleteNote(note)
     }
 
-    override suspend fun read(): List<TextNote> = withContext(Dispatchers.IO) {
-       readStorage()
+    override suspend fun read(): List<TextNote> = withContext(iODispatcher) {
+        readStorage()
     }
 
-    private suspend fun write(note: TextNote) = withContext(Dispatchers.IO) {
+    private suspend fun write(note: TextNote) = withContext(iODispatcher) {
         val tempPath = kotlin.io.path.createTempFile()
         val lines = note.content.data.split('\n')
         tempPath.writeLines(lines)
@@ -40,6 +58,14 @@ class TextNotesRepo @Inject constructor(): NotesRepoImpl(), NotesRepo<TextNote> 
         val id = computeId(size, tempPath)
         Log.d("text-repo", "initial resource name ${tempPath.name}")
         persistNoteProperties(resourceId = id, noteTitle = note.title)
+        Log.d("text-repo", "note id: ${note.resourceMeta?.id}, computed id $id")
+        if (note.exists(id)) {
+            Log.d(
+                "text-repo",
+                "resource with similar content already exists"
+            )
+            return@withContext
+        }
 
         val resourcePath = root.resolve("$id.$NOTE_EXT")
         renameResourceWithNewResourceMeta(
@@ -49,9 +75,10 @@ class TextNotesRepo @Inject constructor(): NotesRepoImpl(), NotesRepo<TextNote> 
             resourceId = id,
             size = size
         )
+        Log.d("text-repo", "file renamed to ${note.resourceMeta?.name} successfully")
     }
 
-    private suspend fun readStorage() = withContext(Dispatchers.IO){
+    private suspend fun readStorage() = withContext(iODispatcher){
         val notes = mutableListOf<TextNote>()
         Files.list(root).forEach { path ->
             if (path.fileName.extension == NOTE_EXT) {
@@ -68,13 +95,13 @@ class TextNotesRepo @Inject constructor(): NotesRepoImpl(), NotesRepo<TextNote> 
                     path.getLastModifiedTime(),
                     size
                 )
-                val titles = propertiesStorage.getProperties(id).titles
-                val descriptions = propertiesStorage.getProperties(id).descriptions
-                val content = Content(data.toString())
+
+                val userNoteProperties = readProperties(id)
+
                 val note = TextNote(
-                    titles.elementAt(0),
-                    descriptions.elementAt(0),
-                    content,
+                    userNoteProperties.title,
+                    userNoteProperties.description,
+                    Content(data.toString()),
                     meta
                 )
                 notes.add(note)

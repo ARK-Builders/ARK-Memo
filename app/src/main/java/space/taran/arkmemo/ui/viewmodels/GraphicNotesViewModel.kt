@@ -6,18 +6,23 @@ import android.graphics.Path
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arklib.ResourceId
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import space.taran.arkmemo.data.repositories.GraphicNotesRepo
+import space.taran.arkmemo.data.repositories.NotesRepo
 import space.taran.arkmemo.models.GraphicNote
 import space.taran.arkmemo.utils.SVG
 import java.util.Stack
 import javax.inject.Inject
 
 @HiltViewModel
-class GraphicalNotesViewModel @Inject constructor(): ViewModel() {
+class GraphicNotesViewModel @Inject constructor(
+    private val repo: NotesRepo<GraphicNote>
+): ViewModel() {
 
-    @Inject lateinit var repo: GraphicNotesRepo
-
+    private val _notes = MutableStateFlow(listOf<GraphicNote>())
+    val notes: StateFlow<List<GraphicNote>> = _notes
     private var paintColor = Color.BLACK
 
     private var strokeWidth = 10f
@@ -33,15 +38,13 @@ class GraphicalNotesViewModel @Inject constructor(): ViewModel() {
 
     private val editPaths = Stack<DrawPath>()
 
-    private val svg = SVG()
+    private var svg = SVG()
 
-    init {
-        if (editPaths.isNotEmpty()) editPaths.clear()
-    }
-
-    fun onSaveClick(note: GraphicNote) {
+    fun updatePathsByNote(note: GraphicNote) {
         viewModelScope.launch {
-            repo.save(note)
+            if (editPaths.isNotEmpty()) editPaths.clear()
+            editPaths.addAll(note.svg?.getPaths()!!)
+            svg = note.svg.copy()
         }
     }
 
