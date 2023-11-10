@@ -1,13 +1,17 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arkmemo.data.repositories.SaveNoteCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.data.repositories.TextNotesRepo
+import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
@@ -22,6 +26,7 @@ class NotesViewModel @Inject constructor(
     private val iODispatcher = Dispatchers.IO
 
     private val notes = MutableStateFlow(listOf<TextNote>())
+    private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
 
     fun init() {
         viewModelScope.launch(iODispatcher) {
@@ -39,8 +44,16 @@ class NotesViewModel @Inject constructor(
                 showProgress(true)
 
             }
-            textNotesRepo.save(note)
-            add(note)
+            textNotesRepo.save(note, object : SaveNoteCallback {
+                override fun onSaveNote(result: SaveNoteResult) {
+                    if (result == SaveNoteResult.SUCCESS) {
+                        add(note)
+                    }
+                    mSaveNoteResultLiveData.postValue(result)
+                }
+
+            })
+
             withContext(Dispatchers.Main) {
                 showProgress(false)
             }
@@ -74,5 +87,9 @@ class NotesViewModel @Inject constructor(
         val notes = this.notes.value.toMutableList()
         notes.remove(note)
         this.notes.value = notes
+    }
+
+    fun getSaveNoteResultLiveData(): LiveData<SaveNoteResult> {
+        return mSaveNoteResultLiveData
     }
 }
