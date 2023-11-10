@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentEditTextNotesBinding
+import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 
@@ -32,6 +33,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init()
+        subscribeLiveData()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,16 +88,26 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
         saveNoteButton.setOnClickListener {
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)
-                if (!show) {
-                    Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
-                        Toast.LENGTH_SHORT)
-                        .show()
-                    activity.onBackPressedDispatcher.onBackPressed()
-                }
             }
         }
     }
 
+    private fun subscribeLiveData() {
+        notesViewModel.getSaveNoteResultLiveData().observe(this) {
+            if (!isResumed) return@observe
+
+            if (it == SaveNoteResult.SUCCESS) {
+                Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
+                    Toast.LENGTH_SHORT)
+                    .show()
+                activity.onBackPressedDispatcher.onBackPressed()
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.ark_memo_note_existing),
+                    Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
 
     companion object{
         const val TAG = "Edit Text Notes"
