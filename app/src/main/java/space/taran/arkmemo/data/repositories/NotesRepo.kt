@@ -1,7 +1,4 @@
-package space.taran.arkmemo.data.repositories
-
-import kotlinx.coroutines.CoroutineScope
-import java.nio.file.Path
+package dev.arkbuilders.arkmemo.data.repositories
 
 interface NotesRepo<Note> {
 
@@ -12,5 +9,4 @@ interface NotesRepo<Note> {
     suspend fun read(): List<Note>
 
     suspend fun delete(note: Note)
-
 }
