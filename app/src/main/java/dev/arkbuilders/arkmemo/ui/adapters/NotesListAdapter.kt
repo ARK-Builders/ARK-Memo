@@ -7,26 +7,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-<<<<<<<< HEAD:app/src/main/java/dev/arkbuilders/arkmemo/ui/adapters/NotesListAdapter.kt
-import space.taran.arkmemo.R
-import space.taran.arkmemo.databinding.NoteBinding
-import space.taran.arkmemo.models.BaseNote
-import space.taran.arkmemo.models.GraphicNote
-import space.taran.arkmemo.models.TextNote
-import space.taran.arkmemo.ui.activities.MainActivity
-import space.taran.arkmemo.ui.activities.replaceFragment
-import space.taran.arkmemo.ui.dialogs.NoteDeleteDialogFragment
-import space.taran.arkmemo.ui.fragments.EditGraphicNotesFragment
-import space.taran.arkmemo.ui.fragments.EditTextNotesFragment
-========
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.databinding.TextNoteBinding
+import dev.arkbuilders.arkmemo.databinding.NoteBinding
+import dev.arkbuilders.arkmemo.models.BaseNote
+import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
 import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialogFragment
+import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
->>>>>>>> origin/main:app/src/main/java/dev/arkbuilders/arkmemo/ui/adapters/TextNotesListAdapter.kt
 
 class NotesListAdapter(private val notes: List<BaseNote>):
     RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {

@@ -1,4 +1,4 @@
-package space.taran.arkmemo.di
+package dev.arkbuilders.arkmemo.di
 
 import dagger.Module
 import dagger.Provides

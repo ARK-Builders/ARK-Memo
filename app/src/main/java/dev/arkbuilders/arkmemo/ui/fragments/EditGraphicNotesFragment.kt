@@ -1,5 +1,6 @@
-package space.taran.arkmemo.ui.fragments
+package dev.arkbuilders.arkmemo.ui.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,13 +11,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import space.taran.arkmemo.R
-import space.taran.arkmemo.ui.viewmodels.GraphicNotesViewModel
-import space.taran.arkmemo.databinding.FragmentEditNotesBinding
-import space.taran.arkmemo.models.Content
-import space.taran.arkmemo.models.GraphicNote
-import space.taran.arkmemo.ui.activities.MainActivity
-import space.taran.arkmemo.ui.viewmodels.NotesViewModel
+import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
+import dev.arkbuilders.arkmemo.models.Content
+import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 
 @AndroidEntryPoint
 class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
@@ -35,7 +36,12 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
         if (arguments != null) {
-            requireArguments().getParcelable<GraphicNote>(GRAPHICAL_NOTE_KEY)?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                requireArguments().getParcelable(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
+                    note = it
+                    graphicNotesViewModel.updatePathsByNote(note)
+                }
+            else requireArguments().getParcelable<GraphicNote>(GRAPHICAL_NOTE_KEY)?.let {
                 note = it
                 graphicNotesViewModel.updatePathsByNote(note)
             }

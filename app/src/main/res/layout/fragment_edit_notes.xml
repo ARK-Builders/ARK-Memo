@@ -41,7 +41,7 @@
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
         android:textColorHint="#757575"/>
-    <space.taran.arkmemo.ui.views.NotesCanvas
+    <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
         android:id="@+id/notesCanvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

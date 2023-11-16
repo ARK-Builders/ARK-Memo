@@ -1,18 +1,18 @@
-package space.taran.arkmemo.data.repositories
+package dev.arkbuilders.arkmemo.data.repositories
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import dev.arkbuilders.arkmemo.data.ResourceMeta
+import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
+import dev.arkbuilders.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
+import dev.arkbuilders.arkmemo.models.Content
+import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.utils.SVG
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import space.taran.arkmemo.data.ResourceMeta
-import space.taran.arkmemo.di.IO_DISPATCHER
-import space.taran.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
-import space.taran.arkmemo.models.Content
-import space.taran.arkmemo.models.GraphicNote
-import space.taran.arkmemo.preferences.MemoPreferences
-import space.taran.arkmemo.utils.SVG
 import java.nio.file.Files
 import javax.inject.Inject
 import javax.inject.Named

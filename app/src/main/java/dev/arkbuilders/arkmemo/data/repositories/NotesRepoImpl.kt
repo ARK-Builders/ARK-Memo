@@ -1,4 +1,4 @@
-package space.taran.arkmemo.data.repositories
+package dev.arkbuilders.arkmemo.data.repositories
 
 import android.util.Log
 import dev.arkbuilders.arklib.ResourceId
@@ -6,13 +6,12 @@ import dev.arkbuilders.arklib.data.index.RootIndex
 import dev.arkbuilders.arklib.user.properties.Properties
 import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import dev.arkbuilders.arkmemo.data.ResourceMeta
+import dev.arkbuilders.arkmemo.models.BaseNote
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import space.taran.arkmemo.data.ResourceMeta
-import space.taran.arkmemo.models.BaseNote
-import space.taran.arkmemo.models.TextNote
 import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.deleteIfExists

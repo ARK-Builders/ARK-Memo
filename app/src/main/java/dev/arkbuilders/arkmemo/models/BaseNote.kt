@@ -1,9 +1,8 @@
-package space.taran.arkmemo.models
+package dev.arkbuilders.arkmemo.models
 
 import android.os.Parcelable
-import kotlinx.parcelize.IgnoredOnParcel
+import dev.arkbuilders.arkmemo.data.ResourceMeta
 import kotlinx.parcelize.Parcelize
-import space.taran.arkmemo.data.ResourceMeta
 
 @Parcelize
 open class BaseNote(

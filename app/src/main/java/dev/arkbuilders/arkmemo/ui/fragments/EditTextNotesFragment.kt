@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,7 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
-import space.taran.arkmemo.models.Content
+import dev.arkbuilders.arkmemo.models.Content
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 
@@ -38,8 +39,12 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
         if(arguments != null) {
-            requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
-                this.note = it
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)?.let {
+                    note = it
+                }
+            else requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
+                note = it
             }
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
         }

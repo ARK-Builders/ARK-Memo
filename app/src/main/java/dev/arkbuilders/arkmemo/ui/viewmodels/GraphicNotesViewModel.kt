@@ -1,4 +1,4 @@
-package space.taran.arkmemo.ui.viewmodels
+package dev.arkbuilders.arkmemo.ui.viewmodels
 
 import android.graphics.Color
 import android.graphics.Paint
@@ -6,13 +6,12 @@ import android.graphics.Path
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.arkbuilders.arklib.ResourceId
+import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
+import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.utils.SVG
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import space.taran.arkmemo.data.repositories.NotesRepo
-import space.taran.arkmemo.models.GraphicNote
-import space.taran.arkmemo.utils.SVG
 import java.util.Stack
 import javax.inject.Inject
 

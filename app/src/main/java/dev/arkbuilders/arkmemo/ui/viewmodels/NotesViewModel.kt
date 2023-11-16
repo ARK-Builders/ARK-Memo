@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
-import space.taran.arkmemo.di.IO_DISPATCHER
-import space.taran.arkmemo.models.BaseNote
-import space.taran.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
+import dev.arkbuilders.arkmemo.models.BaseNote
+import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject

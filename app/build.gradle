@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace 'space.taran.arkmemo'
+    namespace 'dev.arkbuilders.arkmemo'
     compileSdk 33
 
     defaultConfig {

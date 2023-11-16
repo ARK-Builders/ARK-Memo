@@ -1,4 +1,4 @@
-package space.taran.arkmemo.ui.views
+package dev.arkbuilders.arkmemo.ui.views
 
 import android.content.Context
 import android.graphics.Canvas
@@ -6,8 +6,8 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import space.taran.arkmemo.ui.viewmodels.DrawPath
-import space.taran.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
+import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 
 class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
 

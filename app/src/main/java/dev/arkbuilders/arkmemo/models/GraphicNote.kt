@@ -1,10 +1,10 @@
-package space.taran.arkmemo.models
+package dev.arkbuilders.arkmemo.models
 
 import android.os.Parcelable
+import dev.arkbuilders.arkmemo.data.ResourceMeta
+import dev.arkbuilders.arkmemo.utils.SVG
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-import space.taran.arkmemo.data.ResourceMeta
-import space.taran.arkmemo.utils.SVG
 
 @Parcelize
 data class GraphicNote(

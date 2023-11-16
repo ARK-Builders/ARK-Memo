@@ -1,12 +1,12 @@
-package space.taran.arkmemo.utils
+package dev.arkbuilders.arkmemo.utils
 
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path as AndroidDrawPath
 import android.util.Log
 import android.util.Xml
+import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import org.xmlpull.v1.XmlPullParser
-import space.taran.arkmemo.ui.viewmodels.DrawPath
 import java.nio.file.Path
 import java.util.Stack
 import kotlin.io.path.reader
@@ -87,7 +87,7 @@ class SVG {
                         val point = commandsString.substringAfter("$MOVE_TO$SPACE")
                             .substringBefore(SPACE)
                         val pointList = point.split(COMMA)
-                        val x = pointList[0].toFloat();
+                        val x = pointList[0].toFloat()
                         val y = pointList[1].toFloat()
                         Log.d("svg-utils", "move to $point")
                         commandsString = commandsString.removePrefix("$SPACE$MOVE_TO$SPACE$point")
@@ -104,9 +104,9 @@ class SVG {
                         commandsString = commandsString.removePrefix("$SPACE$point2")
                         val point1List = point1.split(COMMA)
                         val point2List = point2.split(COMMA)
-                        val x1 = point1List[0].toFloat();
+                        val x1 = point1List[0].toFloat()
                         val y1 = point1List[1].toFloat()
-                        val x2 = point2List[0].toFloat();
+                        val x2 = point2List[0].toFloat()
                         val y2 = point2List[1].toFloat()
                         Log.d("svg-utils", "quad to $point1 $point2")
                         path.quadTo(x1, y1, x2, y2)

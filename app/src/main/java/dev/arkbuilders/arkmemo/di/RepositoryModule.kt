@@ -5,10 +5,10 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.arkbuilders.arkmemo.data.repositories.GraphicNotesRepo
-import space.taran.arkmemo.data.repositories.NotesRepo
+import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
 import dev.arkbuilders.arkmemo.data.repositories.TextNotesRepo
-import space.taran.arkmemo.models.GraphicNote
-import space.taran.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.models.TextNote
 
 
 @InstallIn(SingletonComponent::class)
