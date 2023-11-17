@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import space.taran.arkfilepicker.presentation.onArkPathPicked
+import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import space.taran.arkmemo.R
 import space.taran.arkmemo.contracts.PermissionContract
 import space.taran.arkmemo.databinding.ActivityMainBinding
