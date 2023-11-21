@@ -19,7 +19,7 @@ import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
-import dev.arkbuilders.arkmemo.files.FilePicker
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
@@ -42,15 +42,15 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     var fragment: Fragment = TextNotesFragment()
 
     init {
-        FilePicker.readPermLauncher =
+        FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) FilePicker.show()
+                if (isGranted) FilePickerDialog.show()
                 else finish()
             }
 
-        FilePicker.readPermLauncher_SDK_R =
+        FilePickerDialog.readPermLauncher_SDK_R =
             registerForActivityResult(PermissionContract()) { isGranted ->
-                if (isGranted) FilePicker.show()
+                if (isGranted) FilePickerDialog.show()
                 else finish()
             }
     }
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
 
         if (memoPreferences.getPath() == null) {
-            FilePicker.show(this, supportFragmentManager)
+            FilePickerDialog.show(this, supportFragmentManager)
 
             supportFragmentManager.onArkPathPicked(this) {
                 memoPreferences.storePath(it.toString())

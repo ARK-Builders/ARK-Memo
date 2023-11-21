@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
-import dev.arkbuilders.arkmemo.models.BaseNote
 import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
@@ -25,7 +25,7 @@ class NotesViewModel @Inject constructor(
     private val memoPreferences: MemoPreferences
 ) : ViewModel() {
 
-    private val notes = MutableStateFlow(listOf<BaseNote>())
+    private val notes = MutableStateFlow(listOf<Note>())
 
     fun init(read: () -> Unit) {
         val initJob = viewModelScope.launch(iODispatcher) {
@@ -44,7 +44,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onSaveClick(note: BaseNote, showProgress: (Boolean) -> Unit) {
+    fun onSaveClick(note: Note, showProgress: (Boolean) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             withContext(Dispatchers.Main) {
                 showProgress(true)
@@ -64,7 +64,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteClick(note: BaseNote) {
+    fun onDeleteClick(note: Note) {
         viewModelScope.launch(iODispatcher) {
             remove(note)
             when (note) {
@@ -74,7 +74,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun getTextNotes(emit: (List<BaseNote>) -> Unit) {
+    fun getTextNotes(emit: (List<Note>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             notes.collect {
                 withContext(Dispatchers.Main) {
@@ -84,16 +84,16 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun add(note: BaseNote) {
+    private fun add(note: Note) {
         val notes = this.notes.value.toMutableList()
-        note.resourceMeta?.let {
-            notes.removeIf { it.resourceMeta?.id == note.resourceMeta?.id }
+        note.resource?.let {
+            notes.removeIf { it.resource?.id == note.resource?.id }
         }
         notes.add(note)
         this.notes.value = notes
     }
 
-    private fun remove(note: BaseNote) {
+    private fun remove(note: Note) {
         val notes = this.notes.value.toMutableList()
         notes.remove(note)
         this.notes.value = notes

@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Named
@@ -17,7 +18,9 @@ object PropertiesStorageModule {
     @Singleton
     @Provides
     @Named(STORAGE_SCOPE)
-    fun storageScope(): CoroutineScope = CoroutineScope(Dispatchers.IO)
+    fun storageScope(
+        @Named(IO_DISPATCHER) dispatcher: CoroutineDispatcher
+    ): CoroutineScope = CoroutineScope(dispatcher)
 
     @Singleton
     @Provides

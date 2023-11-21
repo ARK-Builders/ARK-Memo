@@ -1,17 +1,17 @@
 package dev.arkbuilders.arkmemo.models
 
 import android.os.Parcelable
-import dev.arkbuilders.arkmemo.data.ResourceMeta
-import dev.arkbuilders.arkmemo.utils.SVG
+import dev.arkbuilders.arklib.data.index.Resource
+import dev.arkbuilders.arkmemo.graphics.SVG
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class GraphicNote(
-    val title: String,
+    override val title: String = "",
     val description: String = "",
-    val content: Content,
     @IgnoredOnParcel
     val svg: SVG? = null,
-    private val meta: ResourceMeta? = null
-) : BaseNote(title, description, content, meta), Parcelable
+    @IgnoredOnParcel
+    override var resource: Resource? = null
+) : Note, Parcelable

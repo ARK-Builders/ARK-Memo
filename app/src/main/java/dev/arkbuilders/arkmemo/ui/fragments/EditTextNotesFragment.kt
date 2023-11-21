@@ -13,7 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
-import dev.arkbuilders.arkmemo.models.Content
+import dev.arkbuilders.arkmemo.models.DEFAULT_TITLE
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 
@@ -28,11 +28,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     private val binding by viewBinding(FragmentEditNotesBinding::bind)
 
-    private var note = TextNote(
-        "",
-        "",
-        Content( "")
-    )
+    private var note = TextNote()
     private var noteStr: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,8 +48,9 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val defaultTitle = "Text $DEFAULT_TITLE"
         var title = this.note.title
-        var data = note.content.data
+        var data = note.text
         val editTextListener = object: TextWatcher{
             override fun afterTextChanged(s: Editable?) = Unit
 
@@ -81,12 +78,13 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
+        noteTitle.hint = defaultTitle
         noteTitle.setText(this.note.title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
         editNote.isVisible = true
         editNote.requestFocus()
         editNote.addTextChangedListener(editTextListener)
-        editNote.setText(this.note.content.data)
+        editNote.setText(this.note.text)
 
         if(noteStr != null)
             editNote.setText(noteStr)
@@ -94,9 +92,9 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         saveNoteButton.isEnabled = title.isNotEmpty()
         saveNoteButton.setOnClickListener {
             val note = TextNote(
-                title,
-                content = Content(data),
-                meta = this.note.resourceMeta
+                title = title.ifEmpty { defaultTitle },
+                text = data,
+                resource = this.note.resource
             )
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)

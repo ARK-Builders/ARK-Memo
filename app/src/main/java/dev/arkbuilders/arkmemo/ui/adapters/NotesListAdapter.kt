@@ -9,16 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.NoteBinding
-import dev.arkbuilders.arkmemo.models.BaseNote
 import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
-import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialogFragment
+import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialog
 import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 
-class NotesListAdapter(private val notes: List<BaseNote>):
+class NotesListAdapter(private val notes: List<Note>):
     RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private var activity: MainActivity? = null
@@ -38,8 +38,8 @@ class NotesListAdapter(private val notes: List<BaseNote>):
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].resourceTitle
-        holder.date.text = notes[position].resourceMeta?.modified?.toString() ?: "Just now"
+        holder.title.text = notes[position].title
+        holder.date.text = notes[position].resource?.modified?.toString() ?: "Just now"
     }
 
     override fun getItemCount() = notes.size
@@ -65,9 +65,9 @@ class NotesListAdapter(private val notes: List<BaseNote>):
         }
 
         private val deleteNoteClickListener = View.OnClickListener {
-            NoteDeleteDialogFragment()
+            NoteDeleteDialog()
                 .setNoteToBeDeleted(notes[bindingAdapterPosition])
-                .show(fragmentManager!!, NoteDeleteDialogFragment.TAG)
+                .show(fragmentManager!!, NoteDeleteDialog.TAG)
         }
 
         init {

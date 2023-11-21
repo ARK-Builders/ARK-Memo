@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.utils
+package dev.arkbuilders.arkmemo.graphics
 
 import android.graphics.Color
 import android.graphics.Paint
@@ -16,8 +16,8 @@ class SVG {
     var strokeColor = "black"
     private var fill = "none"
     private var viewBox = "0${SPACE}0$SPACE$100$SPACE$100"
-    var pathData = ""
-        private set
+    private var pathData = ""
+    private var commandsArray = ArrayDeque<String>()
 
     private val paint
         get() = Paint().also {
@@ -30,35 +30,38 @@ class SVG {
         }
 
     fun writeData(command: String) {
-        pathData += "$SPACE$command"
+        commandsArray.add(command)
     }
 
-    fun moveTo(x: Float, y: Float) = "M$SPACE$x,$y"
+    fun moveTo(x: Float, y: Float) = "$SPACE$MOVE_TO$SPACE$x,$y"
 
-    fun relativeLineTo(x: Float, y: Float) = "L$SPACE$x,$y"
+    fun relativeLineTo(x: Float, y: Float) = "$SPACE$ABS_LINE_TO$SPACE$x,$y"
 
     fun quadraticBezierTo(x1: Float, y1: Float, x2: Float, y2: Float) =
-        "Q$SPACE$x1,$y1$SPACE$x2,$y2"
+        "$SPACE$ABS_QUAD_TO$SPACE$x1,$y1$SPACE$x2,$y2"
 
     fun setViewBox(width: Float, height: Float) {
         viewBox = "0${SPACE}0$SPACE$width$SPACE$height"
     }
 
     fun generate(path: Path) {
-        val xmlSerializer = Xml.newSerializer()
-        xmlSerializer.apply {
-            setOutput(path.writer())
-            startDocument("utf-8", false)
-            startTag("", "svg")
-            attribute("", Attributes.VIEW_BOX, viewBox)
-            attribute("", Attributes.XML_NS_URI, XML_NS_URI)
-            startTag("", "path")
-            attribute("", Attributes.Path.STROKE, strokeColor)
-            attribute("", Attributes.Path.FILL, fill)
-            attribute("", Attributes.Path.DATA, pathData)
-            endTag("", "path")
-            endTag("", "svg")
-            endDocument()
+        if (commandsArray.isNotEmpty()) {
+            val xmlSerializer = Xml.newSerializer()
+            pathData = commandsArray.joinToString(separator = "")
+            xmlSerializer.apply {
+                setOutput(path.writer())
+                startDocument("utf-8", false)
+                startTag("", SVG_TAG)
+                attribute("", Attributes.VIEW_BOX, viewBox)
+                attribute("", Attributes.XML_NS_URI, XML_NS_URI)
+                startTag("", PATH_TAG)
+                attribute("", Attributes.Path.STROKE, strokeColor)
+                attribute("", Attributes.Path.FILL, fill)
+                attribute("", Attributes.Path.DATA, pathData)
+                endTag("", PATH_TAG)
+                endTag("", SVG_TAG)
+                endDocument()
+            }
         }
     }
 
@@ -68,7 +71,7 @@ class SVG {
         strokeColor = this@SVG.strokeColor
         fill = this@SVG.fill
         viewBox = this@SVG.viewBox
-        pathData = this@SVG.pathData
+        commandsArray = this@SVG.commandsArray
     }
 
     private fun createPaths(): Stack<DrawPath> {
@@ -79,7 +82,8 @@ class SVG {
             val numberOfCommands = commandsString.filter {
                 it.isLetter()
             }.length
-            Log.d("svg-utils", "$numberOfCommands commands available")
+            if (commandsArray.isNotEmpty()) commandsArray.clear()
+            Log.d("svg", "$numberOfCommands commands available")
             for (index in 1..numberOfCommands) {
                 when (commandsString.substringAfter(SPACE).substringBefore(SPACE)) {
                     MOVE_TO -> {
@@ -89,8 +93,10 @@ class SVG {
                         val pointList = point.split(COMMA)
                         val x = pointList[0].toFloat()
                         val y = pointList[1].toFloat()
-                        Log.d("svg-utils", "move to $point")
-                        commandsString = commandsString.removePrefix("$SPACE$MOVE_TO$SPACE$point")
+                        Log.d("svg", "move to $point")
+                        val command = moveTo(x, y)
+                        commandsArray.add(command)
+                        commandsString = commandsString.removePrefix(command)
                         path.moveTo(x, y)
                         paths.add(DrawPath(path, paint))
                     }
@@ -108,7 +114,8 @@ class SVG {
                         val y1 = point1List[1].toFloat()
                         val x2 = point2List[0].toFloat()
                         val y2 = point2List[1].toFloat()
-                        Log.d("svg-utils", "quad to $point1 $point2")
+                        Log.d("svg", "quad to $point1 $point2")
+                        commandsArray.add(quadraticBezierTo(x1, y1, x2, y2))
                         path.quadTo(x1, y1, x2, y2)
                     }
 
@@ -130,8 +137,8 @@ class SVG {
                     when (event) {
                         XmlPullParser.START_TAG -> {
                             when (tag) {
-                                "svg" -> { viewBox = getAttributeValue("", Attributes.VIEW_BOX) }
-                                "path" -> {
+                                SVG_TAG -> { viewBox = getAttributeValue("", Attributes.VIEW_BOX) }
+                                PATH_TAG -> {
                                     strokeColor = getAttributeValue("", Attributes.Path.STROKE)
                                     fill = getAttributeValue("", Attributes.Path.FILL)
                                     pathData = getAttributeValue("", Attributes.Path.DATA)
@@ -141,11 +148,6 @@ class SVG {
                     }
                     event = next()
                 }
-                Log.d("svg-utils", "view $viewBox")
-                Log.d("svg-utils", "color $strokeColor")
-                Log.d("svg-utils", "fill $fill")
-                Log.d("svg-utils", "data $pathData")
-
                 createPaths()
             }
         }
@@ -170,3 +172,5 @@ private const val ABS_QUAD_TO = "Q"
 private const val SPACE = " "
 private const val COMMA = ","
 private const val XML_NS_URI = "http://www.w3.org/2000/svg"
+private const val SVG_TAG = "svg"
+private const val PATH_TAG = "path"

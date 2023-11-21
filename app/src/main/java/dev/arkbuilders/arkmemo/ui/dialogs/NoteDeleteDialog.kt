@@ -6,14 +6,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.models.BaseNote
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.fragments.deleteNote
 
-class NoteDeleteDialogFragment: DialogFragment() {
+class NoteDeleteDialog: DialogFragment() {
 
-    private var note: BaseNote? = null
+    private var note: Note? = null
 
-    fun setNoteToBeDeleted(note: BaseNote): NoteDeleteDialogFragment{
+    fun setNoteToBeDeleted(note: Note): NoteDeleteDialog{
         this.note = note
         return this
     }

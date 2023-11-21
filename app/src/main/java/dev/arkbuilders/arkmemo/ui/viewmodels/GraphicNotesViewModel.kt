@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
 import dev.arkbuilders.arkmemo.models.GraphicNote
-import dev.arkbuilders.arkmemo.utils.SVG
+import dev.arkbuilders.arkmemo.graphics.SVG
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

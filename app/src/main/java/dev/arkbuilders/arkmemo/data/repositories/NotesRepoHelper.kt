@@ -2,37 +2,41 @@ package dev.arkbuilders.arkmemo.data.repositories
 
 import android.util.Log
 import dev.arkbuilders.arklib.ResourceId
+import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arklib.data.index.RootIndex
 import dev.arkbuilders.arklib.user.properties.Properties
 import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
-import dev.arkbuilders.arkmemo.data.ResourceMeta
-import dev.arkbuilders.arkmemo.models.BaseNote
+import dev.arkbuilders.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
+import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import javax.inject.Inject
+import javax.inject.Named
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.moveTo
 import kotlin.io.path.name
 
-abstract class NotesRepoImpl<Note> constructor(
-    protected val root: Path,
-    private val scope: CoroutineScope,
+class NotesRepoHelper @Inject constructor(
+    private val memoPreferences: MemoPreferences,
+    @Named(STORAGE_SCOPE) private val scope: CoroutineScope,
     private val propertiesStorageRepo: PropertiesStorageRepo
-): NotesRepo<Note> {
+) {
 
-    protected lateinit var propertiesStorage: PropertiesStorage
+    private lateinit var root: Path
+    private lateinit var propertiesStorage: PropertiesStorage
 
-    override suspend fun init() {
+    suspend fun init() {
+        root = memoPreferences.getNotesStorage()
         propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
     }
 
-    protected suspend fun persistNoteProperties(resourceId: ResourceId, noteTitle: String) {
+    suspend fun persistNoteProperties(resourceId: ResourceId, noteTitle: String) {
         with(propertiesStorage) {
             val properties = Properties(setOf(noteTitle), setOf())
             setProperties(resourceId, properties)
@@ -40,25 +44,23 @@ abstract class NotesRepoImpl<Note> constructor(
         }
     }
 
-    protected fun renameResourceWithNewResourceMeta(
-        note: BaseNote,
+    fun renameResource(
+        note: Note,
         tempPath: Path,
         resourcePath: Path,
         resourceId: ResourceId,
-        size: Long
     ) {
         tempPath.moveTo(resourcePath)
-        note.resourceMeta = ResourceMeta(
+        note.resource = Resource(
             id = resourceId,
             name = resourcePath.fileName.name,
             extension = resourcePath.extension,
-            modified = resourcePath.getLastModifiedTime(),
-            size = size
+            modified = resourcePath.getLastModifiedTime()
         )
         Log.d("notes-repo", "resource renamed to ${resourcePath.name} successfully")
     }
 
-    protected fun readProperties(id: ResourceId): UserNoteProperties {
+    fun readProperties(id: ResourceId): UserNoteProperties {
         val title = propertiesStorage.getProperties(id).titles.let {
             if (it.isNotEmpty()) it.elementAt(0) else throw NoteTitlesException()
         }
@@ -68,15 +70,13 @@ abstract class NotesRepoImpl<Note> constructor(
         return UserNoteProperties(title, description)
     }
 
-    protected suspend fun deleteNote(note: BaseNote): Unit = withContext(Dispatchers.IO) {
-        val path = root.resolve("${note.resourceMeta?.name}")
+    suspend fun deleteNote(note: Note): Unit = withContext(Dispatchers.IO) {
+        val path = root.resolve("${note.resource?.name}")
         path.deleteIfExists()
-        propertiesStorage.remove(note.resourceMeta?.id!!)
+        propertiesStorage.remove(note.resource?.id!!)
         propertiesStorage.persist()
-        Log.d("repo", "${note.resourceMeta?.name!!} has been deleted")
+        Log.d("repo", "${note.resource?.name!!} has been deleted")
     }
-
-    protected fun BaseNote.exists(id: ResourceId) = resourceMeta != null && resourceMeta?.id == id
 }
 
 data class UserNoteProperties(

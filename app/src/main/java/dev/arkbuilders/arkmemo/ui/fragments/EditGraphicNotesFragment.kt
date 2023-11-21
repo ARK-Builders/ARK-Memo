@@ -13,7 +13,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
-import dev.arkbuilders.arkmemo.models.Content
+import dev.arkbuilders.arkmemo.models.DEFAULT_TITLE
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
@@ -31,7 +31,7 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
     private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
     private val notesViewModel: NotesViewModel by activityViewModels()
 
-    private var note = GraphicNote("", content = Content(""))
+    private var note = GraphicNote( title = "")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
@@ -50,6 +50,7 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val defaultTitle = "Graphic $DEFAULT_TITLE"
         var title = note.title
         val notesCanvas = binding.notesCanvas
         val saveButton = binding.saveNote
@@ -70,18 +71,17 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
+        noteTitle.hint = defaultTitle
         noteTitle.setText(title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
         notesCanvas.isVisible = true
         notesCanvas.setViewModel(graphicNotesViewModel)
-        saveButton.isEnabled = title.isNotEmpty()
         saveButton.setOnClickListener {
             val svg = graphicNotesViewModel.svg()
             val note = GraphicNote(
-                title,
-                content = Content(svg.pathData),
+                title = title.ifEmpty { defaultTitle },
                 svg = svg,
-                meta = note.resourceMeta
+                resource = note.resource
             )
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)

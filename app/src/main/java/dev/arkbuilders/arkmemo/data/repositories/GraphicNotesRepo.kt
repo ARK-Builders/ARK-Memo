@@ -2,18 +2,18 @@ package dev.arkbuilders.arkmemo.data.repositories
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
+import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
-import dev.arkbuilders.arkmemo.data.ResourceMeta
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
-import dev.arkbuilders.arkmemo.models.Content
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
-import dev.arkbuilders.arkmemo.utils.SVG
+import dev.arkbuilders.arkmemo.graphics.SVG
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import java.nio.file.Files
+import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.io.path.extension
@@ -26,19 +26,23 @@ class GraphicNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
     @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     @Named(STORAGE_SCOPE) private val storageScope: CoroutineScope,
+    private val helper: NotesRepoHelper,
     private val propertiesStorageRepo: PropertiesStorageRepo
-): NotesRepoImpl<GraphicNote>(
-    memoPreferences.getNotesStorage(),
-    storageScope,
-    propertiesStorageRepo
-) {
+): NotesRepo<GraphicNote> {
+
+    private lateinit var root: Path
+
+    override suspend fun init() {
+        helper.init()
+        root = memoPreferences.getNotesStorage()
+    }
 
     override suspend fun save(note: GraphicNote) = withContext(iODispatcher) {
         write(note)
     }
 
     override suspend fun delete(note: GraphicNote) = withContext(iODispatcher) {
-       deleteNote(note)
+       helper.deleteNote(note)
     }
 
     override suspend fun read(): List<GraphicNote> = withContext(iODispatcher) {
@@ -51,23 +55,22 @@ class GraphicNotesRepo @Inject constructor(
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
         Log.d("graphic-repo", "initial resource name ${tempPath.name}")
-        persistNoteProperties(resourceId = id, noteTitle = note.title)
+        helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
 
         if (note.exists(id)){
             Log.d(
                 "graphic-repo",
-                "resource with similar content already exists"
+                "resource with similar text already exists"
             )
             return@withContext
         }
 
-        val resourcePath = root.resolve("${id}.$GRAPHIC_NOTE_ID")
-        renameResourceWithNewResourceMeta(
+        val resourcePath = root.resolve("${id}.$SVG_EXT")
+        helper.renameResource(
             note,
             tempPath,
             resourcePath,
-            id,
-            size
+            id
         )
         Log.d("graphic-repo", "file renamed to $resourcePath successfully")
     }
@@ -75,26 +78,24 @@ class GraphicNotesRepo @Inject constructor(
     private suspend fun readStorage() = withContext(iODispatcher) {
         val notes = mutableListOf<GraphicNote>()
         Files.list(root).forEach { path ->
-            if (path.name.contains(GRAPHIC_NOTE_ID) && path.extension == SVG_EXT) {
+            if (path.extension == SVG_EXT) {
                 val svg = SVG.parse(path)
                 val size = path.fileSize()
                 val id = computeId(size, path)
-                val meta = ResourceMeta(
-                    id,
-                    path.fileName.name,
-                    path.extension,
-                    path.getLastModifiedTime(),
-                    size
+                val resource = Resource(
+                     id = id,
+                    name = path.fileName.name,
+                    extension = path.extension,
+                    modified = path.getLastModifiedTime()
                 )
 
-                val userNoteProperties = readProperties(id)
+                val userNoteProperties = helper.readProperties(id)
 
                 val note = GraphicNote(
-                    userNoteProperties.title,
-                    userNoteProperties.description,
-                    Content(svg.pathData),
-                    svg,
-                    meta
+                    title = userNoteProperties.title,
+                    description = userNoteProperties.description,
+                    svg = svg,
+                    resource = resource
                 )
                 notes.add(note)
             }
@@ -105,4 +106,3 @@ class GraphicNotesRepo @Inject constructor(
 }
 
 private const val SVG_EXT = "svg"
-private const val GRAPHIC_NOTE_ID = "note.$SVG_EXT"
