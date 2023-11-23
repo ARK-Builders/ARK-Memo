@@ -24,7 +24,7 @@
         android:gravity="start"
         android:hint="@string/note_title"
         android:importantForAutofill="no"
-        android:textColorHint="#757575"/>
+        android:textColorHint="@color/gray"/>
     <EditText
         android:id="@+id/editNote"
         android:layout_width="match_parent"
