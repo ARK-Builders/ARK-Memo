@@ -49,6 +49,7 @@ class GraphicNotesViewModel @Inject constructor(
 
     fun onDrawPath(path: DrawPath) {
         editPaths.add(path)
+        svg.addPath(path)
     }
 
     fun onChangeColor(color: Int) {

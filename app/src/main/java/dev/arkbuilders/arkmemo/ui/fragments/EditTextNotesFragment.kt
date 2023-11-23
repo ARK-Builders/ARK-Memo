@@ -89,7 +89,6 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         if(noteStr != null)
             editNote.setText(noteStr)
 
-        saveNoteButton.isEnabled = title.isNotEmpty()
         saveNoteButton.setOnClickListener {
             val note = TextNote(
                 title = title.ifEmpty { defaultTitle },

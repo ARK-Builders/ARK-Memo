@@ -17,7 +17,9 @@ class SVG {
     private var fill = "none"
     private var viewBox = "0${SPACE}0$SPACE$100$SPACE$100"
     private var pathData = ""
-    private var commandsArray = ArrayDeque<String>()
+    private val commandsArray = ArrayDeque<String>()
+    private val paths = Stack<DrawPath>()
+
 
     private val paint
         get() = Paint().also {
@@ -33,12 +35,16 @@ class SVG {
         commandsArray.add(command)
     }
 
-    fun moveTo(x: Float, y: Float) = "$SPACE$MOVE_TO$SPACE$x,$y"
+    fun addPath(path: DrawPath) {
+        paths.add(path)
+    }
 
-    fun relativeLineTo(x: Float, y: Float) = "$SPACE$ABS_LINE_TO$SPACE$x,$y"
+    fun moveTo(x: Float, y: Float) = "$MOVE_TO$SPACE$x$SPACE$y"
+
+    fun relativeLineTo(x: Float, y: Float) = "$ABS_LINE_TO$SPACE$x$SPACE$y"
 
     fun quadraticBezierTo(x1: Float, y1: Float, x2: Float, y2: Float) =
-        "$SPACE$ABS_QUAD_TO$SPACE$x1,$y1$SPACE$x2,$y2"
+        "$ABS_QUAD_TO$SPACE$x1$SPACE$y1$SPACE$x2$SPACE$y2"
 
     fun setViewBox(width: Float, height: Float) {
         viewBox = "0${SPACE}0$SPACE$width$SPACE$height"
@@ -47,7 +53,7 @@ class SVG {
     fun generate(path: Path) {
         if (commandsArray.isNotEmpty()) {
             val xmlSerializer = Xml.newSerializer()
-            pathData = commandsArray.joinToString(separator = "")
+            pathData = commandsArray.joinToString()
             xmlSerializer.apply {
                 setOutput(path.writer())
                 startDocument("utf-8", false)
@@ -65,65 +71,49 @@ class SVG {
         }
     }
 
-    fun getPaths() = createPaths()
+    fun getPaths() = paths
 
     fun copy() = SVG().apply {
         strokeColor = this@SVG.strokeColor
         fill = this@SVG.fill
         viewBox = this@SVG.viewBox
-        commandsArray = this@SVG.commandsArray
+        commandsArray.addAll(this@SVG.commandsArray)
+        paths.addAll(this@SVG.paths)
     }
 
-    private fun createPaths(): Stack<DrawPath> {
-        val paths = Stack<DrawPath>()
-        if (pathData.isNotEmpty()) {
+    private fun createPaths() {
+        commandsArray.addAll(pathData.split("$COMMA$SPACE"))
+        if (commandsArray.isNotEmpty()) {
+            if (paths.isNotEmpty()) paths.clear()
             var path = AndroidDrawPath()
-            var commandsString = pathData
-            val numberOfCommands = commandsString.filter {
-                it.isLetter()
-            }.length
-            if (commandsArray.isNotEmpty()) commandsArray.clear()
-            Log.d("svg", "$numberOfCommands commands available")
-            for (index in 1..numberOfCommands) {
-                when (commandsString.substringAfter(SPACE).substringBefore(SPACE)) {
+            commandsArray.forEach { command ->
+                when (command.first().toString()) {
                     MOVE_TO -> {
                         path = AndroidDrawPath()
-                        val point = commandsString.substringAfter("$MOVE_TO$SPACE")
-                            .substringBefore(SPACE)
-                        val pointList = point.split(COMMA)
+                        val point = command.removePrefix("$MOVE_TO$SPACE")
+                        val pointList = point.split(SPACE)
                         val x = pointList[0].toFloat()
                         val y = pointList[1].toFloat()
                         Log.d("svg", "move to $point")
-                        val command = moveTo(x, y)
-                        commandsArray.add(command)
-                        commandsString = commandsString.removePrefix(command)
                         path.moveTo(x, y)
-                        paths.add(DrawPath(path, paint))
                     }
 
                     ABS_QUAD_TO -> {
-                        val point1 = commandsString.substringAfter("$ABS_QUAD_TO$SPACE")
-                            .substringBefore(SPACE)
-                        commandsString =
-                            commandsString.removePrefix("$SPACE$ABS_QUAD_TO$SPACE$point1")
-                        val point2 = commandsString.substringAfter(SPACE).substringBefore(SPACE)
-                        commandsString = commandsString.removePrefix("$SPACE$point2")
-                        val point1List = point1.split(COMMA)
-                        val point2List = point2.split(COMMA)
-                        val x1 = point1List[0].toFloat()
-                        val y1 = point1List[1].toFloat()
-                        val x2 = point2List[0].toFloat()
-                        val y2 = point2List[1].toFloat()
-                        Log.d("svg", "quad to $point1 $point2")
-                        commandsArray.add(quadraticBezierTo(x1, y1, x2, y2))
+                        val points = command.removePrefix("$ABS_QUAD_TO$SPACE")
+                        val pointList = points.split(SPACE)
+                        val x1 = pointList[0].toFloat()
+                        val y1 = pointList[1].toFloat()
+                        val x2 = pointList[2].toFloat()
+                        val y2 = pointList[3].toFloat()
+                        Log.d("svg", "quad to $x1 $y1 $x2 $y2")
                         path.quadTo(x1, y1, x2, y2)
                     }
 
                     ABS_LINE_TO -> {}
                 }
+                paths.add(DrawPath(path, paint))
             }
         }
-        return paths
     }
 
     companion object {

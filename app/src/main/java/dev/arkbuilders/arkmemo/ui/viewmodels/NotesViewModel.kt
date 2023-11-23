@@ -14,6 +14,7 @@ import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -74,9 +75,9 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun getTextNotes(emit: (List<Note>) -> Unit) {
+    fun getNotes(emit: (List<Note>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
-            notes.collect {
+            notes.collectLatest {
                 withContext(Dispatchers.Main) {
                     emit(it)
                 }

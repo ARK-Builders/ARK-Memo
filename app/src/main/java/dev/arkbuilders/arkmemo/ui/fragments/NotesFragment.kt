@@ -25,7 +25,7 @@ import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 
 @AndroidEntryPoint
-class TextNotesFragment: Fragment(R.layout.fragment_notes) {
+class NotesFragment: Fragment(R.layout.fragment_notes) {
 
     private val binding by viewBinding(FragmentNotesBinding::bind)
 
@@ -78,7 +78,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_notes) {
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                notesViewModel.getTextNotes {
+                notesViewModel.getNotes {
                     val adapter = NotesListAdapter(it)
                     val layoutManager = LinearLayoutManager(requireContext())
                     adapter.setActivity(activity)

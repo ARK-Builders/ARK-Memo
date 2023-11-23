@@ -23,7 +23,7 @@ import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
-import dev.arkbuilders.arkmemo.ui.fragments.TextNotesFragment
+import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private var menu: Menu? = null
 
-    var fragment: Fragment = TextNotesFragment()
+    var fragment: Fragment = NotesFragment()
 
     init {
         FilePickerDialog.readPermLauncher =
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             } else {
                 if (savedInstanceState == null)
                     supportFragmentManager.beginTransaction().apply {
-                        add(fragContainer, fragment, TextNotesFragment.TAG)
+                        add(fragContainer, fragment, NotesFragment.TAG)
                         commit()
                     }
                 else {
@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         this.menu = menu
-        if(fragment.tag != TextNotesFragment.TAG)
+        if(fragment.tag != NotesFragment.TAG)
             showSettingsButton(false)
         return true
     }
