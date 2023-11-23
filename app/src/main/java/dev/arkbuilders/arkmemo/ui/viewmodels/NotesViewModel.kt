@@ -1,13 +1,18 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import dev.arkbuilders.arkmemo.data.repositories.SaveNoteCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import dev.arkbuilders.arkmemo.data.repositories.TextNotesRepo
+import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.GraphicNote
@@ -27,6 +32,7 @@ class NotesViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val notes = MutableStateFlow(listOf<Note>())
+    private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
 
     fun init(read: () -> Unit) {
         val initJob = viewModelScope.launch(iODispatcher) {
@@ -52,13 +58,21 @@ class NotesViewModel @Inject constructor(
             }
             when (note) {
                 is TextNote -> {
-                    textNotesRepo.save(note)
+                    textNotesRepo.save(note, object : SaveNoteCallback {
+                        override fun onSaveNote(result: SaveNoteResult) {
+                            if (result == SaveNoteResult.SUCCESS) {
+                                add(note)
+                            }
+                            mSaveNoteResultLiveData.postValue(result)
+                        }
+
+                    })
                 }
                 is GraphicNote -> {
                     graphicNotesRepo.save(note)
+                    add(note)
                 }
             }
-            add(note)
             withContext(Dispatchers.Main) {
                 showProgress(false)
             }
@@ -98,5 +112,9 @@ class NotesViewModel @Inject constructor(
         val notes = this.notes.value.toMutableList()
         notes.remove(note)
         this.notes.value = notes
+    }
+
+    fun getSaveNoteResultLiveData(): LiveData<SaveNoteResult> {
+        return mSaveNoteResultLiveData
     }
 }

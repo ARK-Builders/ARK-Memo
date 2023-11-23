@@ -34,6 +34,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
+        subscribeLiveData()
         if(arguments != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)?.let {
@@ -68,7 +69,6 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 title = s?.toString() ?: ""
-                saveNoteButton.isEnabled = !s.isNullOrEmpty()
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -101,6 +101,22 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         }
     }
 
+    private fun subscribeLiveData() {
+        notesViewModel.getSaveNoteResultLiveData().observe(this) {
+            if (!isResumed) return@observe
+
+            if (it == SaveNoteResult.SUCCESS) {
+                Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
+                    Toast.LENGTH_SHORT)
+                    .show()
+                activity.onBackPressedDispatcher.onBackPressed()
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.ark_memo_note_existing),
+                    Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
 
     companion object{
         const val TAG = "Edit Text Notes"
