@@ -6,12 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import dev.arkbuilders.arkmemo.data.repositories.SaveNoteCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import dev.arkbuilders.arkmemo.data.repositories.TextNotesRepo
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
@@ -56,21 +54,22 @@ class NotesViewModel @Inject constructor(
             withContext(Dispatchers.Main) {
                 showProgress(true)
             }
+            fun handleResult(result: SaveNoteResult) {
+                if (result == SaveNoteResult.SUCCESS) {
+                    add(note)
+                }
+                mSaveNoteResultLiveData.postValue(result)
+            }
             when (note) {
                 is TextNote -> {
-                    textNotesRepo.save(note, object : SaveNoteCallback {
-                        override fun onSaveNote(result: SaveNoteResult) {
-                            if (result == SaveNoteResult.SUCCESS) {
-                                add(note)
-                            }
-                            mSaveNoteResultLiveData.postValue(result)
-                        }
-
-                    })
+                    textNotesRepo.save(note) { result ->
+                        handleResult(result)
+                    }
                 }
                 is GraphicNote -> {
-                    graphicNotesRepo.save(note)
-                    add(note)
+                    graphicNotesRepo.save(note) { result ->
+                        handleResult(result)
+                    }
                 }
             }
             withContext(Dispatchers.Main) {
@@ -79,7 +78,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteClick(note: Note) {
+    fun onDeleteConfirmed(note: Note) {
         viewModelScope.launch(iODispatcher) {
             remove(note)
             when (note) {

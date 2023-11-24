@@ -6,6 +6,7 @@ import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
+import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
@@ -22,6 +23,7 @@ import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
 import kotlin.io.path.writeLines
 import kotlin.io.path.createTempFile
+import kotlin.io.path.exists
 
 
 class TextNotesRepo @Inject constructor(
@@ -39,8 +41,8 @@ class TextNotesRepo @Inject constructor(
         root = memoPreferences.getNotesStorage()
         helper.init()
     }
-    override suspend fun save(note: TextNote) {
-        write(note)
+    override suspend fun save(note: TextNote, callback: (SaveNoteResult) -> Unit) {
+        write(note) { callback(it) }
     }
 
     override suspend fun delete(note: TextNote) {
@@ -51,7 +53,10 @@ class TextNotesRepo @Inject constructor(
         readStorage()
     }
 
-    private suspend fun write(note: TextNote) = withContext(iODispatcher) {
+    private suspend fun write(
+        note: TextNote,
+        callback: (SaveNoteResult) -> Unit
+    ) = withContext(iODispatcher) {
         val tempPath = createTempFile()
         val lines = note.text.split('\n')
         tempPath.writeLines(lines)
@@ -59,16 +64,17 @@ class TextNotesRepo @Inject constructor(
         val id = computeId(size, tempPath)
         Log.d("text-repo", "initial resource name ${tempPath.name}")
         helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
-        Log.d("text-repo", "note id: ${note.resource?.id}, computed id $id")
-        if (note.exists(id)) {
+
+        val resourcePath = root.resolve("$id.$NOTE_EXT")
+        if (resourcePath.exists()) {
             Log.d(
                 "text-repo",
-                "resource with similar text already exists"
+                "resource with similar content already exists"
             )
+            callback(SaveNoteResult.ERROR_EXISTING)
             return@withContext
         }
 
-        val resourcePath = root.resolve("$id.$NOTE_EXT")
         helper.renameResource(
             note = note,
             tempPath = tempPath,
@@ -76,6 +82,7 @@ class TextNotesRepo @Inject constructor(
             resourceId = id
         )
         Log.d("text-repo", "file renamed to ${note.resource?.name} successfully")
+        callback(SaveNoteResult.SUCCESS)
     }
 
     private suspend fun readStorage() = withContext(iODispatcher){

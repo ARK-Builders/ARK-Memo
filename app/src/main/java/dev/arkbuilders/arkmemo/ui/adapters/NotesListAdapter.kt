@@ -13,10 +13,10 @@ import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
 import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialog
 import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
+import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 class NotesListAdapter(private val notes: List<Note>):
     RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {

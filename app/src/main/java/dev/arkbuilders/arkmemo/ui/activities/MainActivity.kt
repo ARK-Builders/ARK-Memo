@@ -1,13 +1,9 @@
 package dev.arkbuilders.arkmemo.ui.activities
 
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +20,8 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
+import dev.arkbuilders.arkmemo.utils.replaceFragment
+import dev.arkbuilders.arkmemo.utils.resumeFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -132,40 +130,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     fun showProgressBar(show: Boolean) {
         binding.progressBar.isVisible = show
-        if (!show) {
-            Toast.makeText(this, getString(R.string.ark_memo_note_saved),
-                Toast.LENGTH_SHORT)
-                .show()
-            onBackPressedDispatcher.onBackPressed()
-        }
     }
+
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }
-}
-
-fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
-    supportFragmentManager.beginTransaction().apply {
-        val backStackName = fragment.javaClass.name
-        val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
-        if (!popBackStack) {
-            replace(R.id.container, fragment, tag)
-            addToBackStack(backStackName)
-        } else {
-            show(fragment)
-        }
-        commit()
-    }
-}
-
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
-        show(fragment)
-        commit()
-    }
-}
-
-fun Context.getTextFromClipBoard(): String?{
-    val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-    return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }

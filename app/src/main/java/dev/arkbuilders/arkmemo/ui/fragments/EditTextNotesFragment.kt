@@ -5,17 +5,22 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
 import dev.arkbuilders.arkmemo.models.DEFAULT_TITLE
+import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.views.toast
+import dev.arkbuilders.arkmemo.utils.observeSaveResult
 
 @AndroidEntryPoint
 class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
@@ -34,7 +39,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
-        subscribeLiveData()
+        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         if(arguments != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)?.let {
@@ -97,23 +102,6 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
             )
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)
-            }
-        }
-    }
-
-    private fun subscribeLiveData() {
-        notesViewModel.getSaveNoteResultLiveData().observe(this) {
-            if (!isResumed) return@observe
-
-            if (it == SaveNoteResult.SUCCESS) {
-                Toast.makeText(requireContext(), getString(R.string.ark_memo_note_saved),
-                    Toast.LENGTH_SHORT)
-                    .show()
-                activity.onBackPressedDispatcher.onBackPressed()
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.ark_memo_note_existing),
-                    Toast.LENGTH_SHORT)
-                    .show()
             }
         }
     }

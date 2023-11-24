@@ -18,6 +18,7 @@ import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
+import dev.arkbuilders.arkmemo.utils.observeSaveResult
 
 @AndroidEntryPoint
 class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
@@ -35,6 +36,7 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
+        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         if (arguments != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 requireArguments().getParcelable(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
@@ -60,7 +62,6 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 title = s?.toString() ?: ""
-                saveButton.isEnabled = !s.isNullOrEmpty()
             }
 
             override fun afterTextChanged(s: Editable?) {}

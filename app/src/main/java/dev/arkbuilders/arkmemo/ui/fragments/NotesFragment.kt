@@ -20,9 +20,9 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.activities.getTextFromClipBoard
-import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
+import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
+import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 @AndroidEntryPoint
 class NotesFragment: Fragment(R.layout.fragment_notes) {
@@ -102,7 +102,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     }
 }
 
-fun Fragment.deleteNote(note: Note){
+fun Fragment.deleteNote(note: Note) {
     val viewModel: NotesViewModel by activityViewModels()
-    viewModel.onDeleteClick(note)
+    viewModel.onDeleteConfirmed(note)
 }

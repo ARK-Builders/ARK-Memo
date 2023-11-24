@@ -13,10 +13,9 @@ import kotlin.io.path.reader
 import kotlin.io.path.writer
 
 class SVG {
-    var strokeColor = "black"
+    private var strokeColor = "black"
     private var fill = "none"
-    private var viewBox = "0${SPACE}0$SPACE$100$SPACE$100"
-    private var pathData = ""
+    private var viewBox = "$ZERO${SPACE}$ZERO$SPACE$HUNDRED$SPACE$HUNDRED"
     private val commandsArray = ArrayDeque<String>()
     private val paths = Stack<DrawPath>()
 
@@ -47,13 +46,13 @@ class SVG {
         "$ABS_QUAD_TO$SPACE$x1$SPACE$y1$SPACE$x2$SPACE$y2"
 
     fun setViewBox(width: Float, height: Float) {
-        viewBox = "0${SPACE}0$SPACE$width$SPACE$height"
+        viewBox = "$ZERO${SPACE}$ZERO$SPACE$width$SPACE$height"
     }
 
     fun generate(path: Path) {
         if (commandsArray.isNotEmpty()) {
             val xmlSerializer = Xml.newSerializer()
-            pathData = commandsArray.joinToString()
+            val pathData = commandsArray.joinToString()
             xmlSerializer.apply {
                 setOutput(path.writer())
                 startDocument("utf-8", false)
@@ -81,7 +80,7 @@ class SVG {
         paths.addAll(this@SVG.paths)
     }
 
-    private fun createPaths() {
+    private fun createPaths(pathData: String) {
         commandsArray.addAll(pathData.split("$COMMA$SPACE"))
         if (commandsArray.isNotEmpty()) {
             if (paths.isNotEmpty()) paths.clear()
@@ -119,6 +118,7 @@ class SVG {
     companion object {
         fun parse(path: Path) = SVG().apply {
             val xmlParser = Xml.newPullParser()
+            var pathData = ""
             xmlParser.apply {
                 setInput(path.reader())
                 var event = xmlParser.eventType
@@ -138,7 +138,7 @@ class SVG {
                     }
                     event = next()
                 }
-                createPaths()
+                createPaths(pathData)
             }
         }
 
@@ -159,6 +159,8 @@ private const val MOVE_TO = "M"
 private const val ABS_LINE_TO = "L"
 private const val ABS_QUAD_TO = "Q"
 
+private const val ZERO = "0"
+private const val HUNDRED = "100"
 private const val SPACE = " "
 private const val COMMA = ","
 private const val XML_NS_URI = "http://www.w3.org/2000/svg"
