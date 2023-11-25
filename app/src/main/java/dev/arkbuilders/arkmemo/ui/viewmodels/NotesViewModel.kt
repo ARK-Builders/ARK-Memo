@@ -26,7 +26,6 @@ class NotesViewModel @Inject constructor(
     @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     private val textNotesRepo: NotesRepo<TextNote>,
     private val graphicNotesRepo: NotesRepo<GraphicNote>,
-    private val memoPreferences: MemoPreferences
 ) : ViewModel() {
 
     private val notes = MutableStateFlow(listOf<Note>())

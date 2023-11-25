@@ -2,10 +2,7 @@ package dev.arkbuilders.arkmemo.preferences
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import com.simplemobiletools.commons.extensions.getPaths
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
-import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.Path
 

@@ -6,7 +6,6 @@ import android.graphics.Path
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.arkbuilders.arkmemo.data.repositories.NotesRepo
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.graphics.SVG
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,9 +15,7 @@ import java.util.Stack
 import javax.inject.Inject
 
 @HiltViewModel
-class GraphicNotesViewModel @Inject constructor(
-    private val repo: NotesRepo<GraphicNote>
-): ViewModel() {
+class GraphicNotesViewModel @Inject constructor(): ViewModel() {
 
     private val _notes = MutableStateFlow(listOf<GraphicNote>())
     val notes: StateFlow<List<GraphicNote>> = _notes
@@ -39,7 +36,7 @@ class GraphicNotesViewModel @Inject constructor(
 
     private var svg = SVG()
 
-    fun updatePathsByNote(note: GraphicNote) {
+    fun onNoteOpened(note: GraphicNote) {
         viewModelScope.launch {
             if (editPaths.isNotEmpty()) editPaths.clear()
             editPaths.addAll(note.svg?.getPaths()!!)

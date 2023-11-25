@@ -41,11 +41,11 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 requireArguments().getParcelable(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
                     note = it
-                    graphicNotesViewModel.updatePathsByNote(note)
+                    graphicNotesViewModel.onNoteOpened(note)
                 }
             else requireArguments().getParcelable<GraphicNote>(GRAPHICAL_NOTE_KEY)?.let {
                 note = it
-                graphicNotesViewModel.updatePathsByNote(note)
+                graphicNotesViewModel.onNoteOpened(note)
             }
         }
     }

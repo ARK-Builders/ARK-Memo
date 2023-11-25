@@ -3,12 +3,9 @@ package dev.arkbuilders.arkmemo.data.repositories
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
-import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
-import dev.arkbuilders.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
@@ -30,9 +27,7 @@ class TextNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
     @Named(IO_DISPATCHER)
     private val iODispatcher: CoroutineDispatcher,
-    @Named(STORAGE_SCOPE) private val storageScope: CoroutineScope,
-    private val helper: NotesRepoHelper,
-    private val propertiesStorageRepo: PropertiesStorageRepo
+    private val helper: NotesRepoHelper
 ): NotesRepo<TextNote> {
 
     private lateinit var root: Path
@@ -85,7 +80,7 @@ class TextNotesRepo @Inject constructor(
         callback(SaveNoteResult.SUCCESS)
     }
 
-    private suspend fun readStorage() = withContext(iODispatcher){
+    private suspend fun readStorage() = withContext(iODispatcher) {
         val notes = mutableListOf<TextNote>()
         Files.list(root).forEach { path ->
             if (path.fileName.extension == NOTE_EXT) {

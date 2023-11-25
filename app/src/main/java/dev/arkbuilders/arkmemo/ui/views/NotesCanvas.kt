@@ -6,6 +6,7 @@ import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import dev.arkbuilders.arkmemo.graphics.SVGCommand
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 
@@ -38,7 +39,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
                 viewModel.svg().apply {
-                    writeData(moveTo(x, y))
+                    addCommand(SVGCommand.MoveTo(x, y))
                 }
                 currentX = x
                 currentY = y
@@ -48,7 +49,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
                 val y2 = (currentY + y) / 2
                 path.quadTo(currentX, currentY, x2, y2)
                 viewModel.svg().apply {
-                    writeData(quadraticBezierTo(currentX, currentY, x2, y2))
+                    addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2))
                 }
                 currentX = x
                 currentY = y

@@ -27,9 +27,7 @@ import kotlin.io.path.exists
 class GraphicNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
     @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
-    @Named(STORAGE_SCOPE) private val storageScope: CoroutineScope,
-    private val helper: NotesRepoHelper,
-    private val propertiesStorageRepo: PropertiesStorageRepo
+    private val helper: NotesRepoHelper
 ): NotesRepo<GraphicNote> {
 
     private lateinit var root: Path

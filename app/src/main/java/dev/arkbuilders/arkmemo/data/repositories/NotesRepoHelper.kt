@@ -7,15 +7,12 @@ import dev.arkbuilders.arklib.data.index.RootIndex
 import dev.arkbuilders.arklib.user.properties.Properties
 import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
-import dev.arkbuilders.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import javax.inject.Inject
-import javax.inject.Named
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
@@ -24,7 +21,6 @@ import kotlin.io.path.name
 
 class NotesRepoHelper @Inject constructor(
     private val memoPreferences: MemoPreferences,
-    @Named(STORAGE_SCOPE) private val scope: CoroutineScope,
     private val propertiesStorageRepo: PropertiesStorageRepo
 ) {
 
