@@ -15,8 +15,8 @@ class SVG {
     private var strokeColor = "black"
     private var fill = "none"
     private var viewBox = "0 0 100 100"
-    private val commandsArray = ArrayDeque<SVGCommand>()
-    private val canvasPaths = Stack<DrawPath>()
+    private val commands = ArrayDeque<SVGCommand>()
+    private val paths = Stack<DrawPath>()
 
     private val paint
         get() = Paint().also {
@@ -29,11 +29,11 @@ class SVG {
         }
 
     fun addCommand(command: SVGCommand) {
-        commandsArray.add(command)
+        commands.add(command)
     }
 
     fun addPath(path: DrawPath) {
-        canvasPaths.add(path)
+        paths.add(path)
     }
 
     fun setViewBox(width: Float, height: Float) {
@@ -41,9 +41,9 @@ class SVG {
     }
 
     fun generate(path: Path) {
-        if (commandsArray.isNotEmpty()) {
+        if (commands.isNotEmpty()) {
             val xmlSerializer = Xml.newSerializer()
-            val pathData = commandsArray.joinToString(COMMA)
+            val pathData = commands.joinToString(COMMA)
             xmlSerializer.apply {
                 setOutput(path.writer())
                 startDocument("utf-8", false)
@@ -61,21 +61,21 @@ class SVG {
         }
     }
 
-    fun getPaths() = canvasPaths
+    fun getPaths() = paths
 
     fun copy() = SVG().apply {
         strokeColor = this@SVG.strokeColor
         fill = this@SVG.fill
         viewBox = this@SVG.viewBox
-        commandsArray.addAll(this@SVG.commandsArray)
-        canvasPaths.addAll(this@SVG.canvasPaths)
+        commands.addAll(this@SVG.commands)
+        paths.addAll(this@SVG.paths)
     }
 
     private fun createCanvasPaths() {
-        if (commandsArray.isNotEmpty()) {
-            if (canvasPaths.isNotEmpty()) canvasPaths.clear()
+        if (commands.isNotEmpty()) {
+            if (paths.isNotEmpty()) paths.clear()
             var path = AndroidDrawPath()
-            commandsArray.forEach { command ->
+            commands.forEach { command ->
                 when (command) {
                     is SVGCommand.MoveTo -> {
                         path = AndroidDrawPath()
@@ -90,7 +90,7 @@ class SVG {
                         path.lineTo(command.x, command.y)
                     }
                 }
-                canvasPaths.add(DrawPath(path, paint))
+                paths.add(DrawPath(path, paint))
             }
         }
     }
@@ -99,11 +99,14 @@ class SVG {
         fun parse(path: Path) = SVG().apply {
             val xmlParser = Xml.newPullParser()
             var pathData = ""
+
             xmlParser.apply {
                 setInput(path.reader())
+
                 var event = xmlParser.eventType
                 while (event != XmlPullParser.END_DOCUMENT) {
                     val tag = xmlParser.name
+
                     when (event) {
                         XmlPullParser.START_TAG -> {
                             when (tag) {
@@ -116,23 +119,26 @@ class SVG {
                             }
                         }
                     }
+
                     event = next()
                 }
-                val pathDataList = pathData.split(COMMA)
-                pathDataList.forEach {
-                    when (it.first().toString()) {
-                        MOVE_TO_CODE -> {
-                            commandsArray.add(SVGCommand.MoveTo.fromString(it))
+
+
+                pathData.split(COMMA).forEach {
+                    when (it.first()) {
+                        SVGCommand.MoveTo.CODE -> {
+                            commands.add(SVGCommand.MoveTo.fromString(it))
                         }
-                        ABS_LINE_TO_CODE -> {
-                            commandsArray.add(SVGCommand.MoveTo.fromString(it))
+                        SVGCommand.AbsLineTo.CODE -> {
+                            commands.add(SVGCommand.MoveTo.fromString(it))
                         }
-                        ABS_QUAD_TO_CODE -> {
-                            commandsArray.add(SVGCommand.AbsQuadTo.fromString(it))
+                        SVGCommand.AbsQuadTo.CODE -> {
+                            commands.add(SVGCommand.AbsQuadTo.fromString(it))
                         }
                         else -> {}
                     }
                 }
+
                 createCanvasPaths()
             }
         }
@@ -150,17 +156,19 @@ class SVG {
     }
 }
 
-sealed class SVGCommand(val code: String) {
+sealed class SVGCommand {
 
     class MoveTo(
         val x: Float,
         val y: Float
-    ) : SVGCommand(MOVE_TO_CODE) {
-        override fun toString() = "$code$x $y"
+    ) : SVGCommand() {
+        override fun toString() = "$CODE$x $y"
 
         companion object {
+            const val CODE = 'M'
+
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix(MOVE_TO_CODE).split(" ")
+                val coords = string.removePrefix("$CODE").split(" ")
                 val x = coords[0].toFloat()
                 val y = coords[1].toFloat()
                 return MoveTo(x, y)
@@ -171,12 +179,14 @@ sealed class SVGCommand(val code: String) {
     class AbsLineTo(
         val x: Float,
         val y: Float
-    ) : SVGCommand(ABS_LINE_TO_CODE) {
-        override fun toString() = "$code$x $y"
+    ) : SVGCommand() {
+        override fun toString() = "$CODE$x $y"
 
         companion object {
+            const val CODE = 'L'
+
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix(ABS_LINE_TO_CODE).split(" ")
+                val coords = string.removePrefix("$CODE").split(" ")
                 val x = coords[0].toFloat()
                 val y = coords[1].toFloat()
                 return AbsLineTo(x, y)
@@ -189,12 +199,14 @@ sealed class SVGCommand(val code: String) {
         val y1: Float,
         val x2: Float,
         val y2: Float
-    ) : SVGCommand(ABS_QUAD_TO_CODE) {
-        override fun toString() = "$code$x1 $y1 $x2 $y2"
+    ) : SVGCommand() {
+        override fun toString() = "$CODE$x1 $y1 $x2 $y2"
 
         companion object {
+            const val CODE = 'Q'
+
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix(ABS_QUAD_TO_CODE).split(" ")
+                val coords = string.removePrefix("$CODE").split(" ")
                 val x1 = coords[0].toFloat()
                 val y1 = coords[1].toFloat()
                 val x2 = coords[2].toFloat()
@@ -204,10 +216,6 @@ sealed class SVGCommand(val code: String) {
         }
     }
 }
-
-private const val MOVE_TO_CODE = "M"
-private const val ABS_LINE_TO_CODE = "L"
-private const val ABS_QUAD_TO_CODE = "Q"
 
 private const val COMMA = ","
 private const val XML_NS_URI = "http://www.w3.org/2000/svg"
