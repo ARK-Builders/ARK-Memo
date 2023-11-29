@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         }
 
-        if (memoPreferences.getPath() == null) {
+        if (memoPreferences.getPath().isEmpty()) {
             FilePickerDialog.show(this, supportFragmentManager)
 
             supportFragmentManager.onArkPathPicked(this) {
