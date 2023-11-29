@@ -32,7 +32,7 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
         it.isAntiAlias = true
     }
 
-    private val editPaths = Stack<DrawPath>()
+    private val editPaths = ArrayDeque<DrawPath>()
 
     private var svg = SVG()
 
@@ -45,7 +45,7 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
     }
 
     fun onDrawPath(path: DrawPath) {
-        editPaths.add(path)
+        editPaths.addLast(path)
         svg.addPath(path)
     }
 

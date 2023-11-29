@@ -7,7 +7,6 @@ import android.util.Xml
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import org.xmlpull.v1.XmlPullParser
 import java.nio.file.Path
-import java.util.Stack
 import kotlin.io.path.reader
 import kotlin.io.path.writer
 
@@ -16,7 +15,7 @@ class SVG {
     private var fill = "none"
     private var viewBox = ViewBox()
     private val commands = ArrayDeque<SVGCommand>()
-    private val paths = Stack<DrawPath>()
+    private val paths = ArrayDeque<DrawPath>()
 
     private val paint
         get() = Paint().also {
@@ -29,11 +28,11 @@ class SVG {
         }
 
     fun addCommand(command: SVGCommand) {
-        commands.add(command)
+        commands.addLast(command)
     }
 
     fun addPath(path: DrawPath) {
-        paths.add(path)
+        paths.addLast(path)
     }
 
     fun setViewBox(width: Float, height: Float) {
@@ -90,7 +89,7 @@ class SVG {
                         path.lineTo(command.x, command.y)
                     }
                 }
-                paths.add(DrawPath(path, paint))
+                paths.addLast(DrawPath(path, paint))
             }
         }
     }
@@ -131,13 +130,13 @@ class SVG {
                 pathData.split(COMMA).forEach {
                     when (it.first()) {
                         SVGCommand.MoveTo.CODE -> {
-                            commands.add(SVGCommand.MoveTo.fromString(it))
+                            commands.addLast(SVGCommand.MoveTo.fromString(it))
                         }
                         SVGCommand.AbsLineTo.CODE -> {
-                            commands.add(SVGCommand.MoveTo.fromString(it))
+                            commands.addLast(SVGCommand.MoveTo.fromString(it))
                         }
                         SVGCommand.AbsQuadTo.CODE -> {
-                            commands.add(SVGCommand.AbsQuadTo.fromString(it))
+                            commands.addLast(SVGCommand.AbsQuadTo.fromString(it))
                         }
                         else -> {}
                     }
