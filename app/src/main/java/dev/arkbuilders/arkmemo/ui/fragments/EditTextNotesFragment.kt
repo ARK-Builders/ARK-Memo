@@ -13,10 +13,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
-import dev.arkbuilders.arkmemo.models.DEFAULT_TITLE
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
@@ -50,7 +51,10 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val defaultTitle = "Text $DEFAULT_TITLE"
+        val defaultTitle = getString(
+            R.string.ark_memo_text_note,
+            LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+        )
         var title = this.note.title
         var data = note.text
         val editTextListener = object: TextWatcher{

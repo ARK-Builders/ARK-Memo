@@ -13,12 +13,13 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
-import dev.arkbuilders.arkmemo.models.DEFAULT_TITLE
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
@@ -32,7 +33,8 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
     private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
     private val notesViewModel: NotesViewModel by activityViewModels()
 
-    private var note = GraphicNote( title = "")
+    private var note = GraphicNote()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
@@ -52,7 +54,10 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val defaultTitle = "Graphic $DEFAULT_TITLE"
+        val defaultTitle = getString(
+            R.string.ark_memo_graphic_note,
+            LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+        )
         var title = note.title
         val notesCanvas = binding.notesCanvas
         val saveButton = binding.saveNote

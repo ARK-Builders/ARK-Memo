@@ -39,7 +39,8 @@ class NotesListAdapter(private val notes: List<Note>):
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         holder.title.text = notes[position].title
-        holder.date.text = notes[position].resource?.modified?.toString() ?: "Just now"
+        holder.date.text = notes[position].resource?.modified?.toString() ?:
+                activity?.getString(R.string.ark_memo_just_now)
     }
 
     override fun getItemCount() = notes.size
