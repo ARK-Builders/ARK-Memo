@@ -21,8 +21,8 @@ import dev.arkbuilders.arkmemo.utils.replaceFragment
 class NotesListAdapter(private val notes: List<Note>):
     RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
-    private var activity: MainActivity? = null
-    private var fragmentManager: FragmentManager? = null
+    private lateinit var activity: MainActivity
+    private lateinit var fragmentManager: FragmentManager
 
     fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
@@ -40,7 +40,7 @@ class NotesListAdapter(private val notes: List<Note>):
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         holder.title.text = notes[position].title
         holder.date.text = notes[position].resource?.modified?.toString() ?:
-                activity?.getString(R.string.ark_memo_just_now)
+                activity.getString(R.string.ark_memo_just_now)
     }
 
     override fun getItemCount() = notes.size
@@ -56,19 +56,19 @@ class NotesListAdapter(private val notes: List<Note>):
         private val clickNoteToEditListener = View.OnClickListener {
             var tag = EditTextNotesFragment.TAG
             when (val selectedNote = notes[bindingAdapterPosition]) {
-                is TextNote -> activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
+                is TextNote -> activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
                 is GraphicNote -> {
-                    activity?.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
+                    activity.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
                     tag = EditGraphicNotesFragment.TAG
                 }
             }
-            activity?.replaceFragment(activity?.fragment!!, tag)
+            activity.replaceFragment(activity.fragment, tag)
         }
 
         private val deleteNoteClickListener = View.OnClickListener {
             NoteDeleteDialog()
                 .setNoteToBeDeleted(notes[bindingAdapterPosition])
-                .show(fragmentManager!!, NoteDeleteDialog.TAG)
+                .show(fragmentManager, NoteDeleteDialog.TAG)
         }
 
         init {
