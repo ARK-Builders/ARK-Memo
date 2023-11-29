@@ -60,9 +60,9 @@ class SVG {
         }
     }
 
-    fun getPaths() = paths
+    fun getPaths(): ArrayDeque<DrawPath> = paths
 
-    fun copy() = SVG().apply {
+    fun copy(): SVG = SVG().apply {
         strokeColor = this@SVG.strokeColor
         fill = this@SVG.fill
         viewBox = this@SVG.viewBox
@@ -95,7 +95,7 @@ class SVG {
     }
 
     companion object {
-        fun parse(path: Path) = SVG().apply {
+        fun parse(path: Path): SVG = SVG().apply {
             val xmlParser = Xml.newPullParser()
             var pathData = ""
 
@@ -186,7 +186,7 @@ sealed class SVGCommand {
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString() = "$CODE$x $y"
+        override fun toString(): String = "$CODE$x $y"
 
         companion object {
             const val CODE = 'M'
@@ -204,7 +204,7 @@ sealed class SVGCommand {
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString() = "$CODE$x $y"
+        override fun toString(): String = "$CODE$x $y"
 
         companion object {
             const val CODE = 'L'
@@ -224,7 +224,7 @@ sealed class SVGCommand {
         val x2: Float,
         val y2: Float
     ) : SVGCommand() {
-        override fun toString() = "$CODE$x1 $y1 $x2 $y2"
+        override fun toString(): String = "$CODE$x1 $y1 $x2 $y2"
 
         companion object {
             const val CODE = 'Q'

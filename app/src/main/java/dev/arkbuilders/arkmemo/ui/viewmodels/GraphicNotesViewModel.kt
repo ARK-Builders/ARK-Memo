@@ -57,9 +57,9 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
         strokeWidth = width
     }
 
-    fun paths() = editPaths
+    fun paths(): ArrayDeque<DrawPath> = editPaths
 
-    fun svg() = svg
+    fun svg(): SVG = svg
 }
 
 data class DrawPath(
