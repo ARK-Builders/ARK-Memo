@@ -42,7 +42,7 @@ class SVG {
     fun generate(path: Path) {
         if (commands.isNotEmpty()) {
             val xmlSerializer = Xml.newSerializer()
-            val pathData = commands.joinToString(COMMA)
+            val pathData = commands.joinToString()
             xmlSerializer.apply {
                 setOutput(path.writer())
                 startDocument("utf-8", false)
@@ -128,7 +128,7 @@ class SVG {
 
 
                 pathData.split(COMMA).forEach {
-                    when (it.first()) {
+                    when (it.trim().first()) {
                         SVGCommand.MoveTo.CODE -> {
                             commands.addLast(SVGCommand.MoveTo.fromString(it))
                         }
@@ -186,13 +186,13 @@ sealed class SVGCommand {
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE$x $y"
+        override fun toString(): String = "$CODE $x $y"
 
         companion object {
             const val CODE = 'M'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").split(" ")
+                val coords = string.removePrefix("$CODE").trim().split(" ")
                 val x = coords[0].toFloat()
                 val y = coords[1].toFloat()
                 return MoveTo(x, y)
@@ -204,13 +204,13 @@ sealed class SVGCommand {
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE$x $y"
+        override fun toString(): String = "$CODE $x $y"
 
         companion object {
             const val CODE = 'L'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").split(" ")
+                val coords = string.removePrefix("$CODE").trim().split(" ")
                 val x = coords[0].toFloat()
                 val y = coords[1].toFloat()
                 return AbsLineTo(x, y)
@@ -224,13 +224,13 @@ sealed class SVGCommand {
         val x2: Float,
         val y2: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE$x1 $y1 $x2 $y2"
+        override fun toString(): String = "$CODE $x1 $y1 $x2 $y2"
 
         companion object {
             const val CODE = 'Q'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").split(" ")
+                val coords = string.removePrefix("$CODE").trim().split(" ")
                 val x1 = coords[0].toFloat()
                 val y1 = coords[1].toFloat()
                 val x2 = coords[2].toFloat()
