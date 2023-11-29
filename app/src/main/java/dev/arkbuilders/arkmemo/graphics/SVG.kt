@@ -14,7 +14,7 @@ import kotlin.io.path.writer
 class SVG {
     private var strokeColor = "black"
     private var fill = "none"
-    private var viewBox = "0 0 100 100"
+    private var viewBox = ViewBox()
     private val commands = ArrayDeque<SVGCommand>()
     private val paths = Stack<DrawPath>()
 
@@ -37,7 +37,7 @@ class SVG {
     }
 
     fun setViewBox(width: Float, height: Float) {
-        viewBox = "0 0 $width $height"
+        viewBox = ViewBox(width = width, height = height)
     }
 
     fun generate(path: Path) {
@@ -48,7 +48,7 @@ class SVG {
                 setOutput(path.writer())
                 startDocument("utf-8", false)
                 startTag("", SVG_TAG)
-                attribute("", Attributes.VIEW_BOX, viewBox)
+                attribute("", Attributes.VIEW_BOX, viewBox.toString())
                 attribute("", Attributes.XML_NS_URI, XML_NS_URI)
                 startTag("", PATH_TAG)
                 attribute("", Attributes.Path.STROKE, strokeColor)
@@ -110,7 +110,11 @@ class SVG {
                     when (event) {
                         XmlPullParser.START_TAG -> {
                             when (tag) {
-                                SVG_TAG -> { viewBox = getAttributeValue("", Attributes.VIEW_BOX) }
+                                SVG_TAG -> {
+                                    viewBox = ViewBox.fromString(
+                                        getAttributeValue("", Attributes.VIEW_BOX)
+                                    )
+                                }
                                 PATH_TAG -> {
                                     strokeColor = getAttributeValue("", Attributes.Path.STROKE)
                                     fill = getAttributeValue("", Attributes.Path.FILL)
@@ -152,6 +156,27 @@ class SVG {
                 const val FILL = "fill"
                 const val DATA = "d"
             }
+        }
+    }
+}
+
+data class ViewBox(
+    val x: Float = 0f,
+    val y: Float = 0f,
+    val width: Float = 100f,
+    val height: Float = 100f
+) {
+    override fun toString(): String = "$x $y $width $height"
+
+    companion object {
+        fun fromString(string: String): ViewBox {
+            val viewBox = string.split(" ")
+            return ViewBox(
+                viewBox[0].toFloat(),
+                viewBox[1].toFloat(),
+                viewBox[2].toFloat(),
+                viewBox[3].toFloat()
+            )
         }
     }
 }
