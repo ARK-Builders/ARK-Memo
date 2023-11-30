@@ -30,4 +30,6 @@
     <string name="ark_memo_history">History</string>
     <string name="ark_memo_old_version">Older version</string>
     <string name="ark_memo_fork_versions">Fork versions</string>
+    <string name="ark_memo_note_existing">Note existing!</string>
+
 </resources>

@@ -9,10 +9,10 @@ plugins {
 android {
     compileSdk 33
 
-    namespace 'space.taran.arkmemo'
+    namespace 'dev.arkbuilders.arkmemo'
 
     defaultConfig {
-        applicationId "space.taran.arkmemo"
+        applicationId "dev.arkbuilders.arkmemo"
         minSdk 26
         targetSdk 33
         versionCode 1
@@ -88,9 +88,6 @@ dependencies {
 
     implementation 'dev.arkbuilders:arkfilepicker:0.1.1'
     implementation 'dev.arkbuilders:arklib:0.3.3'
-
-    implementation 'ch.acra:acra-http:5.9.5'
-    implementation 'ch.acra:acra-dialog:5.9.5'
 
     implementation 'androidx.preference:preference:1.2.0'
     implementation "com.google.dagger:hilt-android:2.42"
