@@ -60,7 +60,7 @@ class SVG {
         }
     }
 
-    fun getPaths(): ArrayDeque<DrawPath> = paths
+    fun getPaths(): Collection<DrawPath> = paths
 
     fun copy(): SVG = SVG().apply {
         strokeColor = this@SVG.strokeColor
