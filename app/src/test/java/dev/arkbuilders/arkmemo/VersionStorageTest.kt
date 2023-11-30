@@ -1,8 +1,8 @@
 package space.taran.arkmemo
 
 import space.taran.arklib.ResourceId
-import space.taran.arkmemo.data.models.Version
-import space.taran.arkmemo.data.repo.versions.PlainVersionStorage
+import dev.arkbuilders.arkmemo.models.Version
+import dev.arkbuilders.arkmemo.repo.versions.PlainVersionStorage
 import org.junit.Test
 import org.junit.Assert.*
 import java.io.File

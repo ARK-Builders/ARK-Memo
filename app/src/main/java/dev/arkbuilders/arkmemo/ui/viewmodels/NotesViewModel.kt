@@ -5,12 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.arkbuilders.arkmemo.data.repositories.SaveNoteCallback
+import dev.arkbuilders.arklib.ResourceId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import dev.arkbuilders.arkmemo.data.repositories.TextNotesRepo
+import dev.arkbuilders.arkmemo.repo.text.TextNotesRepo
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
@@ -38,36 +39,45 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onSaveClick(note: TextNote, showProgress: (Boolean) -> Unit) {
+    fun onSaveClick(
+        note: Note,
+        showProgress: (Boolean) -> Unit,
+        saveVersion: (ResourceId, ResourceId) -> Unit
+    ) {
         viewModelScope.launch(iODispatcher) {
             withContext(Dispatchers.Main) {
                 showProgress(true)
-
             }
-            textNotesRepo.save(note, object : SaveNoteCallback {
-                override fun onSaveNote(result: SaveNoteResult) {
+            val oldId = note.resource?.id
+            val isNewResource = oldId == null
+            when (note) {
+                is TextNote -> textNotesRepo.save(note) { result ->
                     if (result == SaveNoteResult.SUCCESS) {
+                        val newId = note.resource?.id!!
                         add(note)
+                        if (!isNewResource) saveVersion(oldId!!, newId)
                     }
                     mSaveNoteResultLiveData.postValue(result)
                 }
-
-            })
-
+            }
             withContext(Dispatchers.Main) {
                 showProgress(false)
             }
         }
     }
 
-    fun onDelete(note: TextNote) {
+    fun onDelete(note: Note) {
         viewModelScope.launch(iODispatcher) {
-            remove(note)
-            textNotesRepo.delete(note)
+            when(note) {
+                is TextNote -> {
+                    remove(note)
+                    textNotesRepo.delete(note)
+                }
+            }
         }
     }
 
-    fun getTextNotes(emit: (List<TextNote>) -> Unit) {
+    fun getNotes(emit: (List<TextNote>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             notes.collect {
                 withContext(Dispatchers.Main) {

@@ -19,14 +19,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentTextNotesBinding
-import dev.arkbuilders.arkmemo.data.models.TextNote
-import space.taran.arkmemo.data.viewmodels.VersionsViewModel
+import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.ui.viewmodels.VersionsViewModel
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.activities.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
 import dev.arkbuilders.arkmemo.ui.adapters.TextNotesListAdapter
+import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 
 @AndroidEntryPoint
 class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
@@ -36,8 +36,9 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
+    private val childFragManager by lazy { childFragmentManager }
     private val mainScope = MainScope()
-    private val textNotesViewModel: TextNotesViewModel by activityViewModels()
+    private val notesViewModel: NotesViewModel by activityViewModels()
     private val versionsViewModel: VersionsViewModel by activityViewModels()
 
     private lateinit var newNoteButton: FloatingActionButton
@@ -90,16 +91,10 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        lifecycleScope.launch {
-            versionsViewModel.init()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        textNotesViewModel.init()
+        notesViewModel.init()
+        versionsViewModel.init()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -134,25 +129,21 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
             }
         }
 
-        lifecycleScope.launch {
-            viewLifecycleOwner.apply {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    textNotesViewModel.collectAllNotes {
-                        val latestNotes = it.filter { note ->
-                            versionsViewModel
-                                .getLatestVersions().contains(note.meta?.id) ||
-                                    versionsViewModel.isNotVersionedYet(note)
-                        }
-                        val adapter = TextNotesListAdapter(latestNotes)
-                        val layoutManager = LinearLayoutManager(requireContext())
-                        adapter.setActivity(activity)
-                        adapter.setFragmentManager(childFragmentManager)
-                        adapter.showVersionsTracker(true)
-                        recyclerView.apply {
-                            this.layoutManager = layoutManager
-                            this.adapter = adapter
-                        }
-                    }
+        lifecycleScope.launchWhenStarted {
+            notesViewModel.getNotes {
+                val latestNotes = it.filter { note ->
+                    versionsViewModel
+                        .getChildNotParentIds().contains(note.resource?.id!!) ||
+                            versionsViewModel.isNotVersioned(note.resource?.id!!)
+                }
+                val adapter = TextNotesListAdapter(latestNotes)
+                val layoutManager = LinearLayoutManager(requireContext())
+                adapter.setActivity(activity)
+                adapter.setFragmentManager(childFragManager)
+                adapter.showVersionsTracker(true)
+                recyclerView.apply {
+                    this.layoutManager = layoutManager
+                    this.adapter = adapter
                 }
             }
         }
@@ -174,25 +165,25 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     }
 }
 
-fun Fragment.deleteTextNote(note: TextNote){
-    val viewModel: TextNotesViewModel by activityViewModels()
+fun Fragment.deleteNote(note: Note){
+    val notesViewModel: NotesViewModel by activityViewModels()
     val versionsViewModel: VersionsViewModel by activityViewModels()
     if (
-        versionsViewModel.isVersioned(note) &&
-        versionsViewModel.isLatestVersion(note)
+        versionsViewModel.isVersioned(note.resource?.id!!) &&
+        versionsViewModel.isLatestResource(note.resource?.id!!)
     )
         lifecycleScope.launch {
-            viewModel.collectAllNotes {
+            notesViewModel.getNotes {
                 it.filter { note1 ->
-                    note.meta?.id == note1.meta?.id ||
-                            versionsViewModel.getNoteParentsFromVersions(note)
-                                .contains(note1.meta?.id!!)
+                    note.resource?.id == note1.resource?.id ||
+                            versionsViewModel.getParentIds(note.resource?.id!!)
+                                .contains(note1.resource?.id!!)
                 }
                     .forEach { note2 ->
-                        viewModel.deleteNote(note2)
+                        notesViewModel.onDelete(note2)
                     }
             }
         }
-    else viewModel.deleteNote(note)
-    versionsViewModel.forgetNoteFromVersions(note)
+    else notesViewModel.onDelete(note)
+    versionsViewModel.onDelete(note.resource?.id!!)
 }

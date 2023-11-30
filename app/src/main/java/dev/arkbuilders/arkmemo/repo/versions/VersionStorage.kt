@@ -1,7 +1,7 @@
-package space.taran.arkmemo.data.repo.versions
+package dev.arkbuilders.arkmemo.repo.versions
 
 import dev.arkbuilders.arklib.ResourceId
-import space.taran.arkmemo.data.models.Version
+import dev.arkbuilders.arkmemo.models.Version
 
 interface VersionStorage {
     suspend fun add(version: Version)
@@ -18,7 +18,7 @@ interface VersionStorage {
 
     fun childrenNotParents(): List<ResourceId>
 
-    fun isLatestVersion(id: ResourceId): Boolean
+    fun isLatestResourceVersion(id: ResourceId): Boolean
 
     suspend fun persist()
 }

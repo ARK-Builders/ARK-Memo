@@ -10,19 +10,20 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.TextNoteBinding
-import dev.arkbuilders.arkmemo.data.models.TextNote
+import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
-import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialogFragment
+import dev.arkbuilders.arkmemo.ui.dialogs.DeleteConfirmDialog
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
-import space.taran.arkmemo.ui.fragments.TextNoteVersionsFragment
+import dev.arkbuilders.arkmemo.ui.fragments.VersionsFragment
 
-class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
+class TextNotesListAdapter(private val notes: List<Note>): RecyclerView.Adapter<TextNotesListAdapter.NoteViewHolder>() {
 
-    private var activity: MainActivity? = null
-    private var fragmentManager: FragmentManager? = null
+    private lateinit var activity: MainActivity
+    private lateinit var fragmentManager: FragmentManager
     private var showVersionsTracker = false
-    var showLatestNoteIcon: (TextNote) -> Boolean = {
+    var showLatestNoteIcon: (Note) -> Boolean = {
         false
     }
     private var showVersionsFork = false
@@ -49,8 +50,8 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].content.title
-        holder.date.text = notes[position].meta?.modified?.toString() ?: "Just now"
+        holder.title.text = notes[position].title
+        holder.date.text = notes[position].resource?.modified?.toString() ?: "Just now"
         holder.ivLatestNote.isVisible = showLatestNoteIcon(notes[position])
     }
 
@@ -74,17 +75,17 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
         }
 
         private val deleteNoteClickListener = View.OnClickListener {
-            NoteDeleteDialogFragment()
-                .setNoteToBeDeleted(notes[bindingAdapterPosition])
-                .show(fragmentManager!!, NoteDeleteDialogFragment.TAG)
+            DeleteConfirmDialog()
+                .setNote(notes[bindingAdapterPosition])
+                .show(fragmentManager, DeleteConfirmDialog.TAG)
         }
 
         private val trackVersionsListener = View.OnClickListener {
             val note = notes[bindingAdapterPosition]
-            activity?.fragment = TextNoteVersionsFragment.newInstance(
+            activity.fragment = VersionsFragment.newInstance(
                 note
             )
-            activity?.replaceFragment(activity?.fragment!!, TextNoteVersionsFragment.TAG)
+            activity.replaceFragment(activity.fragment, VersionsFragment.TAG)
         }
 
         init {
@@ -101,10 +102,13 @@ class TextNotesListAdapter(private val notes: List<TextNote>): RecyclerView.Adap
         }
 
         private fun editNote(forked: Boolean = false) {
-            val selectedNote = notes[bindingAdapterPosition]
-            selectedNote.isForked = forked
-            activity?.fragment = EditTextNotesFragment.newInstance(selectedNote)
-            activity?.replaceFragment(activity?.fragment!!, EditTextNotesFragment.TAG)
+            when (val selectedNote = notes[bindingAdapterPosition]) {
+                is TextNote -> {
+                    selectedNote.isForked = forked
+                    activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
+                    activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+                }
+            }
         }
     }
 }

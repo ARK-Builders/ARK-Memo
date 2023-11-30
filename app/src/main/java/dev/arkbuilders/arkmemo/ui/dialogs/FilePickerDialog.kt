@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.files
+package dev.arkbuilders.arkmemo.ui.dialogs
 
 import android.Manifest
 import android.content.Context
@@ -16,7 +16,7 @@ import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerMode
 import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
 
-class FilePicker private constructor(){
+class FilePickerDialog private constructor(){
     companion object{
 
         private const val TAG = "file_picker"
@@ -29,7 +29,7 @@ class FilePicker private constructor(){
         }
 
         fun show(activity: AppCompatActivity, fragmentManager: FragmentManager){
-            this.fragmentManager = fragmentManager
+            Companion.fragmentManager = fragmentManager
             if(isReadPermissionGranted(activity)){
                 show()
             }

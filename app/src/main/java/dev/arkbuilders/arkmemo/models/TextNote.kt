@@ -1,20 +1,16 @@
 package dev.arkbuilders.arkmemo.models
 
 import android.os.Parcelable
+import dev.arkbuilders.arklib.data.index.Resource
 import kotlinx.parcelize.IgnoredOnParcel
-import dev.arkbuilders.arkmemo.data.ResourceMeta
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class TextNote (
-    val content: Content,
+    override val title: String = "",
+    override val description: String = "",
+    val text: String = "",
+    override var isForked: Boolean = false,
     @IgnoredOnParcel
-    var meta: ResourceMeta? = null
-): Parcelable
-{
-    @Parcelize
-    data class Content(
-        val title: String,
-        val data: String
-        ): Parcelable
-}
+    override var resource: Resource? = null
+): Note, Parcelable

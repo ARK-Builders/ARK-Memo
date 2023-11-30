@@ -1,4 +1,4 @@
-package space.taran.arkmemo.data.models
+package dev.arkbuilders.arkmemo.models
 
 import dev.arkbuilders.arklib.ResourceId
 

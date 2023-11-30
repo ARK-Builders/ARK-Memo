@@ -18,12 +18,12 @@ import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
-import dev.arkbuilders.arkmemo.files.FilePicker
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
-import space.taran.arkmemo.ui.fragments.TextNoteVersionsFragment
 import dev.arkbuilders.arkmemo.ui.fragments.TextNotesFragment
+import dev.arkbuilders.arkmemo.ui.fragments.VersionsFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,15 +42,15 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     var fragment: Fragment = TextNotesFragment()
 
     init {
-        FilePicker.readPermLauncher =
+        FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) FilePicker.show()
+                if (isGranted) FilePickerDialog.show()
                 else finish()
             }
 
-        FilePicker.readPermLauncher_SDK_R =
+        FilePickerDialog.readPermLauncher_SDK_R =
             registerForActivityResult(PermissionContract()) { isGranted ->
-                if (isGranted) FilePicker.show()
+                if (isGranted) FilePickerDialog.show()
                 else finish()
             }
     }
@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
 
         if (memoPreferences.getPathString() == null) {
-            FilePicker.show(this, supportFragmentManager)
+            FilePickerDialog.show(this, supportFragmentManager)
 
             supportFragmentManager.onArkPathPicked(this) {
                 memoPreferences.storePath(it.toString())
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         this.menu = menu
         if(
             fragment.tag == TextNotesFragment.TAG ||
-            fragment.tag == TextNoteVersionsFragment.TAG
+            fragment.tag == VersionsFragment.TAG
         )
             showSettingsButton(true)
         else showSettingsButton(false)

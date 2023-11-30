@@ -1,18 +1,18 @@
-package dev.arkbuilders.arkmemo.data.repositories
+package dev.arkbuilders.arkmemo.repo.text
 
 import android.util.Log
 import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.computeId
+import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arklib.data.index.RootIndex
 import dev.arkbuilders.arklib.user.properties.Properties
 import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import dev.arkbuilders.arkmemo.models.SaveNoteResult
+import dev.arkbuilders.arkmemo.models.TextNote
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import dev.arkbuilders.arkmemo.data.ResourceMeta
-import dev.arkbuilders.arkmemo.models.SaveNoteResult
-import dev.arkbuilders.arkmemo.models.TextNote
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.inject.Inject
@@ -41,16 +41,16 @@ class TextNotesRepoImpl @Inject constructor(): TextNotesRepo {
         propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
     }
 
-   override suspend fun save(note: TextNote, callback: SaveNoteCallback) {
+   override suspend fun save(note: TextNote, callback: (SaveNoteResult) -> Unit) {
         write(note, callback)
     }
 
     override suspend fun delete(note: TextNote) = withContext(iODispatcher) {
-        val path = root.resolve("${note.meta?.name}")
+        val path = root.resolve("${note.resource?.name}")
         delete(path)
-        propertiesStorage.remove(note.meta?.id!!)
+        propertiesStorage.remove(note.resource?.id!!)
         propertiesStorage.persist()
-        Log.d("text-repo", "${note.meta?.name!!} has been deleted")
+        Log.d("text-repo", "${note.resource?.name!!} has been deleted")
     }
 
     override  suspend fun read(): List<TextNote> = withContext(Dispatchers.IO) {
@@ -63,16 +63,18 @@ class TextNotesRepoImpl @Inject constructor(): TextNotesRepo {
                 }
                 val size = path.fileSize()
                 val id = computeId(size, path)
-                val meta = ResourceMeta(
+                val resource = Resource(
                     id,
                     path.fileName.name,
                     path.extension,
-                    path.getLastModifiedTime(),
-                    size
+                    path.getLastModifiedTime()
                 )
                 val titles = propertiesStorage.getProperties(id).titles
-                val content = TextNote.Content(titles.elementAtOrNull(0) ?: "", data.toString())
-                val note = TextNote(content, meta)
+                val note = TextNote(
+                    title = titles.elementAtOrNull(0) ?: "",
+                    text = data.toString(),
+                    resource = resource
+                )
                 notes.add(note)
             }
         }
@@ -80,19 +82,21 @@ class TextNotesRepoImpl @Inject constructor(): TextNotesRepo {
         notes
     }
 
-    private suspend fun write(note: TextNote,
-                              saveNoteCallback: SaveNoteCallback) = withContext(Dispatchers.IO) {
+    private suspend fun write(
+        note: TextNote,
+        saveResultCallback: (SaveNoteResult) -> Unit
+    ) = withContext(Dispatchers.IO) {
         val tempPath = kotlin.io.path.createTempFile()
-        val lines = note.content.data.split('\n')
+        val lines = note.text.split('\n')
         tempPath.writeLines(lines)
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
         Log.d("text-repo", "initial resource name ${tempPath.name}")
-        persistNoteProperties(resourceId = id, noteTitle = note.content.title)
+        persistNoteProperties(resourceId = id, noteTitle = note.title)
 
         val resourcePath = root.resolve("$id.$NOTE_EXT")
         if (resourcePath.exists()) {
-            saveNoteCallback.onSaveNote(SaveNoteResult.ERROR_EXISTING)
+            saveResultCallback(SaveNoteResult.ERROR_EXISTING)
             return@withContext
         }
         renameResourceWithNewResourceMeta(
@@ -102,7 +106,7 @@ class TextNotesRepoImpl @Inject constructor(): TextNotesRepo {
             resourceId = id,
             size = size
         )
-        saveNoteCallback.onSaveNote(SaveNoteResult.SUCCESS)
+        saveResultCallback(SaveNoteResult.SUCCESS)
     }
 
     private suspend fun persistNoteProperties(resourceId: ResourceId, noteTitle: String) {
@@ -121,12 +125,11 @@ class TextNotesRepoImpl @Inject constructor(): TextNotesRepo {
         size: Long
     ) {
         tempPath.moveTo(resourcePath)
-        note.meta = ResourceMeta(
+        note.resource = Resource(
             id = resourceId,
             name = resourcePath.fileName.name,
             extension = resourcePath.extension,
-            modified = resourcePath.getLastModifiedTime(),
-            size = size
+            modified = resourcePath.getLastModifiedTime()
         )
         Log.d("notes-repo", "resource renamed to ${resourcePath.name} successfully")
     }
@@ -136,9 +139,4 @@ class TextNotesRepoImpl @Inject constructor(): TextNotesRepo {
     }
 }
 
-interface SaveNoteCallback {
-    fun onSaveNote(result: SaveNoteResult)
-}
-
 private const val NOTE_EXT = "note"
-

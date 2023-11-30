@@ -1,12 +1,12 @@
-package space.taran.arkmemo.data.repo.versions
+package dev.arkbuilders.arkmemo.repo.versions
 
 import android.util.Log
 import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.arkFolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import space.taran.arkmemo.data.models.Version
-import space.taran.arkmemo.data.models.VersionsResult
+import dev.arkbuilders.arkmemo.models.Version
+import dev.arkbuilders.arkmemo.models.VersionsResult
 import space.taran.arkmemo.utils.arkVersions
 import java.nio.file.Files
 import java.nio.file.Path
@@ -41,7 +41,8 @@ class PlainVersionStorage(private val root: Path): VersionStorage {
             )
         }
 
-    override fun isLatestVersion(id: ResourceId) = childrenNotParents().contains(id)
+    override fun isLatestResourceVersion(id: ResourceId): Boolean =
+        childrenNotParents().contains(id)
 
     private fun replace(oldVersion: Version, newVersion: Version) {
         val replaceIndex = versions.indexOf(oldVersion)

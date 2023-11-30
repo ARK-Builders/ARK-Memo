@@ -13,10 +13,7 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
@@ -25,6 +22,7 @@ import dev.arkbuilders.arkmemo.databinding.FragmentEditTextNotesBinding
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.viewmodels.VersionsViewModel
 
 @AndroidEntryPoint
 class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
@@ -38,20 +36,18 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
 
     private val binding by viewBinding(FragmentEditTextNotesBinding::bind)
 
-    private var note =  TextNote(
-        TextNote.Content("", "")
-    )
-    private var noteStr: String? = null
+    private var note =  TextNote()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init()
-        subscribeLiveData()
+        subscribeToSaveResultLiveData()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var note = this.note
+        var title = note.title
+        var data = note.text
         val editNote = binding.editNote
         val saveNoteButton = binding.saveNote
         val editTextListener = object: TextWatcher{
@@ -60,95 +56,113 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_text_notes) {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val noteString = s?.toString()
-                var title = this@EditTextNotesFragment.note.content.title
-                if(noteString != null){
-                    if (title == "") for(char in noteString){
-                        if(char != '\n'){
-                            title += char
-                        }
-                        else break
+                data = s?.toString() ?: ""
+                if (title.isEmpty()) for(char in data){
+                    if(char != '\n'){
+                        title += char
                     }
-                    val content = TextNote.Content(
-                        title = title,
-                        data = noteString
-                    )
-                    note.putContent(content)
-                    if (note.isForked) {
-                        lifecycleScope.launchWhenStarted {
-                            note.hasChanged {
-                                saveNoteButton.isEnabled = it
-                            }
-                        }
-                    }
+                    else break
+                }
+                if (note.isForked) {
+                    saveNoteButton.isEnabled = data != note.text
                 }
             }
+        }
+
+        fun prepare(newNote: TextNote) {
+            note = newNote
+            data = newNote.text
+            title = newNote.title
         }
 
         fun setupKeyboard() {
             val inputMethodManager = requireContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE)
                     as InputMethodManager
-            editNote.requestFocus()
             inputMethodManager.showSoftInput(editNote, SHOW_IMPLICIT)
-            activity.title = getString(R.string.edit_note)
-            editNote.addTextChangedListener(editTextListener)
         }
 
-        if(arguments != null) {
-            val note = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)
-            else requireArguments().getParcelable(NOTE_KEY)
-            noteStr = requireArguments().getString(NOTE_STRING_KEY)
-            if (note != null) this.note = note
-            if (noteStr != null) {
-                val title = noteStr?.split("\n")?.get(0)!!
-                this.note.putContent(
-                    TextNote.Content(
-                        title = title,
-                        data = noteStr!!
-                    )
-                )
-            }
-        }
-
-        if (
-            versionsViewModel.isVersioned(note) && !versionsViewModel.isLatestVersion(note)
-        ) {
-            if (note.isForked) setupKeyboard() else {
+        fun checkNoteForReadOnly() {
+            val resourceId = note.resource?.id!!
+            val isReadOnly = versionsViewModel.isVersioned(resourceId) &&
+                    !versionsViewModel.isLatestResource(resourceId) && !note.isForked
+            if (isReadOnly)             {
                 activity.title = getString(R.string.ark_memo_old_version)
                 editNote.isClickable = false
                 editNote.isFocusable = false
                 editNote.setBackgroundColor(Color.LTGRAY)
             }
-        } else setupKeyboard()
+            saveNoteButton.isVisible = !isReadOnly
+        }
 
+        activity.title = getString(R.string.edit_note)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
+        setupKeyboard()
+
+        if(arguments != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)?.let {
+                    prepare(it)
+                    checkNoteForReadOnly()
+                }
+            else requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
+                prepare(it)
+                checkNoteForReadOnly()
+            }
+            requireArguments().getString(NOTE_STRING_KEY)?.let {
+                data = it
+                title = data.split("\n")[0]
+            }
+            editNote.setText(data)
+        }
+
         editNote.requestFocus()
         editNote.addTextChangedListener(editTextListener)
-        editNote.setText(this.note.content.data)
 
         saveNoteButton.apply {
-            isVisible = versionsViewModel.isLatestVersion(note) ||
-                    versionsViewModel.isNotVersionedYet(note) || note.isForked
+            if (note.isForked) isEnabled = data != note.text
             if (isVisible) {
                 setOnClickListener {
-                    if (note.isNotEmpty()) {
-                        with(editViewModel) {
-                            saveNote(note) { note, newId ->
-                                versionsViewModel.addNoteToVersions(note, newId)
-                                versionsViewModel.emitLatestVersionNoteId(newId)
-                            }
-                            Toast.makeText(
-                                requireContext(), getString(R.string.ark_memo_note_saved),
-                                Toast.LENGTH_SHORT
+                    if (data.isNotEmpty()) {
+                        with(notesViewModel) {
+                            onSaveClick(
+                                TextNote(
+                                    title = title,
+                                    text = data,
+                                    resource = note.resource
+                                ),
+                                showProgress = { show ->
+                                    activity.showProgressBar(show)
+                                },
+                                saveVersion = { oldId, newId ->
+                                    versionsViewModel.createVersion(oldId, newId)
+                                    versionsViewModel.updateLatestResourceId(newId)
+                                }
                             )
-                                .show()
-                            activity.onBackPressedDispatcher.onBackPressed()
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun subscribeToSaveResultLiveData() {
+        lifecycleScope.launchWhenStarted {
+            notesViewModel.getSaveNoteResultLiveData().observe(viewLifecycleOwner) {
+                if (!isResumed) return@observe
+                if (it == SaveNoteResult.SUCCESS) {
+                    Toast.makeText(
+                        requireContext(), getString(R.string.ark_memo_note_saved),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    activity.onBackPressedDispatcher.onBackPressed()
+                } else {
+                    Toast.makeText(
+                        requireContext(), getString(R.string.ark_memo_note_existing),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

@@ -1,18 +1,17 @@
-package space.taran.arkmemo.data.repo.versions
+package dev.arkbuilders.arkmemo.repo.versions
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
-import space.taran.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import java.nio.file.Path
 import javax.inject.Inject
 
-class VersionStorageRepo @Inject constructor() {
+class VersionStorageRepo @Inject constructor(
+    private val memoPreferences: MemoPreferences
+) {
 
-    @Inject @ApplicationContext lateinit var context: Context
     private val storageByRoot = mutableMapOf<Path, PlainVersionStorage>()
 
     suspend fun provide(): VersionStorage {
-        val root = MemoPreferences.getInstance(context).getPath()!!
+        val root = memoPreferences.getPath()!!
         if (storageByRoot[root] == null) {
             val versionStorage = PlainVersionStorage(root)
             versionStorage.init()
