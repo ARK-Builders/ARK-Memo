@@ -2,6 +2,7 @@ package dev.arkbuilders.arkmemo.graphics
 
 import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 import android.graphics.Path as AndroidDrawPath
 import android.util.Xml
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
@@ -103,9 +104,9 @@ class SVG {
                 setInput(path.reader())
 
                 var event = xmlParser.eventType
+                var pathCount = 0
                 while (event != XmlPullParser.END_DOCUMENT) {
                     val tag = xmlParser.name
-
                     when (event) {
                         XmlPullParser.START_TAG -> {
                             when (tag) {
@@ -115,10 +116,15 @@ class SVG {
                                     )
                                 }
                                 PATH_TAG -> {
+                                    pathCount += 1
                                     strokeColor = getAttributeValue("", Attributes.Path.STROKE)
                                     fill = getAttributeValue("", Attributes.Path.FILL)
                                     pathData = getAttributeValue("", Attributes.Path.DATA)
                                 }
+                            }
+                            if (pathCount > 1) {
+                                Log.d("svg", "found more than 1 path in file")
+                                break
                             }
                         }
                     }
@@ -126,17 +132,17 @@ class SVG {
                     event = next()
                 }
 
-
                 pathData.split(COMMA).forEach {
-                    when (it.trim().first()) {
+                    val command = it.trim()
+                    when (command.first()) {
                         SVGCommand.MoveTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(it))
+                            commands.addLast(SVGCommand.MoveTo.fromString(command))
                         }
                         SVGCommand.AbsLineTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(it))
+                            commands.addLast(SVGCommand.MoveTo.fromString(command))
                         }
                         SVGCommand.AbsQuadTo.CODE -> {
-                            commands.addLast(SVGCommand.AbsQuadTo.fromString(it))
+                            commands.addLast(SVGCommand.AbsQuadTo.fromString(command))
                         }
                         else -> {}
                     }

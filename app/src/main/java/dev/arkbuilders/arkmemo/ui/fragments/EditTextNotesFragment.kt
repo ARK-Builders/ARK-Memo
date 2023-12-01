@@ -98,7 +98,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
             val note = TextNote(
                 title = title.ifEmpty { defaultTitle },
                 text = data,
-                resource = this.note.resource
+                resource = note.resource
             )
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)
