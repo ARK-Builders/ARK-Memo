@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.data.repo
+package dev.arkbuilders.arkmemo.repo.graphics
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
@@ -8,6 +8,8 @@ import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
+import dev.arkbuilders.arkmemo.repo.NotesRepo
+import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext

@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.data.repo
+package dev.arkbuilders.arkmemo.repo
 
 import android.util.Log
 import dev.arkbuilders.arklib.ResourceId

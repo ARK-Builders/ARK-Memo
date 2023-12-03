@@ -11,12 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
-import dev.arkbuilders.arkmemo.data.repo.NotesRepo
+import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Named

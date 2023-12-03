@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.data.repo
+package dev.arkbuilders.arkmemo.repo.text
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
@@ -9,6 +9,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.repo.NotesRepo
+import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
 import java.nio.file.Path
 import javax.inject.Inject
