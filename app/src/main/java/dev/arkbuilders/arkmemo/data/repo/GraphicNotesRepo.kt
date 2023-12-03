@@ -1,19 +1,16 @@
-package dev.arkbuilders.arkmemo.data.repositories
+package dev.arkbuilders.arkmemo.data.repo
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
-import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
-import dev.arkbuilders.arkmemo.di.PropertiesStorageModule.STORAGE_SCOPE
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
+import dev.arkbuilders.arkmemo.utils.listFiles
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import java.nio.file.Files
 import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
@@ -60,14 +57,14 @@ class GraphicNotesRepo @Inject constructor(
         note.svg?.generate(tempPath)
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
-        Log.d("graphic-repo", "initial resource name ${tempPath.name}")
+        Log.d(GRAPHICS_REPO, "initial resource name is ${tempPath.name}")
         helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
 
         val resourcePath = root.resolve("${id}.$SVG_EXT")
         if (resourcePath.exists()) {
             Log.d(
-                "graphic-repo",
-                "resource with similar text already exists"
+                GRAPHICS_REPO,
+                "resource with similar content already exists"
             )
             callback(SaveNoteResult.ERROR_EXISTING)
             return@withContext
@@ -79,38 +76,33 @@ class GraphicNotesRepo @Inject constructor(
             resourcePath,
             id
         )
-        Log.d("graphic-repo", "file renamed to $resourcePath successfully")
+        Log.d(GRAPHICS_REPO, "resource renamed to $resourcePath successfully")
         callback(SaveNoteResult.SUCCESS)
     }
 
     private suspend fun readStorage() = withContext(iODispatcher) {
-        val notes = mutableListOf<GraphicNote>()
-        Files.list(root).forEach { path ->
-            if (path.extension == SVG_EXT) {
-                val svg = SVG.parse(path)
-                val size = path.fileSize()
-                val id = computeId(size, path)
-                val resource = Resource(
-                    id = id,
-                    name = path.fileName.name,
-                    extension = path.extension,
-                    modified = path.getLastModifiedTime()
-                )
+        root.listFiles(SVG_EXT) { path ->
+            val svg = SVG.parse(path)
+            val size = path.fileSize()
+            val id = computeId(size, path)
+            val resource = Resource(
+                id = id,
+                name = path.fileName.name,
+                extension = path.extension,
+                modified = path.getLastModifiedTime()
+            )
 
-                val userNoteProperties = helper.readProperties(id)
+            val userNoteProperties = helper.readProperties(id)
 
-                val note = GraphicNote(
-                    title = userNoteProperties.title,
-                    description = userNoteProperties.description,
-                    svg = svg,
-                    resource = resource
-                )
-                notes.add(note)
-            }
+            GraphicNote(
+                title = userNoteProperties.title,
+                description = userNoteProperties.description,
+                svg = svg,
+                resource = resource
+            )
         }
-        Log.d("graphic-repo", "${notes.size} graphic note resources found")
-        notes
     }
 }
 
+private const val GRAPHICS_REPO = "graphics-repo"
 private const val SVG_EXT = "svg"

@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.data.repositories
+package dev.arkbuilders.arkmemo.data.repo
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
-import java.nio.file.Files
+import dev.arkbuilders.arkmemo.utils.listFiles
 import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
@@ -21,7 +21,6 @@ import kotlin.io.path.name
 import kotlin.io.path.writeLines
 import kotlin.io.path.createTempFile
 import kotlin.io.path.exists
-
 
 class TextNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
@@ -36,6 +35,7 @@ class TextNotesRepo @Inject constructor(
         root = memoPreferences.getNotesStorage()
         helper.init()
     }
+
     override suspend fun save(note: TextNote, callback: (SaveNoteResult) -> Unit) {
         write(note) { callback(it) }
     }
@@ -57,13 +57,13 @@ class TextNotesRepo @Inject constructor(
         tempPath.writeLines(lines)
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
-        Log.d("text-repo", "initial resource name ${tempPath.name}")
+        Log.d(TEXT_REPO, "initial resource name is ${tempPath.name}")
         helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
 
         val resourcePath = root.resolve("$id.$NOTE_EXT")
         if (resourcePath.exists()) {
             Log.d(
-                "text-repo",
+                TEXT_REPO,
                 "resource with similar content already exists"
             )
             callback(SaveNoteResult.ERROR_EXISTING)
@@ -76,42 +76,38 @@ class TextNotesRepo @Inject constructor(
             resourcePath = resourcePath,
             resourceId = id
         )
-        Log.d("text-repo", "file renamed to ${note.resource?.name} successfully")
+        Log.d(TEXT_REPO, "resource renamed to $resourcePath successfully")
         callback(SaveNoteResult.SUCCESS)
     }
 
-    private suspend fun readStorage() = withContext(iODispatcher) {
-        val notes = mutableListOf<TextNote>()
-        Files.list(root).forEach { path ->
-            if (path.fileName.extension == NOTE_EXT) {
-                val data = StringBuilder()
-                path.forEachLine {
-                    data.appendLine(it)
-                }
-                val size = path.fileSize()
-                val id = computeId(size, path)
-                val resource = Resource(
-                    id = id,
-                    name = path.fileName.name,
-                    extension = path.extension,
-                    modified = path.getLastModifiedTime()
-                )
-
-                val userNoteProperties = helper.readProperties(id)
-
-                val note = TextNote(
-                    title = userNoteProperties.title,
-                    description = userNoteProperties.description,
-                    text = data.toString(),
-                    resource = resource
-                )
-                notes.add(note)
+    private suspend fun readStorage(): List<TextNote> = withContext(iODispatcher) {
+        root.listFiles(NOTE_EXT) { path ->
+            val data = StringBuilder()
+            path.forEachLine {
+                data.appendLine(it)
             }
+            val size = path.fileSize()
+            val id = computeId(size, path)
+            val resource = Resource(
+                id = id,
+                name = path.fileName.name,
+                extension = path.extension,
+                modified = path.getLastModifiedTime()
+            )
+
+            val userNoteProperties = helper.readProperties(id)
+
+            val note = TextNote(
+                title = userNoteProperties.title,
+                description = userNoteProperties.description,
+                text = data.toString(),
+                resource = resource
+            )
+            note
         }
-        Log.d("text-repo", "${notes.size} text note resources found")
-        notes
     }
 }
 
+private const val TEXT_REPO = "text-repo"
 private const val NOTE_EXT = "note"
 

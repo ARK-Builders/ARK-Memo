@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.data.repositories
+package dev.arkbuilders.arkmemo.data.repo
 
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 

@@ -8,6 +8,10 @@ import androidx.lifecycle.LiveData
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.ui.views.toast
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.extension
+import kotlin.streams.toList
 
 fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
     result.observe(this) {
@@ -47,3 +51,8 @@ fun Context.getTextFromClipBoard(): String?{
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }
+
+fun <R> Path.listFiles(extension: String, process: (Path) -> R): List<R> =
+    Files.list(this).toList().filter { it.extension == extension }.map {
+        process(it)
+    }
