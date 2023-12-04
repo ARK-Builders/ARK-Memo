@@ -99,13 +99,12 @@ class TextNotesRepo @Inject constructor(
 
             val userNoteProperties = helper.readProperties(id)
 
-            val note = TextNote(
+            TextNote(
                 title = userNoteProperties.title,
                 description = userNoteProperties.description,
                 text = data.toString(),
                 resource = resource
             )
-            note
         }
     }
 }

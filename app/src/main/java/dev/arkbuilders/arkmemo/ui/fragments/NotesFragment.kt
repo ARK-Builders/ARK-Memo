@@ -76,17 +76,15 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         newTextNoteButton.setOnClickListener(newTextNoteClickListener)
         newGraphicNoteButton.setOnClickListener(newGraphicNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                notesViewModel.getNotes {
-                    val adapter = NotesListAdapter(it)
-                    val layoutManager = LinearLayoutManager(requireContext())
-                    adapter.setActivity(activity)
-                    adapter.setFragmentManager(childFragmentManager)
-                    recyclerView.apply {
-                        this.layoutManager = layoutManager
-                        this.adapter = adapter
-                    }
+        lifecycleScope.launchWhenStarted {
+            notesViewModel.getNotes {
+                val adapter = NotesListAdapter(it)
+                val layoutManager = LinearLayoutManager(requireContext())
+                adapter.setActivity(activity)
+                adapter.setFragmentManager(childFragmentManager)
+                recyclerView.apply {
+                    this.layoutManager = layoutManager
+                    this.adapter = adapter
                 }
             }
         }
