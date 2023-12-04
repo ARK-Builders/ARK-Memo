@@ -12,12 +12,12 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
+import dev.arkbuilders.arkmemo.utils.readLines
 import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.io.path.extension
 import kotlin.io.path.fileSize
-import kotlin.io.path.forEachLine
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
 import kotlin.io.path.writeLines
@@ -84,10 +84,6 @@ class TextNotesRepo @Inject constructor(
 
     private suspend fun readStorage(): List<TextNote> = withContext(iODispatcher) {
         root.listFiles(NOTE_EXT) { path ->
-            val data = StringBuilder()
-            path.forEachLine {
-                data.appendLine(it)
-            }
             val size = path.fileSize()
             val id = computeId(size, path)
             val resource = Resource(
@@ -99,12 +95,14 @@ class TextNotesRepo @Inject constructor(
 
             val userNoteProperties = helper.readProperties(id)
 
-            TextNote(
-                title = userNoteProperties.title,
-                description = userNoteProperties.description,
-                text = data.toString(),
-                resource = resource
-            )
+            path.readLines { data ->
+                TextNote(
+                    title = userNoteProperties.title,
+                    description = userNoteProperties.description,
+                    text = data,
+                    resource = resource
+                )
+            }
         }
     }
 }

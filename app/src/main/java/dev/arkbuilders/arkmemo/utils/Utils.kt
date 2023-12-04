@@ -11,6 +11,7 @@ import dev.arkbuilders.arkmemo.ui.views.toast
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.extension
+import kotlin.io.path.forEachLine
 import kotlin.streams.toList
 
 fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
@@ -56,3 +57,11 @@ fun <R> Path.listFiles(extension: String, process: (Path) -> R): List<R> =
     Files.list(this).toList().filter { it.extension == extension }.map {
         process(it)
     }
+
+fun <R> Path.readLines(useLines: (String) -> R): R {
+    val dataBuilder = StringBuilder()
+    forEachLine {
+        dataBuilder.appendLine(it)
+    }
+    return useLines(dataBuilder.removeSuffix("\n").toString())
+}
