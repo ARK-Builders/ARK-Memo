@@ -22,7 +22,7 @@ fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
             toast(requireContext(), getString(R.string.ark_memo_note_saved))
             activity?.onBackPressedDispatcher?.onBackPressed()
         } else {
-            toast(requireContext(), getString(R.string.ark_memo_note_existing))
+            context?.let { ctx -> toast(ctx, getString(R.string.ark_memo_note_existing)) }
         }
     }
 }
