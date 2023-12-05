@@ -6,7 +6,7 @@ import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.files.FilePicker
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.views.PathPreference
@@ -40,7 +40,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         pathPref?.setOnPreferenceClickListener {
-            FilePicker.show(activity, parentFragmentManager)
+            FilePickerDialog.show(activity, parentFragmentManager)
             true
         }
 

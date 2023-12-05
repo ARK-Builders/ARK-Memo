@@ -1,11 +1,9 @@
-package dev.arkbuilders.arkmemo.files
+package dev.arkbuilders.arkmemo.ui.dialogs
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -15,8 +13,16 @@ import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerFragme
 import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerMode
 import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 
-class FilePicker private constructor(){
+class FilePickerDialog: ArkFilePickerFragment() {
+
+    override fun dismiss() {
+        super.dismiss()
+        val activity = (requireActivity() as MainActivity)
+        if (activity.memoPreferences.getPathString() == null) activity.finish()
+    }
+
     companion object{
 
         private const val TAG = "file_picker"
@@ -24,12 +30,16 @@ class FilePicker private constructor(){
         var readPermLauncher: ActivityResultLauncher<String>? = null
         var readPermLauncher_SDK_R: ActivityResultLauncher<String>? = null
 
+        fun newInstance(config: ArkFilePickerConfig) = FilePickerDialog().apply {
+            setConfig(config)
+        }
+
         fun show() {
-            ArkFilePickerFragment.newInstance(getFilePickerConfig()).show(fragmentManager!!, TAG)
+            newInstance(getFilePickerConfig()).show(fragmentManager!!, TAG)
         }
 
         fun show(activity: AppCompatActivity, fragmentManager: FragmentManager){
-            this.fragmentManager = fragmentManager
+            Companion.fragmentManager = fragmentManager
             if(isReadPermissionGranted(activity)){
                 show()
             }
@@ -53,10 +63,6 @@ class FilePicker private constructor(){
             else{
                 readPermLauncher?.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
-        }
-
-        fun permissionDeniedError(context: Context){
-            Toast.makeText(context, context.getString(R.string.no_file_access), Toast.LENGTH_SHORT).show()
         }
 
         private fun getFilePickerConfig() = ArkFilePickerConfig(
