@@ -31,5 +31,7 @@
     <string name="ark_memo_just_now">Just now</string>
     <string name="ark_memo_graphic_note">Graphic note %1$s</string>
     <string name="ark_memo_text_note">Text note %1$s</string>
+    <string name="ark_memo_add_new_note">New note</string>
+    <string name="ark_memo_close">Close</string>
 
 </resources>

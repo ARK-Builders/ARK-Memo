@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -38,8 +39,11 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     private lateinit var newTextNoteButton: FloatingActionButton
     private lateinit var newGraphicNoteButton: FloatingActionButton
     private lateinit var pasteNoteButton: Button
+    private lateinit var newNoteButton: ExtendedFloatingActionButton
 
     private lateinit var recyclerView: RecyclerView
+
+    private var showFabs = false
 
     private val newTextNoteClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
@@ -70,9 +74,24 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         recyclerView = binding.include.recyclerView
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        newTextNoteButton = binding.newNote
+        newTextNoteButton = binding.newTextNote
         pasteNoteButton = binding.pasteNote
         newGraphicNoteButton = binding.newGraphicNote
+        newNoteButton = binding.newNote
+        newNoteButton.shrink()
+        newNoteButton.setOnClickListener {
+            showFabs = if (!showFabs) {
+                newNoteButton.extend()
+                newTextNoteButton.show()
+                newGraphicNoteButton.show()
+                true
+            } else {
+                newNoteButton.shrink()
+                newTextNoteButton.hide()
+                newGraphicNoteButton.hide()
+                false
+            }
+        }
         newTextNoteButton.setOnClickListener(newTextNoteClickListener)
         newGraphicNoteButton.setOnClickListener(newGraphicNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
