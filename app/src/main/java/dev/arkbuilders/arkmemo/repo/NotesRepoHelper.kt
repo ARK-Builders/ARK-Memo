@@ -56,9 +56,9 @@ class NotesRepoHelper @Inject constructor(
         Log.d("notes-repo", "resource renamed to ${resourcePath.name} successfully")
     }
 
-    fun readProperties(id: ResourceId): UserNoteProperties {
+    fun readProperties(id: ResourceId, defaultTitle: String): UserNoteProperties {
         val title = propertiesStorage.getProperties(id).titles.let {
-            if (it.isNotEmpty()) it.elementAt(0) else throw NoteTitlesException()
+            if (it.isNotEmpty()) it.elementAt(0) else defaultTitle
         }
         val description = propertiesStorage.getProperties(id).descriptions.let {
             if (it.isNotEmpty()) it.elementAt(0) else ""
@@ -79,5 +79,3 @@ data class UserNoteProperties(
     val title: String,
     val description: String
 )
-
-class NoteTitlesException: Exception("note resource missing at least one title")

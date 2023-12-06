@@ -94,7 +94,7 @@ class GraphicNotesRepo @Inject constructor(
                 modified = path.getLastModifiedTime()
             )
 
-            val userNoteProperties = helper.readProperties(id)
+            val userNoteProperties = helper.readProperties(id, "")
 
             GraphicNote(
                 title = userNoteProperties.title,

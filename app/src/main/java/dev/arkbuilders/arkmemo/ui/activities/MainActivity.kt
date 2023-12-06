@@ -84,7 +84,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     }
                 }
             }
-
         }
 
         if (memoPreferences.getPath().isEmpty()) {

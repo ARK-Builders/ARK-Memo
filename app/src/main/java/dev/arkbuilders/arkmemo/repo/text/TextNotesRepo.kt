@@ -93,9 +93,12 @@ class TextNotesRepo @Inject constructor(
                 modified = path.getLastModifiedTime()
             )
 
-            val userNoteProperties = helper.readProperties(id)
-
             path.readLines { data ->
+                val userNoteProperties = helper.readProperties(
+                    id,
+                    data.substringBefore("\n")
+                )
+
                 TextNote(
                     title = userNoteProperties.title,
                     description = userNoteProperties.description,

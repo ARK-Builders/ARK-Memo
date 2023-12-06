@@ -19,8 +19,10 @@ fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
         if (!isResumed) return@observe
 
         if (it == SaveNoteResult.SUCCESS) {
-            toast(requireContext(), getString(R.string.ark_memo_note_saved))
-            activity?.onBackPressedDispatcher?.onBackPressed()
+            context?.let { ctx ->
+                toast(ctx, getString(R.string.ark_memo_note_saved))
+                activity?.onBackPressedDispatcher?.onBackPressed()
+            }
         } else {
             context?.let { ctx -> toast(ctx, getString(R.string.ark_memo_note_existing)) }
         }
