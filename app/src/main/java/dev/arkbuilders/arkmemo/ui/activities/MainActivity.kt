@@ -1,8 +1,5 @@
 package dev.arkbuilders.arkmemo.ui.activities
 
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -18,11 +15,13 @@ import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
-import dev.arkbuilders.arkmemo.files.FilePicker
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
-import dev.arkbuilders.arkmemo.ui.fragments.TextNotesFragment
+import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
+import dev.arkbuilders.arkmemo.utils.replaceFragment
+import dev.arkbuilders.arkmemo.utils.resumeFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,18 +37,18 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private var menu: Menu? = null
 
-    var fragment: Fragment = TextNotesFragment()
+    var fragment: Fragment = NotesFragment()
 
     init {
-        FilePicker.readPermLauncher =
+        FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) FilePicker.show()
+                if (isGranted) FilePickerDialog.show()
                 else finish()
             }
 
-        FilePicker.readPermLauncher_SDK_R =
+        FilePickerDialog.readPermLauncher_SDK_R =
             registerForActivityResult(PermissionContract()) { isGranted ->
-                if (isGranted) FilePicker.show()
+                if (isGranted) FilePickerDialog.show()
                 else finish()
             }
     }
@@ -73,7 +72,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             } else {
                 if (savedInstanceState == null)
                     supportFragmentManager.beginTransaction().apply {
-                        add(fragContainer, fragment, TextNotesFragment.TAG)
+                        add(fragContainer, fragment, NotesFragment.TAG)
                         commit()
                     }
                 else {
@@ -85,11 +84,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     }
                 }
             }
-
         }
 
-        if (memoPreferences.getPathString() == null) {
-            FilePicker.show(this, supportFragmentManager)
+        if (memoPreferences.getPath().isEmpty()) {
+            FilePickerDialog.show(this, supportFragmentManager)
 
             supportFragmentManager.onArkPathPicked(this) {
                 memoPreferences.storePath(it.toString())
@@ -102,7 +100,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         this.menu = menu
-        if(fragment.tag != TextNotesFragment.TAG)
+        if(fragment.tag != NotesFragment.TAG)
             showSettingsButton(false)
         return true
     }
@@ -132,33 +130,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     fun showProgressBar(show: Boolean) {
         binding.progressBar.isVisible = show
     }
+
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }
-}
-
-fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
-    supportFragmentManager.beginTransaction().apply {
-        val backStackName = fragment.javaClass.name
-        val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
-        if (!popBackStack) {
-            replace(R.id.container, fragment, tag)
-            addToBackStack(backStackName)
-        } else {
-            show(fragment)
-        }
-        commit()
-    }
-}
-
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
-        show(fragment)
-        commit()
-    }
-}
-
-fun Context.getTextFromClipBoard(): String?{
-    val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-    return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }
