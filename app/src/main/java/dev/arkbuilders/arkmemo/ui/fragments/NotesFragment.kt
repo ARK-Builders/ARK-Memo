@@ -12,37 +12,47 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
-import dev.arkbuilders.arkmemo.databinding.FragmentTextNotesBinding
-import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.activities.getTextFromClipBoard
-import dev.arkbuilders.arkmemo.ui.activities.replaceFragment
-import dev.arkbuilders.arkmemo.ui.adapters.TextNotesListAdapter
+import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
+import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
+import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 @AndroidEntryPoint
-class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
+class NotesFragment: Fragment(R.layout.fragment_notes) {
 
-    private val binding by viewBinding(FragmentTextNotesBinding::bind)
+    private val binding by viewBinding(FragmentNotesBinding::bind)
 
     private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
 
-    private val textNotesViewModel: NotesViewModel by activityViewModels()
+    private val notesViewModel: NotesViewModel by activityViewModels()
 
-    private lateinit var newNoteButton: FloatingActionButton
+    private lateinit var newTextNoteButton: FloatingActionButton
+    private lateinit var newGraphicNoteButton: FloatingActionButton
     private lateinit var pasteNoteButton: Button
+    private lateinit var newNoteButton: ExtendedFloatingActionButton
 
     private lateinit var recyclerView: RecyclerView
 
-    private val newNoteClickListener = View.OnClickListener {
+    private var showFabs = false
+
+    private val newTextNoteClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+    }
+
+    private val newGraphicNoteClickListener = View.OnClickListener{
+        activity.fragment = EditGraphicNotesFragment.newInstance()
+        activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
     }
 
     private val pasteNoteClickListener = View.OnClickListener {
@@ -56,7 +66,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        textNotesViewModel.init()
+        notesViewModel.apply {  init { readAllNotes() } }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,21 +74,36 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
         recyclerView = binding.include.recyclerView
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        newNoteButton = binding.newNote
+        newTextNoteButton = binding.newTextNote
         pasteNoteButton = binding.pasteNote
-        newNoteButton.setOnClickListener(newNoteClickListener)
+        newGraphicNoteButton = binding.newGraphicNote
+        newNoteButton = binding.newNote
+        newNoteButton.shrink()
+        newNoteButton.setOnClickListener {
+            showFabs = if (!showFabs) {
+                newNoteButton.extend()
+                newTextNoteButton.show()
+                newGraphicNoteButton.show()
+                true
+            } else {
+                newNoteButton.shrink()
+                newTextNoteButton.hide()
+                newGraphicNoteButton.hide()
+                false
+            }
+        }
+        newTextNoteButton.setOnClickListener(newTextNoteClickListener)
+        newGraphicNoteButton.setOnClickListener(newGraphicNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
-        lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                textNotesViewModel.getTextNotes {
-                    val adapter = TextNotesListAdapter(it)
-                    val layoutManager = LinearLayoutManager(requireContext())
-                    adapter.setActivity(activity)
-                    adapter.setFragmentManager(childFragmentManager)
-                    recyclerView.apply {
-                        this.layoutManager = layoutManager
-                        this.adapter = adapter
-                    }
+        lifecycleScope.launchWhenStarted {
+            notesViewModel.getNotes {
+                val adapter = NotesListAdapter(it)
+                val layoutManager = LinearLayoutManager(requireContext())
+                adapter.setActivity(activity)
+                adapter.setFragmentManager(childFragmentManager)
+                recyclerView.apply {
+                    this.layoutManager = layoutManager
+                    this.adapter = adapter
                 }
             }
         }
@@ -94,7 +119,7 @@ class TextNotesFragment: Fragment(R.layout.fragment_text_notes) {
     }
 }
 
-fun Fragment.deleteNote(note: TextNote){
+fun Fragment.deleteNote(note: Note) {
     val viewModel: NotesViewModel by activityViewModels()
-    viewModel.onDelete(note)
+    viewModel.onDeleteConfirmed(note)
 }

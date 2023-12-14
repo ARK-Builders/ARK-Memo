@@ -3,9 +3,9 @@ package dev.arkbuilders.arkmemo.preferences
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
 import java.nio.file.Path
 import javax.inject.Inject
+import kotlin.io.path.Path
 
 
 private const val NAME = "memo_prefs"
@@ -23,18 +23,7 @@ class MemoPreferencesImpl @Inject constructor(@ApplicationContext context: Conte
         }
     }
 
-    override fun getPathString() = sharedPreferences.getString(CURRENT_NOTES_PATH, null)
+    override fun getPath(): String = sharedPreferences.getString(CURRENT_NOTES_PATH, "") ?: ""
 
-    override fun getPath(): Path? {
-        val pathString = getPathString()
-        var path: Path? = null
-        try {
-            val file = File(pathString!!)
-            file.mkdir()
-            path = file.toPath()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return path
-    }
+    override fun getNotesStorage(): Path = Path(getPath())
 }
