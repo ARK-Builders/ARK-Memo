@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: Development
     env:
-        ACRA_LOGIN: ${{ secrets.ACRARIUM_BASIC_AUTH_LOGIN }}
-        ACRA_PASS: ${{ secrets.ACRARIUM_BASIC_AUTH_PASSWORD }}
-        ACRA_URI: ${{ secrets.ACRARIUM_URI }}
+      ACRA_LOGIN: ${{ secrets.ACRARIUM_BASIC_AUTH_LOGIN }}
+      ACRA_PASS: ${{ secrets.ACRARIUM_BASIC_AUTH_PASSWORD }}
+      ACRA_URI: ${{ secrets.ACRARIUM_URI }}
     steps:
     - uses: actions/checkout@v3
 
@@ -19,6 +19,14 @@ jobs:
         java-version: '17'
         distribution: 'adopt'
         cache: gradle
+
+    - name: Validate Gradle wrapper
+      uses: gradle/wrapper-validation-action@v1.0.5
+
+    - name: Decrypt the keystore for signing
+      run: |
+        echo "${{ secrets.KEYSTORE_ENCRYPTED }}" > keystore.asc
+        gpg -d --passphrase "${{ secrets.KEYSTORE_PASSWORD   }}" --batch keystore.asc > keystore.jks
 
     - name: Build Release APK
       run: ./gradlew assembleRelease
