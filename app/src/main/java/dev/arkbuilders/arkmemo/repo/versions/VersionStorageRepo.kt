@@ -11,7 +11,7 @@ class VersionStorageRepo @Inject constructor(
     private val storageByRoot = mutableMapOf<Path, PlainVersionStorage>()
 
     suspend fun provide(): VersionStorage {
-        val root = memoPreferences.getPath()!!
+        val root = memoPreferences.getNotesStorage()
         if (storageByRoot[root] == null) {
             val versionStorage = PlainVersionStorage(root)
             versionStorage.init()

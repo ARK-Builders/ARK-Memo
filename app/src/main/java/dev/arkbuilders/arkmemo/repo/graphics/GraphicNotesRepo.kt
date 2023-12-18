@@ -1,18 +1,18 @@
-package dev.arkbuilders.arkmemo.repo.text
+package dev.arkbuilders.arkmemo.repo.graphics
 
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
-import dev.arkbuilders.arkmemo.models.SaveNoteResult
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.graphics.SVG
+import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
-import dev.arkbuilders.arkmemo.utils.readLines
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
@@ -20,52 +20,52 @@ import kotlin.io.path.extension
 import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
-import kotlin.io.path.writeLines
 import kotlin.io.path.createTempFile
 import kotlin.io.path.exists
 
-class TextNotesRepo @Inject constructor(
+class GraphicNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
-    @Named(IO_DISPATCHER)
-    private val iODispatcher: CoroutineDispatcher,
+    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     private val helper: NotesRepoHelper
-): NotesRepo<TextNote> {
+): NotesRepo<GraphicNote> {
 
     private lateinit var root: Path
 
     override suspend fun init() {
-        root = memoPreferences.getNotesStorage()
         helper.init()
+        root = memoPreferences.getNotesStorage()
     }
 
-    override suspend fun save(note: TextNote, callback: (SaveNoteResult) -> Unit) {
+    override suspend fun save(
+        note: GraphicNote,
+        callback: (SaveNoteResult) -> Unit
+    ) = withContext(iODispatcher) {
         write(note) { callback(it) }
     }
 
-    override suspend fun delete(note: TextNote) {
+    override suspend fun delete(note: GraphicNote) = withContext(iODispatcher) {
         helper.deleteNote(note)
     }
 
-    override suspend fun read(): List<TextNote> = withContext(iODispatcher) {
+    override suspend fun read(): List<GraphicNote> = withContext(iODispatcher) {
         readStorage()
     }
 
     private suspend fun write(
-        note: TextNote,
+        note: GraphicNote,
         callback: (SaveNoteResult) -> Unit
     ) = withContext(iODispatcher) {
         val tempPath = createTempFile()
-        val lines = note.text.split('\n')
-        tempPath.writeLines(lines)
+        note.svg?.generate(tempPath)
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
-        Log.d(TEXT_REPO, "initial resource name is ${tempPath.name}")
+        Log.d(GRAPHICS_REPO, "initial resource name is ${tempPath.name}")
         helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
 
-        val resourcePath = root.resolve("$id.$NOTE_EXT")
+        val resourcePath = root.resolve("${id}.$SVG_EXT")
         if (resourcePath.exists()) {
             Log.d(
-                TEXT_REPO,
+                GRAPHICS_REPO,
                 "resource with similar content already exists"
             )
             callback(SaveNoteResult.ERROR_EXISTING)
@@ -73,17 +73,18 @@ class TextNotesRepo @Inject constructor(
         }
 
         helper.renameResource(
-            note = note,
-            tempPath = tempPath,
-            resourcePath = resourcePath,
-            resourceId = id
+            note,
+            tempPath,
+            resourcePath,
+            id
         )
-        Log.d(TEXT_REPO, "resource renamed to $resourcePath successfully")
+        Log.d(GRAPHICS_REPO, "resource renamed to $resourcePath successfully")
         callback(SaveNoteResult.SUCCESS)
     }
 
-    private suspend fun readStorage(): List<TextNote> = withContext(iODispatcher) {
-        root.listFiles(NOTE_EXT) { path ->
+    private suspend fun readStorage() = withContext(iODispatcher) {
+        root.listFiles(SVG_EXT) { path ->
+            val svg = SVG.parse(path)
             val size = path.fileSize()
             val id = computeId(size, path)
             val resource = Resource(
@@ -93,23 +94,17 @@ class TextNotesRepo @Inject constructor(
                 modified = path.getLastModifiedTime()
             )
 
-            path.readLines { data ->
-                val userNoteProperties = helper.readProperties(
-                    id,
-                    data.substringBefore("\n")
-                )
+            val userNoteProperties = helper.readProperties(id, "")
 
-                TextNote(
-                    title = userNoteProperties.title,
-                    description = userNoteProperties.description,
-                    text = data,
-                    resource = resource
-                )
-            }
+            GraphicNote(
+                title = userNoteProperties.title,
+                description = userNoteProperties.description,
+                svg = svg,
+                resource = resource
+            )
         }
     }
 }
 
-private const val TEXT_REPO = "text-repo"
-private const val NOTE_EXT = "note"
-
+private const val GRAPHICS_REPO = "graphics-repo"
+private const val SVG_EXT = "svg"

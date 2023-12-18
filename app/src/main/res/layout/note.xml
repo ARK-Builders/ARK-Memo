@@ -61,7 +61,7 @@
             android:src="@drawable/ic_history"
             android:visibility="gone" />
         <ImageButton
-            android:id="@+id/btn_fork_versions"
+            android:id="@+id/btn_fork_version"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@null"

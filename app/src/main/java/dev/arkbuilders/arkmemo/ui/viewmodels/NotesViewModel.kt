@@ -6,36 +6,46 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arklib.ResourceId
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.repo.text.TextNotesRepo
-import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
+import dev.arkbuilders.arkmemo.repo.NotesRepo
+import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
+import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val textNotesRepo: TextNotesRepo,
-    private val memoPreferences: MemoPreferences
+    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
+    private val textNotesRepo: NotesRepo<TextNote>,
+    private val graphicNotesRepo: NotesRepo<GraphicNote>,
 ) : ViewModel() {
 
-
-    private val iODispatcher = Dispatchers.IO
-
-    private val notes = MutableStateFlow(listOf<TextNote>())
+    private val notes = MutableStateFlow(listOf<Note>())
     private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
 
-    fun init() {
+    fun init(read: () -> Unit) {
+        val initJob = viewModelScope.launch(iODispatcher) {
+            textNotesRepo.init()
+            graphicNotesRepo.init()
+        }
+        viewModelScope.launch {
+            initJob.join()
+            read()
+        }
+    }
+
+    fun readAllNotes() {
         viewModelScope.launch(iODispatcher) {
-            textNotesRepo.init(
-                memoPreferences.getPath()!!,
-                viewModelScope
-            )
-            notes.value = textNotesRepo.read()
+            notes.value = textNotesRepo.read() + graphicNotesRepo.read()
         }
     }
 
@@ -66,20 +76,19 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onDelete(note: Note) {
+    fun onDeleteConfirmed(note: Note) {
         viewModelScope.launch(iODispatcher) {
-            when(note) {
-                is TextNote -> {
-                    remove(note)
-                    textNotesRepo.delete(note)
-                }
+            remove(note)
+            when (note) {
+                is TextNote -> textNotesRepo.delete(note)
+                is GraphicNote -> graphicNotesRepo.delete(note)
             }
         }
     }
 
-    fun getNotes(emit: (List<TextNote>) -> Unit) {
+    fun getNotes(emit: (List<Note>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
-            notes.collect {
+            notes.collectLatest {
                 withContext(Dispatchers.Main) {
                     emit(it)
                 }
@@ -87,13 +96,16 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    private fun add(note: TextNote) {
+    private fun add(note: Note) {
         val notes = this.notes.value.toMutableList()
+        note.resource?.let {
+            notes.removeIf { it.resource?.id == note.resource?.id }
+        }
         notes.add(note)
         this.notes.value = notes
     }
 
-    private fun remove(note: TextNote) {
+    private fun remove(note: Note) {
         val notes = this.notes.value.toMutableList()
         notes.remove(note)
         this.notes.value = notes

@@ -7,6 +7,7 @@ plugins {
 }
 
 android {
+    namespace 'dev.arkbuilders.arkmemo'
     compileSdk 33
 
     namespace 'dev.arkbuilders.arkmemo'
@@ -29,10 +30,10 @@ android {
     }
     signingConfigs {
         testRelease {
-            storeFile project.rootProject.file('./testRelease.jks')
-            storePassword "arkmemo"
-            keyAlias "key0"
-            keyPassword "arkmemo"
+            storeFile project.rootProject.file('keystore.jks')
+            storePassword "sw0rdf1sh"
+            keyAlias "ark-builders-test"
+            keyPassword "rybamech"
             v1SigningEnabled true
             v2SigningEnabled true
         }
@@ -64,13 +65,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
     buildFeatures{
+        buildConfig true
         viewBinding true
     }
 }
@@ -96,7 +98,7 @@ dependencies {
 
     implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
 
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
