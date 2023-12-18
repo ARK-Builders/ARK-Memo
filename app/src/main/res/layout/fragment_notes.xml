@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="220dp"
         android:visibility="gone"
         android:clickable="true"
         android:contentDescription="@string/new_note"
@@ -39,11 +39,23 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="150dp"
         android:clickable="true"
         android:visibility="gone"
         android:contentDescription="@string/new_note"
         android:src="@drawable/ic_brush" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNewVoiceNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:clickable="true"
+        android:visibility="gone"
+        android:contentDescription="@string/new_note"
+        android:src="@drawable/ic_mic" />
 
     <Button
         android:id="@+id/pasteNote"

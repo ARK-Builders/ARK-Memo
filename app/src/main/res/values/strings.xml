@@ -33,5 +33,10 @@
     <string name="ark_memo_text_note">Text note %1$s</string>
     <string name="ark_memo_add_new_note">New note</string>
     <string name="ark_memo_close">Close</string>
+    <string name="ark_memo_voice_note">Voice note %1$s</string>
+    <string name="ark_memo_record">Record</string>
+    <string name="ark_memo_stop">Stop</string>
+    <string name="ark_memo_duration">Duration</string>
+    <string name="ark_memo_duration_default">00:00</string>
 
 </resources>

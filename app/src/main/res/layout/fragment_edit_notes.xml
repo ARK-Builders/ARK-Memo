@@ -10,49 +10,75 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    <EditText
-        android:id="@+id/noteTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:ems="10"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:inputType="text"
-        android:gravity="start"
-        android:hint="@string/note_title"
-        android:importantForAutofill="no"
-        android:textColorHint="@color/gray"/>
-    <EditText
-        android:id="@+id/editNote"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="80dp"
-        android:paddingTop="10dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:ems="10"
-        android:focusedByDefault="true"
-        android:gravity="start|top"
-        android:visibility="gone"
-        android:hint="@string/start_text_note"
-        android:importantForAutofill="no"
-        android:inputType="textMultiLine"
-        android:textColorHint="#757575"/>
-    <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
-        android:id="@+id/notesCanvas"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="80dp"
-        android:paddingTop="10dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:visibility="gone"/>
+        <EditText
+            android:id="@+id/note_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:ems="10"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:inputType="text"
+            android:gravity="start"
+            android:hint="@string/note_title"
+            android:importantForAutofill="no"
+            android:textColorHint="@color/gray"/>
+        <EditText
+            android:id="@+id/editNote"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="80dp"
+            android:paddingTop="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:ems="10"
+            android:focusedByDefault="true"
+            android:gravity="start|top"
+            android:visibility="gone"
+            android:hint="@string/start_text_note"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine"
+            android:textColorHint="#757575"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <include
+                android:id="@+id/recorder_view_binding"
+                layout="@layout/recorder_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_gravity="center"/>
+
+            <include
+                android:id="@+id/media_player_view_binding"
+                layout="@layout/media_player_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
+            android:id="@+id/notesCanvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="80dp"
+            android:paddingTop="10dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:visibility="gone"/>
     </LinearLayout>
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/saveNote"
+        android:id="@+id/btn_save"
         android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_gravity="center"

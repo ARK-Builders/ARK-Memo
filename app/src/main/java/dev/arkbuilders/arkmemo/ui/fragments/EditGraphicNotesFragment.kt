@@ -60,7 +60,7 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         )
         var title = note.title
         val notesCanvas = binding.notesCanvas
-        val saveButton = binding.saveNote
+        val btnSave = binding.btnSave
         val noteTitle = binding.noteTitle
         val noteTitleChangeListener = object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -82,7 +82,7 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         noteTitle.addTextChangedListener(noteTitleChangeListener)
         notesCanvas.isVisible = true
         notesCanvas.setViewModel(graphicNotesViewModel)
-        saveButton.setOnClickListener {
+        btnSave.setOnClickListener {
             val svg = graphicNotesViewModel.svg()
             val note = GraphicNote(
                 title = title.ifEmpty { defaultTitle },

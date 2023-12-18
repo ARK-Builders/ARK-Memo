@@ -67,3 +67,26 @@ fun <R> Path.readLines(useLines: (String) -> R): R {
     }
     return useLines(dataBuilder.removeSuffix("\n").toString())
 }
+
+fun tenthSecondsToString(duration: Long): String {
+    val seconds = duration / 10
+    val remainingMilliSeconds = duration % 10
+    val minutes = seconds / 60
+    val remainingSeconds = seconds % 60
+    return "${
+        if (minutes <= 9) "0$minutes" else minutes
+    }:${
+        if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
+    }:0$remainingMilliSeconds"
+}
+
+fun millisToString(duration: Long): String {
+    val seconds = duration / 1000
+    val minutes = seconds / 60
+    val remainingSeconds = seconds % 60
+    return "${
+        if (minutes <= 9) "0$minutes" else minutes
+    }:${
+        if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
+    }"
+}
