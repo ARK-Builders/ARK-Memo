@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class GraphicNote(
     override val title: String = "",
-    val description: String = "",
+    override val description: String = "",
     @IgnoredOnParcel
     val svg: SVG? = null,
     @IgnoredOnParcel

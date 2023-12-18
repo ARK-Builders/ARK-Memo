@@ -6,22 +6,22 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 
@@ -35,6 +35,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     }
 
     private val notesViewModel: NotesViewModel by activityViewModels()
+    private val arkMediaPlayerViewModel: ArkMediaPlayerViewModel by activityViewModels()
 
     private lateinit var newTextNoteButton: FloatingActionButton
     private lateinit var newGraphicNoteButton: FloatingActionButton
@@ -71,6 +72,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val fabNewVoiceNote = binding.fabNewVoiceNote
         recyclerView = binding.include.recyclerView
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -79,25 +81,45 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         newGraphicNoteButton = binding.newGraphicNote
         newNoteButton = binding.newNote
         newNoteButton.shrink()
+        showFabs = false
         newNoteButton.setOnClickListener {
             showFabs = if (!showFabs) {
                 newNoteButton.extend()
                 newTextNoteButton.show()
                 newGraphicNoteButton.show()
+                fabNewVoiceNote.show()
                 true
             } else {
                 newNoteButton.shrink()
                 newTextNoteButton.hide()
                 newGraphicNoteButton.hide()
+                fabNewVoiceNote.hide()
                 false
             }
         }
         newTextNoteButton.setOnClickListener(newTextNoteClickListener)
         newGraphicNoteButton.setOnClickListener(newGraphicNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
+        fabNewVoiceNote.setOnClickListener {
+            activity.fragment = ArkRecorderFragment.newInstance()
+            activity.replaceFragment(activity.fragment, ArkRecorderFragment.TAG)
+        }
         lifecycleScope.launchWhenStarted {
             notesViewModel.getNotes {
-                val adapter = NotesListAdapter(it)
+                val adapter = NotesListAdapter(
+                    it,
+                    onPlayPauseClick = { path ->
+                        arkMediaPlayerViewModel.onPlayOrPauseClick(path)
+                    },
+                    observeViewModel = {
+                            showState: (ArkMediaPlayerState) -> Unit,
+                            handleSideEffect: (ArkMediaPlayerSideEffect) -> Unit ->
+                        arkMediaPlayerViewModel.collect(
+                            stateToUI = { state -> showState(state) },
+                            handleSideEffect = { effect -> handleSideEffect(effect) }
+                        )
+                    }
+                )
                 val layoutManager = LinearLayoutManager(requireContext())
                 adapter.setActivity(activity)
                 adapter.setFragmentManager(childFragmentManager)

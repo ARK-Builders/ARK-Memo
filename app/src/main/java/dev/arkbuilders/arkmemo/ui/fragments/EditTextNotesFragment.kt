@@ -68,7 +68,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         }
         val noteTitle = binding.noteTitle
         val editNote = binding.editNote
-        val saveNoteButton = binding.saveNote
+        val btnSave = binding.btnSave
         val noteTitleChangeListener = object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -94,7 +94,7 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         if(noteStr != null)
             editNote.setText(noteStr)
 
-        saveNoteButton.setOnClickListener {
+        btnSave.setOnClickListener {
             val note = TextNote(
                 title = title.ifEmpty { defaultTitle },
                 text = data,
@@ -105,7 +105,6 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
             }
         }
     }
-
     companion object{
         const val TAG = "Edit Text Notes"
         private const val NOTE_STRING_KEY = "note string"
