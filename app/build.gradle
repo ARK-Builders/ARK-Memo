@@ -91,7 +91,7 @@ dependencies {
 
     implementation 'androidx.preference:preference:1.2.0'
     implementation "com.google.dagger:hilt-android:2.42"
-    kapt "com.google.dagger:hilt-compiler:2.42"
+    kapt "com.google.dagger:hilt-compiler:2.50"
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
 
     implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6'
