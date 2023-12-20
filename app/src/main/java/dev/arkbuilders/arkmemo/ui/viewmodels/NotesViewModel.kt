@@ -11,13 +11,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import dev.arkbuilders.arkmemo.repo.text.TextNotesRepo
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.repo.graphics.GraphicNotesRepo
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Named
@@ -60,14 +60,20 @@ class NotesViewModel @Inject constructor(
             }
             val oldId = note.resource?.id
             val isNewResource = oldId == null
+            fun handleResult(result: SaveNoteResult) {
+                if (result == SaveNoteResult.SUCCESS) {
+                    val newId = note.resource?.id!!
+                    add(note)
+                    if (!isNewResource) saveVersion(oldId!!, newId)
+                }
+                mSaveNoteResultLiveData.postValue(result)
+            }
             when (note) {
                 is TextNote -> textNotesRepo.save(note) { result ->
-                    if (result == SaveNoteResult.SUCCESS) {
-                        val newId = note.resource?.id!!
-                        add(note)
-                        if (!isNewResource) saveVersion(oldId!!, newId)
-                    }
-                    mSaveNoteResultLiveData.postValue(result)
+                    handleResult(result)
+                }
+                is GraphicNote -> graphicNotesRepo.save(note) { result ->
+                    handleResult(result)
                 }
             }
             withContext(Dispatchers.Main) {

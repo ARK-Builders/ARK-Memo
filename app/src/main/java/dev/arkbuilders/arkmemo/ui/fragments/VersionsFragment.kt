@@ -3,6 +3,7 @@ package dev.arkbuilders.arkmemo.ui.fragments
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -42,13 +43,13 @@ class VersionsFragment: Fragment(R.layout.fragment_notes) {
         super.onCreate(savedInstanceState)
         versionsViewModel.init()
         notesViewModel.init {}
-        observeViewModel()
+        readArguments()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        readArguments()
         initUI()
+        observeViewModel()
     }
 
     override fun onResume() {
@@ -59,15 +60,10 @@ class VersionsFragment: Fragment(R.layout.fragment_notes) {
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
-                versionsViewModel.collectLatestResourceId { id ->
-                    notesViewModel.getNotes { notes ->
-                        val latestNoteAndItsParents = notes.filter { note ->
-                            note.resource?.id == id ||
-                                    versionsViewModel.getParentIds(id)
-                                        .contains(note.resource?.id)
-                        }
+                notesViewModel.getNotes {
+                    versionsViewModel.getLatestNoteFamilyTree(it) { notes ->
                         val adapter = NotesListAdapter(
-                            latestNoteAndItsParents,
+                            notes,
                             isLatestNote = { note ->
                                 val resourceId = note.resource?.id!!
                                 versionsViewModel.isLatestResource(resourceId) ||

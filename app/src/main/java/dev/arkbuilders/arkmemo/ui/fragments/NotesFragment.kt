@@ -56,11 +56,13 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     private val fabNewTextClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+        showFabs = false
     }
 
     private val fabNewGraphicClickListener = View.OnClickListener{
         activity.fragment = EditGraphicNotesFragment.newInstance()
         activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
+        showFabs = false
     }
 
     private val btnPasteClickListener = View.OnClickListener {
@@ -68,6 +70,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         if (clipBoardText != null) {
             activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
             activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+            showFabs = false
         }
         else toast(requireContext(), getString(R.string.nothing_to_paste))
     }
@@ -78,17 +81,18 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         super.onCreate(savedInstanceState)
         notesViewModel.apply {  init { readAllNotes() } }
         versionsViewModel.init()
-        observeViewModel()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initUI()
+        observeViewModel()
     }
 
     override fun onResume() {
         super.onResume()
         activity.fragment = this
+        showFabs = false
     }
 
     override fun onDestroy() {
@@ -104,6 +108,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         btnPaste = binding.fabPaste
         fabNewGraphic = binding.fabNewGraphic
         fabNew = binding.fabNew
+        fabNew.isVisible = true
         fabNew.shrink()
         fabNew.setOnClickListener {
             showFabs = if (!showFabs) {
@@ -120,6 +125,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         }
         fabNewText.setOnClickListener(fabNewTextClickListener)
         fabNewGraphic.setOnClickListener(fabNewGraphicClickListener)
+        btnPaste.isVisible = true
         btnPaste.setOnClickListener(btnPasteClickListener)
         delayHide()
         rvNotes.apply {
@@ -142,14 +148,16 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 notesViewModel.getNotes {
-                    val adapter = NotesListAdapter(it)
-                    val layoutManager = LinearLayoutManager(requireContext())
-                    adapter.setActivity(activity)
-                    adapter.setFragmentManager(childFragManager)
-                    adapter.showVersionTracker(true)
-                    rvNotes.apply {
-                        this.layoutManager = layoutManager
-                        this.adapter = adapter
+                    versionsViewModel.getLatestNotes(it) { notes ->
+                        val adapter = NotesListAdapter(notes)
+                        val layoutManager = LinearLayoutManager(requireContext())
+                        adapter.setActivity(activity)
+                        adapter.setFragmentManager(childFragManager)
+                        adapter.showVersionTracker(true)
+                        rvNotes.apply {
+                            this.layoutManager = layoutManager
+                            this.adapter = adapter
+                        }
                     }
                 }
             }
@@ -200,14 +208,11 @@ fun Fragment.deleteNote(note: Note) {
     )
         lifecycleScope.launch {
             notesViewModel.getNotes {
-                it.filter { note1 ->
-                    note.resource?.id == note1.resource?.id ||
-                            versionsViewModel.getParentIds(note.resource?.id!!)
-                                .contains(note1.resource?.id!!)
-                }
-                    .forEach { note2 ->
-                        notesViewModel.onDeleteConfirmed(note2)
+                versionsViewModel.getLatestNoteFamilyTree(it) { notes ->
+                    notes.forEach { note ->
+                        notesViewModel.onDeleteConfirmed(note)
                     }
+                }
             }
         }
     else notesViewModel.onDeleteConfirmed(note)

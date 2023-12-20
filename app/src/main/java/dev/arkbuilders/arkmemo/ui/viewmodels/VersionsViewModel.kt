@@ -1,9 +1,11 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arklib.ResourceId
+import dev.arkbuilders.arkmemo.models.Note
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -27,15 +29,32 @@ class VersionsViewModel @Inject constructor(
         }
     }
 
-    fun updateLatestResourceId(newId: ResourceId) {
+    fun getLatestNotes(notes: List<Note>, emit: (List<Note>) -> Unit) {
         viewModelScope.launch {
-            latestResourceId.emit(newId)
+            val latestNotes = notes.filter {
+                getChildNotParentIds().contains(it.resource?.id) ||
+                        isNotVersioned(it.resource?.id!!)
+            }
+            emit(latestNotes)
         }
     }
 
-    suspend fun collectLatestResourceId(emit: suspend (ResourceId) -> Unit) {
-        latestResourceId.collectLatest {
-            emit(it!!)
+    fun getLatestNoteFamilyTree(notes: List<Note>, emit: (List<Note>) -> Unit) {
+        viewModelScope.launch {
+            latestResourceId.collectLatest { id ->
+                id?.let {
+                    val familyTree = notes.filter {
+                        getParentIds(id).contains(it.resource?.id) || it.resource?.id == id
+                    }
+                    emit(familyTree)
+                }
+            }
+        }
+    }
+
+    fun updateLatestResourceId(newId: ResourceId) {
+        viewModelScope.launch {
+            latestResourceId.emit(newId)
         }
     }
 

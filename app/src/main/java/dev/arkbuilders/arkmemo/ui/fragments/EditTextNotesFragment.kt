@@ -81,8 +81,8 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.initEditUI()
-        readArguments()
         initUI()
+        readArguments()
     }
 
     private fun initUI() {
@@ -172,6 +172,9 @@ class EditTextNotesFragment: Fragment(R.layout.fragment_edit_notes) {
             etNote.isClickable = false
             etNote.isFocusable = false
             etNote.setBackgroundColor(Color.LTGRAY)
+            etTitle.isClickable = false
+            etTitle.isFocusable = false
+            etTitle.setBackgroundColor(Color.LTGRAY)
         }
         btnSave.isVisible = !isReadOnly
     }

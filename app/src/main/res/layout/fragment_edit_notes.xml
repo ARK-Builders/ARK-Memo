@@ -60,7 +60,6 @@
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="@string/save"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/editView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
