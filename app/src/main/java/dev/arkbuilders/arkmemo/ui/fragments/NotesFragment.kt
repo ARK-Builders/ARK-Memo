@@ -16,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
-import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.models.
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
