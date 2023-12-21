@@ -4,7 +4,6 @@ import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
-import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
@@ -18,7 +17,6 @@ import javax.inject.Inject
 import javax.inject.Named
 import kotlin.io.path.exists
 import kotlin.io.path.fileSize
-import kotlin.io.path.createTempFile
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name

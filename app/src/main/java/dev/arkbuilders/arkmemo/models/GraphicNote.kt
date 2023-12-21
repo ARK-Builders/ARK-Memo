@@ -1,4 +1,4 @@
-package dev.arkbuilders.arkmemo.graphics.models
+package dev.arkbuilders.arkmemo.models
 
 import android.os.Parcelable
 import dev.arkbuilders.arklib.data.index.Resource
