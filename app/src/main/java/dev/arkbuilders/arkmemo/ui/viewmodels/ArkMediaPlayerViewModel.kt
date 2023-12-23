@@ -1,16 +1,16 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.media.ArkMediaPlayer
 import dev.arkbuilders.arkmemo.utils.millisToString
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Timer
 import javax.inject.Inject
-import kotlin.concurrent.timer
 
 sealed class ArkMediaPlayerSideEffect {
     object StartPlaying: ArkMediaPlayerSideEffect()
@@ -36,12 +36,37 @@ class ArkMediaPlayerViewModel @Inject constructor(
     private val arkMediaPlayerSideEffect = MutableStateFlow<ArkMediaPlayerSideEffect?>(null)
     private val arkMediaPlayerState = MutableStateFlow<ArkMediaPlayerState?>(null)
 
-    private var timer: Timer? = null
+    fun initPlayer(path: String) {
+        currentPlayingVoiceNotePath = path
+        arkMediaPlayer.init(
+            path,
+            onCompletion = {
+                arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.StopPlaying
+            },
+            onPrepared = {
+                arkMediaPlayerState.value = ArkMediaPlayerState(
+                    progress = 0f,
+                    duration = millisToString(arkMediaPlayer.duration().toLong())
+                )
+            }
+        )
+    }
 
     fun onPlayOrPauseClick(path: String) {
         if (currentPlayingVoiceNotePath != path) {
             currentPlayingVoiceNotePath = path
-            arkMediaPlayer.init(path)
+            arkMediaPlayer.init(
+                path,
+                onCompletion = {
+                    arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.StopPlaying
+                },
+                onPrepared = {
+                    arkMediaPlayerState.value = ArkMediaPlayerState(
+                        progress = 0f,
+                        duration = millisToString(arkMediaPlayer.duration().toLong())
+                    )
+                }
+            )
         }
         if (arkMediaPlayer.isPlaying()) {
             onPauseClick()
@@ -50,9 +75,9 @@ class ArkMediaPlayerViewModel @Inject constructor(
         onPlayClick()
     }
 
-    fun onSeekTo(progress: Int) {
-        val point = (progress / 100) * arkMediaPlayer.duration()
-        arkMediaPlayer.seekTo(point)
+    fun onSeekTo(position: Int) {
+        val pos = (position.toFloat() / 100f) * arkMediaPlayer.duration()
+        arkMediaPlayer.seekTo(pos.toInt())
     }
 
     fun collect(
@@ -75,28 +100,23 @@ class ArkMediaPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun startTimer() {
-        timer = timer(initialDelay = 0L, period = arkMediaPlayer.duration().toLong()) {
-            arkMediaPlayerState.value = ArkMediaPlayerState(
-                progress = arkMediaPlayer.currentPosition().toFloat() /
-                        arkMediaPlayer.duration().toFloat(),
-                duration = millisToString(arkMediaPlayer.duration().toLong())
-            )
+    private fun startProgressMonitor() {
+        viewModelScope.launch(Dispatchers.Default) {
+            var progress: Float
+            do {
+                progress = (arkMediaPlayer.currentPosition().toFloat() /
+                        arkMediaPlayer.duration().toFloat()) * 100
+                arkMediaPlayerState.value = ArkMediaPlayerState(
+                    progress = progress,
+                    duration = millisToString(arkMediaPlayer.duration().toLong())
+                )
+            } while(arkMediaPlayer.isPlaying())
         }
-    }
-
-    private fun stopTimer() {
-        timer?.cancel()
-        timer = null
     }
 
     private fun onPlayClick() {
         arkMediaPlayer.play()
-        arkMediaPlayer.onCompletion = {
-            stopTimer()
-            arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.StopPlaying
-        }
-        startTimer()
+        startProgressMonitor()
         arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.StartPlaying
     }
 

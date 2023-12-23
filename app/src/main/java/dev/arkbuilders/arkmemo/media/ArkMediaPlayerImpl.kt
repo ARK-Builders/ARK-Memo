@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.media
 
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import javax.inject.Inject
 
@@ -7,10 +8,21 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
 
     private var player: MediaPlayer? = null
 
-    override var onCompletion: () -> Unit = {}
+    private var onCompletionHandler: () -> Unit = {}
+    private var onPreparedHandler: () -> Unit = {}
 
-    override fun init(path: String) {
+    override fun init(path: String, onCompletion: () -> Unit, onPrepared: () -> Unit) {
+        onCompletionHandler = onCompletion
+        onPreparedHandler = onPrepared
         player = MediaPlayer().apply {
+            setOnCompletionListener(this@ArkMediaPlayerImpl)
+            setOnPreparedListener(this@ArkMediaPlayerImpl)
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
             setDataSource(path)
             prepare()
         }
@@ -32,8 +44,8 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
         player?.pause()
     }
 
-    override fun seekTo(point: Int) {
-        player?.seekTo(point)
+    override fun seekTo(position: Int) {
+        player?.seekTo(position)
     }
 
     override fun duration(): Int = player?.duration!!
@@ -42,7 +54,13 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
 
     override fun isPlaying(): Boolean = player?.isPlaying!!
 
-    override fun onCompletion(p0: MediaPlayer?) {
-        onCompletion()
+    override fun onCompletion(player: MediaPlayer?) {
+        onCompletionHandler()
     }
+
+    override fun onPrepared(player: MediaPlayer?) {
+        onPreparedHandler()
+    }
+
+    override fun onSeekComplete(player: MediaPlayer?) {}
 }

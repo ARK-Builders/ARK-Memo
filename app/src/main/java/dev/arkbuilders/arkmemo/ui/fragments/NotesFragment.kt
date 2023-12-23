@@ -19,8 +19,6 @@ import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
-import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
-import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.replaceFragment
@@ -110,17 +108,13 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
                     it,
                     onPlayPauseClick = { path ->
                         arkMediaPlayerViewModel.onPlayOrPauseClick(path)
-                    },
-                    observeViewModel = {
-                            showState: (ArkMediaPlayerState) -> Unit,
-                            handleSideEffect: (ArkMediaPlayerSideEffect) -> Unit ->
-                        arkMediaPlayerViewModel.collect(
-                            stateToUI = { state -> showState(state) },
-                            handleSideEffect = { effect -> handleSideEffect(effect) }
-                        )
                     }
                 )
                 val layoutManager = LinearLayoutManager(requireContext())
+                arkMediaPlayerViewModel.collect(
+                    stateToUI = { state -> adapter.observeItemState = { state } },
+                    handleSideEffect = { effect -> adapter.observeItemSideEffect = { effect } }
+                )
                 adapter.setActivity(activity)
                 adapter.setFragmentManager(childFragmentManager)
                 recyclerView.apply {

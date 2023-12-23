@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -40,7 +41,6 @@ class ArkMediaPlayerFragment: Fragment(R.layout.fragment_edit_notes) {
 
     private val binding by viewBinding(FragmentEditNotesBinding::bind)
     private val arkMediaPlayerViewModel: ArkMediaPlayerViewModel by viewModels()
-    private val notesViewModel: NotesViewModel by activityViewModels()
 
     private lateinit var seekBar: SeekBar
     private lateinit var ivPlayPause: ImageView
@@ -52,13 +52,14 @@ class ArkMediaPlayerFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        observeViewModel()
+        arkMediaPlayerViewModel.initPlayer(note.path.toString())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.initEditUI()
         initUI()
+        observeViewModel()
     }
 
     private fun initUI() {
@@ -77,6 +78,15 @@ class ArkMediaPlayerFragment: Fragment(R.layout.fragment_edit_notes) {
             override fun afterTextChanged(p0: Editable?) {}
 
         }
+        val seekBarChangeListener = object: OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, isFromUser: Boolean) {
+                if (isFromUser) arkMediaPlayerViewModel.onSeekTo(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        }
         binding.mediaPlayerViewBinding.mediaPlayerView.isVisible = true
         seekBar = binding.mediaPlayerViewBinding.seekBar
         ivPlayPause = binding.mediaPlayerViewBinding.ivPlayPause
@@ -84,13 +94,13 @@ class ArkMediaPlayerFragment: Fragment(R.layout.fragment_edit_notes) {
         etTitle = binding.noteTitle
         btnSave = binding.btnSave
 
-
         etTitle.hint = defaultTitle
         etTitle.setText(title)
         etTitle.addTextChangedListener(textWatcher)
         ivPlayPause.setOnClickListener {
             arkMediaPlayerViewModel.onPlayOrPauseClick(note.path.toString())
         }
+        seekBar.setOnSeekBarChangeListener(seekBarChangeListener)
     }
 
     private fun showState(state: ArkMediaPlayerState) {

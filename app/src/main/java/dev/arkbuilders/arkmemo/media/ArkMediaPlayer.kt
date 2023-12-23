@@ -2,11 +2,12 @@ package dev.arkbuilders.arkmemo.media
 
 import android.media.MediaPlayer
 
-interface ArkMediaPlayer: MediaPlayer.OnCompletionListener {
+interface ArkMediaPlayer:
+    MediaPlayer.OnCompletionListener,
+    MediaPlayer.OnPreparedListener,
+    MediaPlayer.OnSeekCompleteListener {
 
-    var onCompletion: () -> Unit
-
-    fun init(path: String)
+    fun init(path: String, onCompletion: () -> Unit, onPrepared: () -> Unit)
 
     fun play()
 
@@ -14,7 +15,7 @@ interface ArkMediaPlayer: MediaPlayer.OnCompletionListener {
 
     fun pause()
 
-    fun seekTo(point: Int)
+    fun seekTo(position: Int)
 
     fun duration(): Int
 

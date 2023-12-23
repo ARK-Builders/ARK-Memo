@@ -26,15 +26,14 @@ import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 class NotesListAdapter(
     private val notes: List<Note>,
-    private val onPlayPauseClick: (String) -> Unit,
-    private val observeViewModel: (
-        showState: (ArkMediaPlayerState) -> Unit,
-        handleSideEffect: (ArkMediaPlayerSideEffect) -> Unit
-    ) -> Unit
+    private val onPlayPauseClick: (String) -> Unit
 ): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private lateinit var activity: MainActivity
     private lateinit var fragmentManager: FragmentManager
+
+    lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
+    lateinit var observeItemState: () -> ArkMediaPlayerState
 
     fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
@@ -54,16 +53,12 @@ class NotesListAdapter(
         holder.title.text = note.title
         holder.date.text = note.resource?.modified?.toString() ?:
                 activity.getString(R.string.ark_memo_just_now)
+        holder.btnPlayPause.isVisible = false
         if (note is VoiceNote) {
             holder.btnPlayPause.isVisible = true
             holder.btnPlayPause.setOnClickListener {
                 onPlayPauseClick(note.path.toString())
-            }
-            if (holder.btnPlayPause.isPressed) {
-                observeViewModel(
-                    {},
-                    { handleMediaPlayerSideEffect(it, holder) }
-                )
+                handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
             }
         }
     }
