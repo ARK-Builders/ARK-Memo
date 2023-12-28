@@ -19,14 +19,14 @@ class FilePickerDialog: ArkFilePickerFragment() {
 
     override fun dismiss() {
         super.dismiss()
-        val activity = (requireActivity() as MainActivity)
-        if (activity.memoPreferences.getPathString() == null) activity.finish()
+        val activity = (activity as? MainActivity)
+        if (activity?.memoPreferences?.getPathString() == null) activity?.finish()
     }
 
     companion object{
 
         private const val TAG = "file_picker"
-        private var fragmentManager: FragmentManager? = null
+        private lateinit var fragmentManager: FragmentManager
         var readPermLauncher: ActivityResultLauncher<String>? = null
         var readPermLauncher_SDK_R: ActivityResultLauncher<String>? = null
 
@@ -35,7 +35,7 @@ class FilePickerDialog: ArkFilePickerFragment() {
         }
 
         fun show() {
-            newInstance(getFilePickerConfig()).show(fragmentManager!!, TAG)
+            newInstance(getFilePickerConfig()).show(fragmentManager, TAG)
         }
 
         fun show(activity: AppCompatActivity, fragmentManager: FragmentManager){
