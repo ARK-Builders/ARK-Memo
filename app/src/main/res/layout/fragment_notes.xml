@@ -5,24 +5,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include
-        android:id="@+id/include"
+        android:id="@+id/rv_notes_binding"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="80dp"
         layout="@layout/recyclerview"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/newNote"
+        android:id="@+id/fab_new"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ark_memo_close"
         android:layout_gravity="bottom|end"
+        android:visibility="gone"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="20dp"
         app:icon="@drawable/add"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/newTextNote"
+        android:id="@+id/fab_new_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -34,7 +34,7 @@
         android:src="@drawable/ic_create" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/newGraphicNote"
+        android:id="@+id/fab_new_graphic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -46,10 +46,11 @@
         android:src="@drawable/ic_brush" />
 
     <Button
-        android:id="@+id/pasteNote"
+        android:id="@+id/fab_paste"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
+        android:visibility="gone"
         android:layout_marginBottom="10dp"
         android:text="@string/paste" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

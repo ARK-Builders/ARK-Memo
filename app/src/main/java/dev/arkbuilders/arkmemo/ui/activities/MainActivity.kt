@@ -22,6 +22,7 @@ import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 import dev.arkbuilders.arkmemo.utils.resumeFragment
+import dev.arkbuilders.arkmemo.ui.fragments.VersionsFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -100,8 +101,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         this.menu = menu
-        if(fragment.tag != NotesFragment.TAG)
-            showSettingsButton(false)
+        if(
+            fragment.tag == NotesFragment.TAG ||
+            fragment.tag == VersionsFragment.TAG
+        )
+            showSettingsButton(true)
+        else showSettingsButton(false)
         return true
     }
 
@@ -129,6 +134,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     fun showProgressBar(show: Boolean) {
         binding.progressBar.isVisible = show
+    }
+
+    fun initEditUI() {
+        title = getString(R.string.edit_note)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        showSettingsButton(false)
     }
 
     companion object{

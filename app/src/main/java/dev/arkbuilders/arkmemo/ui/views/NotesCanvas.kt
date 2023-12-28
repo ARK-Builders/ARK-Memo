@@ -16,6 +16,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     private var currentY = 0f
     private lateinit var viewModel: GraphicNotesViewModel
     private var path = Path()
+    var disableDrawing = false
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -33,34 +34,38 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val x = event.x
-        val y = event.y
-        when(event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                path.moveTo(x, y)
-                viewModel.svg().apply {
-                    addCommand(SVGCommand.MoveTo(x, y))
+        if (!disableDrawing) {
+            val x = event.x
+            val y = event.y
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    path.moveTo(x, y)
+                    viewModel.svg().apply {
+                        addCommand(SVGCommand.MoveTo(x, y))
+                    }
+                    currentX = x
+                    currentY = y
                 }
-                currentX = x
-                currentY = y
-            }
-            MotionEvent.ACTION_MOVE -> {
-                val x2 = (currentX + x) / 2
-                val y2 = (currentY + y) / 2
-                path.quadTo(currentX, currentY, x2, y2)
-                viewModel.svg().apply {
-                    addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2))
+
+                MotionEvent.ACTION_MOVE -> {
+                    val x2 = (currentX + x) / 2
+                    val y2 = (currentY + y) / 2
+                    path.quadTo(currentX, currentY, x2, y2)
+                    viewModel.svg().apply {
+                        addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2))
+                    }
+                    currentX = x
+                    currentY = y
                 }
-                currentX = x
-                currentY = y
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    path = Path()
+                }
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                path = Path()
-            }
+            val drawPath = DrawPath(path, viewModel.paint)
+            viewModel.onDrawPath(drawPath)
+            invalidate()
         }
-        val drawPath = DrawPath(path, viewModel.paint)
-        viewModel.onDrawPath(drawPath)
-        invalidate()
         return true
     }
 

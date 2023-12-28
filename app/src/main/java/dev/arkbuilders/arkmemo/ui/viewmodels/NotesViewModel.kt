@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arklib.ResourceId
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.repo.graphics.GraphicNotesRepo
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Named
@@ -47,27 +49,31 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onSaveClick(note: Note, showProgress: (Boolean) -> Unit) {
+    fun onSaveClick(
+        note: Note,
+        showProgress: (Boolean) -> Unit,
+        saveVersion: (ResourceId, ResourceId) -> Unit
+    ) {
         viewModelScope.launch(iODispatcher) {
             withContext(Dispatchers.Main) {
                 showProgress(true)
             }
+            val oldId = note.resource?.id
+            val isNewResource = oldId == null
             fun handleResult(result: SaveNoteResult) {
                 if (result == SaveNoteResult.SUCCESS) {
+                    val newId = note.resource?.id!!
                     add(note)
+                    if (!isNewResource) saveVersion(oldId!!, newId)
                 }
                 mSaveNoteResultLiveData.postValue(result)
             }
             when (note) {
-                is TextNote -> {
-                    textNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
+                is TextNote -> textNotesRepo.save(note) { result ->
+                    handleResult(result)
                 }
-                is GraphicNote -> {
-                    graphicNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
+                is GraphicNote -> graphicNotesRepo.save(note) { result ->
+                    handleResult(result)
                 }
             }
             withContext(Dispatchers.Main) {

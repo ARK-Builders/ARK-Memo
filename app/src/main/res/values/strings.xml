@@ -27,6 +27,10 @@
     <string name="ark_memo_delete_warn">Are you sure to delete note?</string>
     <string name="ark_memo_note_existing">Note already exists</string>
     <string name="ark_memo_note_saved">Note saved successfully</string>
+    <string name="ark_memo_track_versions">Track versions</string>
+    <string name="ark_memo_history">History</string>
+    <string name="ark_memo_old_version">Older version</string>
+    <string name="ark_memo_fork_versions">Fork versions</string>
     <string name="note_title">Title</string>
     <string name="ark_memo_just_now">Just now</string>
     <string name="ark_memo_graphic_note">Graphic note %1$s</string>

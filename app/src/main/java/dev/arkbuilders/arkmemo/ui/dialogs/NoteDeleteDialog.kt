@@ -11,9 +11,9 @@ import dev.arkbuilders.arkmemo.ui.views.toast
 
 class NoteDeleteDialog: DialogFragment() {
 
-    private var note: Note? = null
+    private lateinit var note: Note
 
-    fun setNoteToBeDeleted(note: Note): NoteDeleteDialog {
+    fun setNote(note: Note): NoteDeleteDialog {
         this.note = note
         return this
     }
@@ -26,11 +26,9 @@ class NoteDeleteDialog: DialogFragment() {
                 dialog.cancel()
             }
             .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
-                if(note != null) {
-                    parentFragment?.deleteNote(note!!)
-                    toast(requireContext(), getString(R.string.note_deleted))
-                    dialog.cancel()
-                }
+                parentFragment?.deleteNote(note)
+                toast(requireContext(), getString(R.string.note_deleted))
+                dialog.cancel()
             }
         return builder.create()
     }

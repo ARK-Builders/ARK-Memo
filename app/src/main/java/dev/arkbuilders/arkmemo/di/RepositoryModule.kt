@@ -13,6 +13,7 @@ import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
+import dev.arkbuilders.arkmemo.repo.versions.VersionStorageRepo
 
 
 @InstallIn(SingletonComponent::class)
@@ -30,5 +31,10 @@ abstract class RepositoryModule {
             memoPreferences: MemoPreferences,
             propertiesStorageRepo: PropertiesStorageRepo
         ) = NotesRepoHelper(memoPreferences, propertiesStorageRepo)
+
+        @Provides
+        fun provideVersionStorageRepo(
+            memoPreferences: MemoPreferences
+        ) = VersionStorageRepo(memoPreferences)
     }
 }
