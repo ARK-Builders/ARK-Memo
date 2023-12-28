@@ -1,9 +1,10 @@
 package dev.arkbuilders.arkmemo.repo.versions
 
 import dev.arkbuilders.arklib.ResourceId
-import dev.arkbuilders.arkmemo.models.Version
+import dev.arkbuilders.arklib.data.storage.Storage
 
-interface VersionStorage {
+interface VersionStorage: Storage<Version2> {
+
     suspend fun add(version: Version)
 
     suspend fun forget(id: ResourceId)
@@ -19,6 +20,4 @@ interface VersionStorage {
     fun childrenNotParents(): List<ResourceId>
 
     fun isLatestResourceVersion(id: ResourceId): Boolean
-
-    suspend fun persist()
 }

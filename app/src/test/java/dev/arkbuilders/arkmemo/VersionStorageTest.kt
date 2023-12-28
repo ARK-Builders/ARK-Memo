@@ -1,8 +1,8 @@
 package space.taran.arkmemo
 
 import space.taran.arklib.ResourceId
-import dev.arkbuilders.arkmemo.models.Version
-import dev.arkbuilders.arkmemo.repo.versions.PlainVersionStorage
+import dev.arkbuilders.arkmemo.repo.versions.Version
+import dev.arkbuilders.arkmemo.repo.versions.RootVersionStorage
 import org.junit.Test
 import org.junit.Assert.*
 import java.io.File
@@ -10,7 +10,7 @@ import java.io.File
 
 class VersionStorageTest {
     private val path = File(ROOT_PATH).toPath()
-    private val versionStorage = PlainVersionStorage(path)
+    private val versionStorage = RootVersionStorage(path)
 
     @Test
     fun versions_size_is_correct() {

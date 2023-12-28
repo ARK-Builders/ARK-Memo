@@ -5,7 +5,6 @@ import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.arkFolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import dev.arkbuilders.arkmemo.models.Version
 import dev.arkbuilders.arkmemo.models.VersionsResult
 import space.taran.arkmemo.utils.arkVersions
 import java.nio.file.Files
@@ -13,7 +12,7 @@ import java.nio.file.Path
 import java.nio.file.attribute.FileTime
 import kotlin.io.path.writeLines
 
-class PlainVersionStorage(private val root: Path): VersionStorage {
+class RootVersionStorage(private val root: Path): VersionStorage {
 
     private val storageFile = root.arkFolder().arkVersions()
     private var lastModified = FileTime.fromMillis(0L)

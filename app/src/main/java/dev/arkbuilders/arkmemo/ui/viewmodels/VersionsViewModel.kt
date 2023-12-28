@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import dev.arkbuilders.arkmemo.models.Version
+import dev.arkbuilders.arkmemo.repo.versions.Version
 import dev.arkbuilders.arkmemo.repo.versions.VersionStorage
 import dev.arkbuilders.arkmemo.repo.versions.VersionStorageRepo
 import javax.inject.Inject
