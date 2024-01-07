@@ -16,6 +16,7 @@ import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialog
 import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
+import dev.arkbuilders.arkmemo.utils.getAutoTitle
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 class NotesListAdapter(private val notes: List<Note>):
@@ -38,7 +39,7 @@ class NotesListAdapter(private val notes: List<Note>):
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.title.text = notes[position].title
+        holder.title.text = notes[position].getAutoTitle(activity)
         holder.date.text = notes[position].resource?.modified?.toString() ?:
                 activity.getString(R.string.ark_memo_just_now)
     }

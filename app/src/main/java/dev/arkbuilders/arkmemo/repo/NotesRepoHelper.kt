@@ -9,6 +9,7 @@ import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.utils.isEqual
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
@@ -32,11 +33,23 @@ class NotesRepoHelper @Inject constructor(
         propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
     }
 
-    suspend fun persistNoteProperties(resourceId: ResourceId, noteTitle: String) {
+    suspend fun persistNoteProperties(resourceId: ResourceId,
+                                      noteTitle: String,
+                                      description: String? = null): Boolean {
         with(propertiesStorage) {
-            val properties = Properties(setOf(noteTitle), setOf())
-            setProperties(resourceId, properties)
-            persist()
+            val properties = Properties(
+                setOf(noteTitle),
+                mutableSetOf<String>().apply {
+                    description?.let { this.add(description) }
+            })
+            val currentProperties = getProperties(resourceId)
+            if (currentProperties.isEqual(properties)) {
+                return false
+            } else {
+                setProperties(resourceId, properties)
+                persist()
+                return true
+            }
         }
     }
 

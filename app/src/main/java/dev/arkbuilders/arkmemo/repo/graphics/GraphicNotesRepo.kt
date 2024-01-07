@@ -60,15 +60,19 @@ class GraphicNotesRepo @Inject constructor(
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
         Log.d(GRAPHICS_REPO, "initial resource name is ${tempPath.name}")
-        helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
+        val isPropertiesChanged = helper.persistNoteProperties(
+            resourceId = id,
+            noteTitle = note.title,
+            description = note.description)
 
         val resourcePath = root.resolve("${id}.$SVG_EXT")
         if (resourcePath.exists()) {
-            Log.d(
-                GRAPHICS_REPO,
-                "resource with similar content already exists"
-            )
-            callback(SaveNoteResult.ERROR_EXISTING)
+            if (isPropertiesChanged) {
+                callback(SaveNoteResult.SUCCESS)
+            } else {
+                Log.d(GRAPHICS_REPO, "resource with similar content already exists")
+                callback(SaveNoteResult.ERROR_EXISTING)
+            }
             return@withContext
         }
 

@@ -6,29 +6,22 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
-class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
+class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
     private val activity by lazy {
         requireActivity() as MainActivity
     }
-
-    private val binding by viewBinding(FragmentEditNotesBinding::bind)
 
     private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
     private val notesViewModel: NotesViewModel by activityViewModels()
@@ -54,10 +47,6 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val defaultTitle = getString(
-            R.string.ark_memo_graphic_note,
-            LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-        )
         var title = note.title
         val notesCanvas = binding.notesCanvas
         val saveButton = binding.saveNote
@@ -67,6 +56,9 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 title = s?.toString() ?: ""
+                if (title.isEmpty()) {
+                    binding.noteTitle.hint = getString(R.string.hint_new_graphical_note)
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -77,7 +69,7 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
 
-        noteTitle.hint = defaultTitle
+        noteTitle.hint = getString(R.string.hint_new_graphical_note)
         noteTitle.setText(title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
         notesCanvas.isVisible = true
@@ -85,14 +77,17 @@ class EditGraphicNotesFragment: Fragment(R.layout.fragment_edit_notes) {
         saveButton.setOnClickListener {
             val svg = graphicNotesViewModel.svg()
             val note = GraphicNote(
-                title = title.ifEmpty { defaultTitle },
+                title = binding.noteTitle.text.toString(),
                 svg = svg,
+                description = binding.editTextDescription.text.toString(),
                 resource = note.resource
             )
             notesViewModel.onSaveClick(note) { show ->
                 activity.showProgressBar(show)
             }
         }
+
+        binding.editTextDescription.setText(this.note.description)
     }
 
     override fun onResume() {
