@@ -1,6 +1,7 @@
 package dev.arkbuilders.arkmemo.ui.dialogs
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
@@ -8,19 +9,34 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkfilepicker.ArkFilePickerConfig
 import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerFragment
 import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerMode
 import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FilePickerDialog: ArkFilePickerFragment() {
+
+    @Inject lateinit var memoPreferences: MemoPreferences
 
     override fun dismiss() {
         super.dismiss()
-        val activity = (activity as? MainActivity)
-        if (activity?.memoPreferences?.getPathString() == null) activity?.finish()
+        checkStorage()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        checkStorage()
+    }
+
+    private fun checkStorage() {
+        if (memoPreferences.getPath().isEmpty()) {
+            activity?.finish()
+        }
     }
 
     companion object{
@@ -29,10 +45,6 @@ class FilePickerDialog: ArkFilePickerFragment() {
         private lateinit var fragmentManager: FragmentManager
         var readPermLauncher: ActivityResultLauncher<String>? = null
         var readPermLauncher_SDK_R: ActivityResultLauncher<String>? = null
-
-        fun newInstance(config: ArkFilePickerConfig) = FilePickerDialog().apply {
-            setConfig(config)
-        }
 
         fun show() {
             newInstance(getFilePickerConfig()).show(fragmentManager, TAG)
@@ -44,6 +56,10 @@ class FilePickerDialog: ArkFilePickerFragment() {
                 show()
             }
             else askForReadPermissions()
+        }
+
+        private fun newInstance(config: ArkFilePickerConfig) = FilePickerDialog().apply {
+            setConfig(config)
         }
 
         private fun isReadPermissionGranted(activity: AppCompatActivity): Boolean{
