@@ -1,9 +1,9 @@
 package dev.arkbuilders.arkmemo.ui.dialogs
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.os.Environment
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
@@ -23,21 +23,17 @@ class FilePickerDialog: ArkFilePickerFragment() {
 
     @Inject lateinit var memoPreferences: MemoPreferences
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (storageNotAvailable()) { isCancelable = false }
+    }
+
     override fun dismiss() {
         super.dismiss()
-        checkStorage()
+        if (storageNotAvailable()) { activity?.finish() }
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        super.onCancel(dialog)
-        checkStorage()
-    }
-
-    private fun checkStorage() {
-        if (memoPreferences.getPath().isEmpty()) {
-            activity?.finish()
-        }
-    }
+    private fun storageNotAvailable(): Boolean  = memoPreferences.getPath().isEmpty()
 
     companion object{
 
