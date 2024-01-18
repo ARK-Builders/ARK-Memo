@@ -6,16 +6,13 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
@@ -48,11 +45,13 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     private val newTextNoteClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+        showFabs = false
     }
 
     private val newGraphicNoteClickListener = View.OnClickListener{
         activity.fragment = EditGraphicNotesFragment.newInstance()
         activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
+        showFabs = false
     }
 
     private val pasteNoteClickListener = View.OnClickListener {
