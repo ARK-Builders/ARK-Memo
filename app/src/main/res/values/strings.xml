@@ -30,7 +30,6 @@
     <string name="note_title">Title</string>
     <string name="ark_memo_just_now">Just now</string>
     <string name="ark_memo_graphic_note">Graphic note %1$s</string>
-    <string name="ark_memo_text_note">Text note %1$s</string>
     <string name="ark_memo_add_new_note">New note</string>
     <string name="ark_memo_close">Close</string>
     <string name="ark_memo_voice_note">Voice note %1$s</string>
@@ -38,5 +37,9 @@
     <string name="ark_memo_stop">Stop</string>
     <string name="ark_memo_duration">Duration</string>
     <string name="ark_memo_duration_default">00:00</string>
+    <string name="create_note_description_title">Description</string>
+    <string name="hint_new_text_note">New text note</string>
+    <string name="hint_new_graphical_note">New graphical note</string>
+    <string name="hint_new_note_description">Put description for this note</string>
 
 </resources>

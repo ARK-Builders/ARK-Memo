@@ -22,6 +22,7 @@ import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
+import dev.arkbuilders.arkmemo.utils.getAutoTitle
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 class NotesListAdapter(
@@ -50,7 +51,7 @@ class NotesListAdapter(
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val note = notes[position]
-        holder.title.text = note.title
+        holder.title.text = note.getAutoTitle(activity)
         holder.date.text = note.resource?.modified?.toString() ?:
                 activity.getString(R.string.ark_memo_just_now)
         holder.btnPlayPause.isVisible = false

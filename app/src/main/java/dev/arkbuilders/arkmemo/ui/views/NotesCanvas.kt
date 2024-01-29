@@ -17,11 +17,6 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     private lateinit var viewModel: GraphicNotesViewModel
     private var path = Path()
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        viewModel.svg().setViewBox(w.toFloat(), h.toFloat())
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val paths = viewModel.paths()

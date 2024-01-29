@@ -1,82 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:id="@+id/editView"
+    <EditText
+        android:id="@+id/noteTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="start"
+        android:hint="@string/hint_new_text_note"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:paddingHorizontal="@dimen/padding_horizontal_common"
+        android:paddingTop="10dp"
+        android:textColorHint="@color/gray"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/noteTitle"
+        android:text="@string/create_note_description_title"
+        android:paddingHorizontal="@dimen/padding_horizontal_common"
+        android:drawableEnd="@drawable/ic_chevron_right"
+        android:id="@+id/tv_description"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/tv_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_description"
+        android:hint="@string/hint_new_note_description"
+        android:paddingHorizontal="@dimen/padding_horizontal_common"
+        android:id="@+id/edit_text_description"
+        android:visibility="gone"
+        android:inputType="none"
+        tools:visibility="visible"/>
+    <androidx.constraintlayout.widget.Barrier
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="edit_text_description,tv_description"
+        android:id="@+id/barrier_description"/>
+
+    <EditText
+        android:id="@+id/editNote"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:ems="10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barrier_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:focusedByDefault="true"
+        android:gravity="start|top"
+        android:hint="@string/start_text_note"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="80dp"
+        android:textColorHint="#757575"
+        android:visibility="gone"
+        tools:visibility="visible" />
+    <include
+        android:id="@+id/recorder_view_binding"
+        layout="@layout/recorder_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_gravity="center"/>
+
+    <include
+        android:id="@+id/media_player_view_binding"
+        layout="@layout/media_player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        <EditText
-            android:id="@+id/note_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:ems="10"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:inputType="text"
-            android:gravity="start"
-            android:hint="@string/note_title"
-            android:importantForAutofill="no"
-            android:textColorHint="@color/gray"/>
-        <EditText
-            android:id="@+id/editNote"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="80dp"
-            android:paddingTop="10dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:ems="10"
-            android:focusedByDefault="true"
-            android:gravity="start|top"
-            android:visibility="gone"
-            android:hint="@string/start_text_note"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine"
-            android:textColorHint="#757575"/>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <include
-                android:id="@+id/recorder_view_binding"
-                layout="@layout/recorder_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_gravity="center"/>
-
-            <include
-                android:id="@+id/media_player_view_binding"
-                layout="@layout/media_player_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
-            android:id="@+id/notesCanvas"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingBottom="80dp"
-            android:paddingTop="10dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:visibility="gone"/>
-    </LinearLayout>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
+        android:id="@+id/notesCanvas"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barrier_description"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="80dp"
+        android:visibility="gone"
+        tools:visibility="gone"/>
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/btn_save"
         android:layout_width="150dp"
@@ -85,7 +116,7 @@
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="@string/save"
-        app:layout_constraintBottom_toBottomOf="@id/editView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

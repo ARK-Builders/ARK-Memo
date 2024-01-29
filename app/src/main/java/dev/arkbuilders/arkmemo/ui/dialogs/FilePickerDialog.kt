@@ -1,31 +1,49 @@
 package dev.arkbuilders.arkmemo.ui.dialogs
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.os.Environment
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
+import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkfilepicker.ArkFilePickerConfig
 import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerFragment
 import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerMode
 import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import javax.inject.Inject
 
-class FilePickerDialog private constructor(){
+@AndroidEntryPoint
+class FilePickerDialog: ArkFilePickerFragment() {
+
+    @Inject lateinit var memoPreferences: MemoPreferences
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (storageNotAvailable()) { isCancelable = false }
+    }
+
+    override fun dismiss() {
+        super.dismiss()
+        if (storageNotAvailable()) { activity?.finish() }
+    }
+
+    private fun storageNotAvailable(): Boolean  = memoPreferences.getPath().isEmpty()
+
     companion object{
 
         private const val TAG = "file_picker"
-        private var fragmentManager: FragmentManager? = null
+        private lateinit var fragmentManager: FragmentManager
         var readPermLauncher: ActivityResultLauncher<String>? = null
         var readPermLauncher_SDK_R: ActivityResultLauncher<String>? = null
 
         fun show() {
-            ArkFilePickerFragment.newInstance(getFilePickerConfig()).show(fragmentManager!!, TAG)
+            newInstance(getFilePickerConfig()).show(fragmentManager, TAG)
         }
 
         fun show(activity: AppCompatActivity, fragmentManager: FragmentManager){
@@ -34,6 +52,10 @@ class FilePickerDialog private constructor(){
                 show()
             }
             else askForReadPermissions()
+        }
+
+        private fun newInstance(config: ArkFilePickerConfig) = FilePickerDialog().apply {
+            setConfig(config)
         }
 
         private fun isReadPermissionGranted(activity: AppCompatActivity): Boolean{
@@ -53,10 +75,6 @@ class FilePickerDialog private constructor(){
             else{
                 readPermLauncher?.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
-        }
-
-        fun permissionDeniedError(context: Context){
-            Toast.makeText(context, context.getString(R.string.no_file_access), Toast.LENGTH_SHORT).show()
         }
 
         private fun getFilePickerConfig() = ArkFilePickerConfig(

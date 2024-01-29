@@ -47,11 +47,13 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     private val newTextNoteClickListener = View.OnClickListener {
         activity.fragment = EditTextNotesFragment()
         activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+        showFabs = false
     }
 
     private val newGraphicNoteClickListener = View.OnClickListener{
         activity.fragment = EditGraphicNotesFragment.newInstance()
         activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
+        showFabs = false
     }
 
     private val pasteNoteClickListener = View.OnClickListener {
