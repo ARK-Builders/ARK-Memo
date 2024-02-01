@@ -13,9 +13,11 @@ import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
+import dev.arkbuilders.arkmemo.media.ArkMediaPlayer
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.models.VoiceNote
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Named
@@ -25,25 +27,28 @@ class NotesViewModel @Inject constructor(
     @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     private val textNotesRepo: NotesRepo<TextNote>,
     private val graphicNotesRepo: NotesRepo<GraphicNote>,
+    private val voiceNotesRepo: NotesRepo<VoiceNote>,
+    private val arkMediaPlayer: ArkMediaPlayer
 ) : ViewModel() {
 
     private val notes = MutableStateFlow(listOf<Note>())
     private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
 
-    fun init(read: () -> Unit) {
+    fun init(extraBlock: () -> Unit) {
         val initJob = viewModelScope.launch(iODispatcher) {
             textNotesRepo.init()
             graphicNotesRepo.init()
+            voiceNotesRepo.init()
         }
         viewModelScope.launch {
             initJob.join()
-            read()
+            extraBlock()
         }
     }
 
     fun readAllNotes() {
         viewModelScope.launch(iODispatcher) {
-            notes.value = textNotesRepo.read() + graphicNotesRepo.read()
+            notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
         }
     }
 
@@ -69,6 +74,11 @@ class NotesViewModel @Inject constructor(
                         handleResult(result)
                     }
                 }
+                is VoiceNote -> {
+                    voiceNotesRepo.save(note) { result ->
+                        handleResult(result)
+                    }
+                }
             }
             withContext(Dispatchers.Main) {
                 showProgress(false)
@@ -82,6 +92,7 @@ class NotesViewModel @Inject constructor(
             when (note) {
                 is TextNote -> textNotesRepo.delete(note)
                 is GraphicNote -> graphicNotesRepo.delete(note)
+                is VoiceNote -> voiceNotesRepo.delete(note)
             }
         }
     }

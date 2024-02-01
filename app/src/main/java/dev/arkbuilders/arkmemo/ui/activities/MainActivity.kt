@@ -3,6 +3,7 @@ package dev.arkbuilders.arkmemo.ui.activities
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
+import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -40,6 +41,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     var fragment: Fragment = NotesFragment()
 
+    private var shouldRecord = false
+    private val audioRecordingPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            shouldRecord = isGranted
+        }
+
     init {
         FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -61,6 +68,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+        audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
 
         fun showFragment() {
             val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
@@ -121,7 +129,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         return true
     }
 
-    fun showSettingsButton(show: Boolean = true){
+    fun showSettingsButton(show: Boolean = true) {
         if(menu != null) {
             val settingsItem = menu?.findItem(R.id.settings)
             settingsItem?.isVisible = show
@@ -131,6 +139,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     fun showProgressBar(show: Boolean) {
         binding.progressBar.isVisible = show
     }
+
+    fun initEditUI() {
+        title = getString(R.string.edit_note)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        showSettingsButton(false)
+    }
+
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }

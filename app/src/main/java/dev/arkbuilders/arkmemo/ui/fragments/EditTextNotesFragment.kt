@@ -57,7 +57,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         }
         val noteTitle = binding.noteTitle
         val editNote = binding.editNote
-        val saveNoteButton = binding.saveNote
+        val btnSave = binding.btnSave
         val noteTitleChangeListener = object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -85,7 +85,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         if(noteStr != null)
             editNote.setText(noteStr)
 
-        saveNoteButton.setOnClickListener {
+        btnSave.setOnClickListener {
             val note = TextNote(
                 title = title,
                 description = binding.editTextDescription.text.toString(),
@@ -99,7 +99,6 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
         binding.editTextDescription.setText(this.note.description)
     }
-
     companion object{
         const val TAG = "Edit Text Notes"
         private const val NOTE_STRING_KEY = "note string"

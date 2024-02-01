@@ -19,6 +19,7 @@ import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 
@@ -32,6 +33,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     }
 
     private val notesViewModel: NotesViewModel by activityViewModels()
+    private val arkMediaPlayerViewModel: ArkMediaPlayerViewModel by activityViewModels()
 
     private lateinit var newTextNoteButton: FloatingActionButton
     private lateinit var newGraphicNoteButton: FloatingActionButton
@@ -70,6 +72,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val fabNewVoiceNote = binding.fabNewVoiceNote
         recyclerView = binding.include.recyclerView
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -78,26 +81,42 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         newGraphicNoteButton = binding.newGraphicNote
         newNoteButton = binding.newNote
         newNoteButton.shrink()
+        showFabs = false
         newNoteButton.setOnClickListener {
             showFabs = if (!showFabs) {
                 newNoteButton.extend()
                 newTextNoteButton.show()
                 newGraphicNoteButton.show()
+                fabNewVoiceNote.show()
                 true
             } else {
                 newNoteButton.shrink()
                 newTextNoteButton.hide()
                 newGraphicNoteButton.hide()
+                fabNewVoiceNote.hide()
                 false
             }
         }
         newTextNoteButton.setOnClickListener(newTextNoteClickListener)
         newGraphicNoteButton.setOnClickListener(newGraphicNoteClickListener)
         pasteNoteButton.setOnClickListener(pasteNoteClickListener)
+        fabNewVoiceNote.setOnClickListener {
+            activity.fragment = ArkRecorderFragment.newInstance()
+            activity.replaceFragment(activity.fragment, ArkRecorderFragment.TAG)
+        }
         lifecycleScope.launchWhenStarted {
             notesViewModel.getNotes {
-                val adapter = NotesListAdapter(it)
+                val adapter = NotesListAdapter(
+                    it,
+                    onPlayPauseClick = { path ->
+                        arkMediaPlayerViewModel.onPlayOrPauseClick(path)
+                    }
+                )
                 val layoutManager = LinearLayoutManager(requireContext())
+                arkMediaPlayerViewModel.collect(
+                    stateToUI = { state -> adapter.observeItemState = { state } },
+                    handleSideEffect = { effect -> adapter.observeItemSideEffect = { effect } }
+                )
                 adapter.setActivity(activity)
                 adapter.setFragmentManager(childFragmentManager)
                 recyclerView.apply {
