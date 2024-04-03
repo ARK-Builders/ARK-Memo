@@ -136,17 +136,18 @@ class NotesFragment: Fragment() {
         binding.edtSearch.addTextChangedListener(
             onTextChanged = { text, _, _, _ ->
                 binding.pbLoading.visible()
+                binding.groupSearchResultEmpty.gone()
 
                 if (!binding.edtSearch.isFocused && text.isNullOrEmpty()) return@addTextChangedListener
 
                 notesViewModel.searchNote(keyword = text.toString()) { notes ->
+                    binding.pbLoading.gone()
                     if (notes.isEmpty()) {
                         binding.groupSearchResultEmpty.visible()
                     } else {
                         binding.groupSearchResultEmpty.gone()
                     }
                     notesAdapter?.updateData(notes, fromSearch = true, keyword = text.toString())
-                    binding.pbLoading.gone()
                 }
         })
     }
