@@ -43,8 +43,8 @@ class GraphicNotesRepo @Inject constructor(
         write(note) { callback(it) }
     }
 
-    override suspend fun delete(note: GraphicNote) = withContext(iODispatcher) {
-        helper.deleteNote(note)
+    override suspend fun delete(notes: GraphicNote) = withContext(iODispatcher) {
+        helper.deleteNote(notes)
     }
 
     override suspend fun read(): List<GraphicNote> = withContext(iODispatcher) {

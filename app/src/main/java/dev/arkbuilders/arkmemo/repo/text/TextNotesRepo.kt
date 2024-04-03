@@ -42,8 +42,8 @@ class TextNotesRepo @Inject constructor(
         write(note) { callback(it) }
     }
 
-    override suspend fun delete(note: TextNote) {
-        helper.deleteNote(note)
+    override suspend fun delete(notes: List<TextNote>) {
+        helper.deleteNote(notes)
     }
 
     override suspend fun read(): List<TextNote> = withContext(iODispatcher) {

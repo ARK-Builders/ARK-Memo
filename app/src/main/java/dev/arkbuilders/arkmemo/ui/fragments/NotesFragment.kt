@@ -1,6 +1,7 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -41,6 +42,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     private lateinit var newNoteButton: ExtendedFloatingActionButton
 
     private lateinit var recyclerView: RecyclerView
+//    private var mNoteAdapter: NotesListAdapter? = null
 
     private var showFabs = false
 
@@ -130,6 +132,12 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
     override fun onResume() {
         super.onResume()
         activity.fragment = this
+    }
+
+    fun toggleActionMode() {
+        Log.d("tuancoltech", "toggleActionMode " + this@NotesFragment)
+//        mNoteAdapter?.toggleActionMode()
+        (recyclerView.adapter as? NotesListAdapter)?.toggleActionMode()
     }
 
     companion object {

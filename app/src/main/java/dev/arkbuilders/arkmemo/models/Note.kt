@@ -6,4 +6,5 @@ interface Note {
     val title: String
     val description: String
     var resource: Resource?
+    var selected: Boolean
 }

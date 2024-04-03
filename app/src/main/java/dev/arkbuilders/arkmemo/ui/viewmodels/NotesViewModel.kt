@@ -86,13 +86,15 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteConfirmed(note: Note) {
+    fun onDeleteConfirmed(notes: List<Note>) {
         viewModelScope.launch(iODispatcher) {
-            remove(note)
-            when (note) {
-                is TextNote -> textNotesRepo.delete(note)
-                is GraphicNote -> graphicNotesRepo.delete(note)
-                is VoiceNote -> voiceNotesRepo.delete(note)
+            notes.forEach { note ->
+                remove(note)
+                when (note) {
+                    is TextNote -> textNotesRepo.delete(notes)
+                    is GraphicNote -> graphicNotesRepo.delete(notes)
+                    is VoiceNote -> voiceNotesRepo.delete(notes)
+                }
             }
         }
     }

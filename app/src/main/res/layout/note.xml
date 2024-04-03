@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
 <androidx.appcompat.widget.LinearLayoutCompat
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -55,6 +56,7 @@
             android:contentDescription="@string/playpause"
             android:src="@drawable/ic_play"
             app:tint="@color/purple_700" />
+
         <ImageButton
             android:id="@+id/deleteNote"
             android:layout_width="50dp"
@@ -62,7 +64,20 @@
             android:layout_margin="5dp"
             android:background="@null"
             android:contentDescription="@string/delete"
-            android:src="@drawable/delete" />
+            android:src="@drawable/delete"
+            tools:visibility="visible"
+            android:visibility="visible"
+            app:tint="@color/purple_700" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:contentDescription="@string/select"
+            android:id="@+id/cb_delete"
+            tools:visibility="visible"
+            android:visibility="gone"/>
+
     </androidx.appcompat.widget.LinearLayoutCompat>
     <View
         android:id="@+id/divider"

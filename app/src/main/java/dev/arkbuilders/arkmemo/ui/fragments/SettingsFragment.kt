@@ -37,6 +37,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         activity.title = getString(R.string.settings)
         activity.showSettingsButton(false)
+        activity.toggleBatchDeleteOption(false)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         pathPref?.setOnPreferenceClickListener {

@@ -74,6 +74,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         activity.title = getString(R.string.edit_note)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         activity.showSettingsButton(false)
+        activity.toggleBatchDeleteOption(false)
 
         noteTitle.setText(this.note.title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)

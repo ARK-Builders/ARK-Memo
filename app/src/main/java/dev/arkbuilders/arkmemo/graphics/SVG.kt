@@ -134,6 +134,7 @@ class SVG {
 
                 pathData.split(COMMA).forEach {
                     val command = it.trim()
+                    if (command.isEmpty()) return@forEach
                     when (command.first()) {
                         SVGCommand.MoveTo.CODE -> {
                             commands.addLast(SVGCommand.MoveTo.fromString(command))

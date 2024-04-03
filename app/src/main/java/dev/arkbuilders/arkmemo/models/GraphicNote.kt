@@ -13,5 +13,6 @@ data class GraphicNote(
     @IgnoredOnParcel
     val svg: SVG? = null,
     @IgnoredOnParcel
-    override var resource: Resource? = null
+    override var resource: Resource? = null,
+    override var selected: Boolean = false
 ) : Note, Parcelable

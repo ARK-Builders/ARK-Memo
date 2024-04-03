@@ -9,12 +9,13 @@ import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.fragments.deleteNote
 import dev.arkbuilders.arkmemo.ui.views.toast
 
-class NoteDeleteDialog: DialogFragment() {
+class NoteDeleteDialog(private val mCustomMessage: String? = null,
+                       private val mPositiveAction: (() -> Unit)? = null): DialogFragment() {
 
-    private var note: Note? = null
+    private var notes: List<Note>? = null
 
-    fun setNoteToBeDeleted(note: Note): NoteDeleteDialog {
-        this.note = note
+    fun setNoteToBeDeleted(notes: List<Note>): NoteDeleteDialog {
+        this.notes = notes
         return this
     }
 
@@ -26,11 +27,13 @@ class NoteDeleteDialog: DialogFragment() {
                 dialog.cancel()
             }
             .setPositiveButton(R.string.ark_memo_ok){ dialog, _ ->
-                if(note != null) {
-                    parentFragment?.deleteNote(note!!)
+                if(notes != null) {
+                    parentFragment?.deleteNote(notes!!)
                     toast(requireContext(), getString(R.string.note_deleted))
                     dialog.cancel()
                 }
+
+                mPositiveAction?.invoke()
             }
         return builder.create()
     }

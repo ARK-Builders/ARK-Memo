@@ -82,6 +82,7 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
     }
 
     private fun initUI() {
+        activity.toggleBatchDeleteOption(false)
         val defaultTitle = getString(
             R.string.ark_memo_voice_note,
             LocalDate.now().format(DateTimeFormatter.ISO_DATE)

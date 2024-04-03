@@ -1,8 +1,10 @@
 package dev.arkbuilders.arkmemo.ui.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -23,7 +25,9 @@ import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.utils.getAutoTitle
+import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.replaceFragment
+import dev.arkbuilders.arkmemo.utils.visible
 
 class NotesListAdapter(
     private val notes: List<Note>,
@@ -32,6 +36,7 @@ class NotesListAdapter(
 
     private lateinit var activity: MainActivity
     private lateinit var fragmentManager: FragmentManager
+    private var mActionMode = false
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
     lateinit var observeItemState: () -> ArkMediaPlayerState
@@ -61,6 +66,16 @@ class NotesListAdapter(
                 onPlayPauseClick(note.path.toString())
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
             }
+        }
+
+        holder.cbDelete.isChecked = note.selected
+        Log.i("tuancoltech", "onBindViewHolder pos: " + position + ". mActionMode: " + mActionMode)
+        if (mActionMode) {
+            holder.btnDeleteNote.gone()
+            holder.cbDelete.visible()
+        } else {
+            holder.btnDeleteNote.visible()
+            holder.cbDelete.gone()
         }
     }
 
@@ -104,7 +119,15 @@ class NotesListAdapter(
         holder.btnPlayPause.setImageDrawable(playIcon)
     }
 
-    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    fun toggleActionMode() {
+        mActionMode = !mActionMode
+        Log.v("tuancoltech", "toggleActionMode mActionMode: " + mActionMode)
+        notes.forEach { it.selected = false }
+        notifyDataSetChanged()
+    }
+
+    inner class NoteViewHolder(itemView: View)
+        : RecyclerView.ViewHolder(itemView) {
         private val binding by viewBinding {
             NoteBinding.bind(itemView)
         }
@@ -112,6 +135,8 @@ class NotesListAdapter(
         val title = binding.noteTitle
         val date = binding.noteDate
         val btnPlayPause = binding.btnPlayPause
+        val btnDeleteNote = binding.deleteNote
+        val cbDelete = binding.cbDelete
 
         private val clickNoteToEditListener = View.OnClickListener {
             var tag = EditTextNotesFragment.TAG
@@ -135,9 +160,18 @@ class NotesListAdapter(
                 .show(fragmentManager, NoteDeleteDialog.TAG)
         }
 
+        private val noteCheckedListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            notes[bindingAdapterPosition].selected = isChecked
+            Log.d("tuancoltech", "noteCheckedListener pos: " + bindingAdapterPosition + ". isChecked: " + isChecked)
+//            notifyItemChanged(bindingAdapterPosition)
+//            onCheckedForDelete?.invoke(bindingAdapterPosition)
+//            onSelectForDelete.invoke(bindingAdapterPosition)
+        }
+
         init {
             binding.theNote.setOnClickListener(clickNoteToEditListener)
             binding.deleteNote.setOnClickListener(deleteNoteClickListener)
+            binding.cbDelete.setOnCheckedChangeListener(noteCheckedListener)
         }
     }
 }
