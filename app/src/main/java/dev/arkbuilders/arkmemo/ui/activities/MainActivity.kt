@@ -171,8 +171,3 @@ fun AppCompatActivity.resumeFragment(fragment: Fragment){
         commit()
     }
 }
-
-fun Context.getTextFromClipBoard(): String?{
-    val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-    return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
-}

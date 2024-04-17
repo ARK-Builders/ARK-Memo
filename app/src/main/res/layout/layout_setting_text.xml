@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
+    android:background="?attr/selectableItemBackground">
+    
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="@dimen/common_padding"
+        android:layout_marginVertical="8dp"
+        android:id="@+id/iv_icon"
+        tools:src="@drawable/ic_theme"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/iv_icon"
+        app:layout_constraintTop_toTopOf="@+id/iv_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_icon"
+        android:layout_marginStart="12dp"
+        style="@style/TextSmall"
+        android:id="@+id/tv_text"
+        android:textColor="@color/text_secondary"
+        tools:text="Light Mode"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.SwitchButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switch_right"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_icon"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_icon"
+        android:layout_marginEnd="@dimen/common_padding"
+        style="@style/SwitchButton"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -82,9 +82,14 @@ class NotesRepoHelper @Inject constructor(
     suspend fun deleteNote(note: Note): Unit = withContext(Dispatchers.IO) {
         val path = root.resolve("${note.resource?.name}")
         path.deleteIfExists()
-        propertiesStorage.remove(note.resource?.id!!)
+        note.resource?.id?.let { resourceId ->
+            propertiesStorage.remove(resourceId)
+        }
+
         propertiesStorage.persist()
-        Log.d("repo", "${note.resource?.name!!} has been deleted")
+        note.resource?.name?.let { name ->
+            Log.d("repo", "${name} has been deleted")
+        }
     }
 }
 

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <include layout="@layout/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/toolbar_custom"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_app_logo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_custom"
+        android:layout_marginTop="64dp"
+        android:id="@+id/iv_app_logo"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_app_logo"
+        android:text="@string/app_name"
+        style="@style/TextXLarge"
+        android:layout_marginTop="20dp"
+        android:id="@+id/tv_app_name"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_app_name"
+        android:text="@string/app_name"
+        style="@style/TextSmall"
+        android:layout_marginTop="4dp"
+        android:id="@+id/tv_app_version"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_app_version"
+        android:text="@string/app_author"
+        style="@style/TextSmall"
+        android:layout_marginTop="4dp"
+        android:id="@+id/tv_app_author"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_app_author"
+        android:text="@string/app_copyright"
+        style="@style/TextSmall"
+        android:layout_marginTop="4dp"
+        android:id="@+id/tv_app_copyright"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.SettingTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_theme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_app_copyright"
+        android:layout_marginTop="64dp"
+        app:stv_text="@string/light_mode"
+        app:stv_switch_on="true"
+        android:visibility="gone"
+        app:stv_icon="@drawable/ic_theme"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.SettingTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_terms_of_service"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_theme"
+        android:layout_marginTop="@dimen/setting_item_margin_top"
+        app:stv_text="@string/terms_of_service"
+        android:visibility="gone"
+        app:stv_icon="@drawable/ic_terms_of_service"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.SettingTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_privacy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_terms_of_service"
+        android:layout_marginTop="@dimen/setting_item_margin_top"
+        app:stv_text="@string/privacy_policy"
+        android:visibility="gone"
+        app:stv_icon="@drawable/ic_privacy"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.SettingTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_rate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_privacy"
+        android:layout_marginTop="@dimen/setting_item_margin_top"
+        app:stv_text="@string/rate_us"
+        app:stv_icon="@drawable/ic_rate"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.SettingTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_feedback"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_rate"
+        android:layout_marginTop="@dimen/setting_item_margin_top"
+        app:stv_text="@string/support"
+        app:stv_icon="@drawable/ic_feedback"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

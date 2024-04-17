@@ -8,6 +8,7 @@ import dev.arkbuilders.arkmemo.utils.tenthSecondsToString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.File
 import java.nio.file.Path
 import java.util.Timer
 import javax.inject.Inject
@@ -81,6 +82,11 @@ class ArkRecorderViewModel @Inject constructor(
 
     fun getRecordingPath(): Path {
         return arkAudioRecorder.getRecording()
+    }
+
+    fun isRecordExisting(): Boolean {
+        val recordFile = File(getRecordingPath().toUri())
+        return !isRecording.value && recordFile.exists() && recordFile.length() > 0
     }
 
     private fun onStartRecordingClick() {

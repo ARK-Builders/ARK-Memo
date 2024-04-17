@@ -10,24 +10,27 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.databinding.NoteBinding
+import dev.arkbuilders.arkmemo.databinding.AdapterTextNoteBinding
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.dialogs.NoteDeleteDialog
 import dev.arkbuilders.arkmemo.ui.fragments.ArkMediaPlayerFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
+import dev.arkbuilders.arkmemo.ui.views.NotesCanvas
 import dev.arkbuilders.arkmemo.utils.getAutoTitle
+import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.replaceFragment
+import dev.arkbuilders.arkmemo.utils.visible
 
 class NotesListAdapter(
     private val notes: List<Note>,
-    private val onPlayPauseClick: (String) -> Unit
+    private val onPlayPauseClick: (String) -> Unit,
+    private val onThumbPrepare : (note: GraphicNote, holder: NotesCanvas) -> Unit
 ): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private lateinit var activity: MainActivity
@@ -45,22 +48,35 @@ class NotesListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.note, parent, false)
-        return NoteViewHolder(itemView)
+        val binding = AdapterTextNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        binding.root.clipToOutline = true
+        return NoteViewHolder(binding.root)
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val note = notes[position]
         holder.title.text = note.getAutoTitle(activity)
-        holder.date.text = note.resource?.modified?.toString() ?:
-                activity.getString(R.string.ark_memo_just_now)
-        holder.btnPlayPause.isVisible = false
+//        holder.date.text = note.resource?.modified?.toString() ?:
+//                activity.getString(R.string.ark_memo_just_now)
+        if (note is TextNote) {
+            holder.contentPreview.text = note.text
+        }
+        holder.layoutAudioView.isVisible = false
         if (note is VoiceNote) {
-            holder.btnPlayPause.isVisible = true
+            holder.layoutAudioView.isVisible = true
             holder.btnPlayPause.setOnClickListener {
                 onPlayPauseClick(note.path.toString())
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
             }
+        } else if (note is GraphicNote) {
+            holder.canvasGraphicThumb.visible()
+            onThumbPrepare(note, holder.canvasGraphicThumb)
+        }
+
+        if (note.pendingForDelete) {
+            holder.tvDelete.visible()
+        } else {
+            holder.tvDelete.gone()
         }
     }
 
@@ -106,12 +122,15 @@ class NotesListAdapter(
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val binding by viewBinding {
-            NoteBinding.bind(itemView)
+            AdapterTextNoteBinding.bind(itemView)
         }
 
-        val title = binding.noteTitle
-        val date = binding.noteDate
-        val btnPlayPause = binding.btnPlayPause
+        val title = binding.tvTitle
+        val contentPreview = binding.tvContentPreview
+        val btnPlayPause = binding.ivPlayAudio
+        val layoutAudioView = binding.layoutAudioView
+        val canvasGraphicThumb = binding.canvasGraphicThumb
+        val tvDelete = binding.tvDelete
 
         private val clickNoteToEditListener = View.OnClickListener {
             var tag = EditTextNotesFragment.TAG
@@ -129,15 +148,8 @@ class NotesListAdapter(
             activity.replaceFragment(activity.fragment, tag)
         }
 
-        private val deleteNoteClickListener = View.OnClickListener {
-            NoteDeleteDialog()
-                .setNoteToBeDeleted(notes[bindingAdapterPosition])
-                .show(fragmentManager, NoteDeleteDialog.TAG)
-        }
-
         init {
-            binding.theNote.setOnClickListener(clickNoteToEditListener)
-            binding.deleteNote.setOnClickListener(deleteNoteClickListener)
+            binding.root.setOnClickListener(clickNoteToEditListener)
         }
     }
 }

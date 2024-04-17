@@ -40,6 +40,10 @@ class SVG {
         viewBox = ViewBox(width = width, height = height)
     }
 
+    fun getViewBox(): ViewBox {
+        return viewBox
+    }
+
     fun generate(path: Path) {
         if (commands.isNotEmpty()) {
             val xmlSerializer = Xml.newSerializer()
@@ -134,6 +138,7 @@ class SVG {
 
                 pathData.split(COMMA).forEach {
                     val command = it.trim()
+                    if (command.isEmpty()) return@forEach
                     when (command.first()) {
                         SVGCommand.MoveTo.CODE -> {
                             commands.addLast(SVGCommand.MoveTo.fromString(command))
