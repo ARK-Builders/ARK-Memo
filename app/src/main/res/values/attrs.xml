@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SettingTextView">
+        <attr name="stv_switch_on" format="reference|boolean"/>
+        <attr name="stv_text" format="reference|string"/>
+        <attr name="stv_icon" format="reference|integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="GraphicControlTextView">
+        <attr name="gct_drawable" format="reference|integer"/>
+        <attr name="gct_selected" format="reference|boolean"/>
+    </declare-styleable>
+
+</resources>

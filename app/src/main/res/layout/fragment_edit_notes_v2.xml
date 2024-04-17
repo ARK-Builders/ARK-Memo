@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+    
+    <include layout="@layout/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/toolbar"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/text_tag"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:text="Last edited 17 Feb 2024, 4:09 PM"
+        android:layout_marginStart="@dimen/common_padding"
+        android:id="@+id/tv_last_modified"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+
+    <EditText
+        android:id="@+id/edt_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_last_modified"
+        android:gravity="start"
+        android:hint="@string/hint_new_text_note"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:layout_marginHorizontal="@dimen/common_padding"
+        android:layout_marginTop="4dp"
+        android:textColorHint="@color/text_primary"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="@dimen/common_padding"
+        android:layout_marginBottom="@dimen/common_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/edt_title"
+        android:id="@+id/rv_tags"
+        android:visibility="gone"
+        android:layout_marginTop="12dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_title"
+        android:text="@string/create_note_description_title"
+        android:layout_marginHorizontal="@dimen/common_padding"
+        android:drawableEnd="@drawable/ic_chevron_right"
+        android:id="@+id/tv_description"
+        android:visibility="gone"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/tv_description"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_description"
+        android:hint="@string/hint_new_note_description"
+        android:layout_marginHorizontal="@dimen/common_padding"
+        android:id="@+id/edit_text_description"
+        android:visibility="gone"
+        android:inputType="none"
+        tools:visibility="gone" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="edit_text_description,tv_description"
+        android:id="@+id/barrier_description"/>
+
+    <EditText
+        android:id="@+id/editNote"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:ems="10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barrier_description"
+        app:layout_constraintBottom_toTopOf="@+id/barrier_bottom_edt_note"
+        android:focusedByDefault="true"
+        android:background="@null"
+        android:gravity="start|top"
+        android:hint="@string/start_text_note"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine"
+        android:layout_marginHorizontal="@dimen/common_padding"
+        android:paddingTop="10dp"
+        android:paddingBottom="80dp"
+        android:textColorHint="#757575"
+        android:visibility="gone"
+        tools:visibility="visible" />
+    <include
+        android:id="@+id/recorder_view_binding"
+        layout="@layout/recorder_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_gravity="center"/>
+
+    <include
+        android:id="@+id/layout_audio_view"
+        layout="@layout/media_player_view_v2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginHorizontal="@dimen/common_padding"
+        android:layout_marginTop="@dimen/common_padding"
+        app:layout_constraintTop_toBottomOf="@+id/edt_title"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
+        android:id="@+id/notesCanvas"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/barrier_description"
+        app:layout_constraintBottom_toTopOf="@+id/layout_graphics_control"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="80dp"
+        android:visibility="gone"
+        tools:visibility="gone"/>
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/btn_save"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="@string/save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <include layout="@layout/layout_graphic_bottom_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_graphics_control"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        tools:visibility="gone"/>
+
+    <include layout="@layout/layout_audio_record"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_audio_record"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/save"
+        tools:visibility="visible"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:clickable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginEnd="@dimen/common_padding"
+        android:layout_marginBottom="12dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_paste"
+        style="@style/ActionTextView"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:foreground="@null"
+        android:drawablePadding="6dp"
+        android:text="@string/paste"
+        android:textColor="@color/text_tertiary"
+        android:clickable="true"
+        android:layout_marginStart="@dimen/common_padding"
+        app:layout_constraintTop_toTopOf="@+id/tv_save"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_save"
+        app:layout_constraintStart_toStartOf="parent"
+        app:drawableStartCompat="@drawable/ic_clipboard" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_save"
+        android:layout_marginBottom="12dp"
+        android:background="@color/border_secondary"
+        android:id="@+id/bottom_control_divider"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="bottom_control_divider,tv_save,tv_paste"
+        android:id="@+id/group_text_controls"
+        tools:visibility="visible"
+        android:visibility="gone"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        android:id="@+id/barrier_bottom_edt_note"
+        app:constraint_referenced_ids="bottom_control_divider"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

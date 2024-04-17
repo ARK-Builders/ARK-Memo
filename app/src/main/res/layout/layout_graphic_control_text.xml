@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tv_label"
+    style="@style/ActionTextView"
+    android:drawablePadding="8dp"
+    tools:text="@string/graphic_control_color"
+    android:textColor="@color/text_tertiary"
+    android:clickable="true"
+    app:drawableStartCompat="@drawable/ic_selected_brush_type" />

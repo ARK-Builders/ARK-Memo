@@ -2,6 +2,7 @@ package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,8 +10,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -21,24 +22,28 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
+import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesV2Binding
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
 import dev.arkbuilders.arkmemo.ui.views.WaveView
+import dev.arkbuilders.arkmemo.ui.views.toast
+import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
+import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
-class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
+class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
 
     private val activity by lazy { requireActivity() as MainActivity }
-    private val binding by viewBinding(FragmentEditNotesBinding::bind)
+    private val binding by viewBinding(FragmentEditNotesV2Binding::bind)
 
     private var shouldRecord = false
     private val audioRecordingPermissionLauncher =
@@ -55,6 +60,11 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
     private lateinit var tvDuration: TextView
     private lateinit var btnSave: ExtendedFloatingActionButton
     private lateinit var waveView: WaveView
+
+    private val defaultNoteTitle by lazy { getString(
+        R.string.ark_memo_voice_note,
+        LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+    ) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,12 +92,8 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
     }
 
     private fun initUI() {
-        val defaultTitle = getString(
-            R.string.ark_memo_voice_note,
-            LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-        )
         var title = ""
-        val etTitle = binding.noteTitle
+        val etTitle = binding.edtTitle
         val etTitleWatcher = object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -98,35 +104,70 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        binding.recorderViewBinding.recorderView.isVisible = true
+        binding.toolbar.ivBack.setOnClickListener {
+            showSaveNoteDialog()
+        }
+        binding.toolbar.ivRightActionIcon.setImageResource(R.drawable.ic_delete_note)
+
+        binding.layoutAudioRecord.root.visible()
         btnSave = binding.btnSave
-        ivRecord = binding.recorderViewBinding.ivRecord
-        ivPauseResume = binding.recorderViewBinding.ivPauseResume
-        tvDuration = binding.recorderViewBinding.tvDuration
+        ivRecord = binding.layoutAudioRecord.ivRecord
+        ivPauseResume = binding.layoutAudioRecord.ivPauseResume
+        tvDuration = binding.layoutAudioRecord.tvDuration
         waveView = binding.recorderViewBinding.waveView
 
         ivPauseResume.isEnabled = false
         btnSave.isEnabled = false
 
-        etTitle.hint = defaultTitle
+        etTitle.hint = defaultNoteTitle
         etTitle.addTextChangedListener(etTitleWatcher)
 
         ivRecord.setOnClickListener {
-            arkRecorderViewModel.onStartStopClick()
+            if (arkRecorderViewModel.isRecordExisting()) {
+                CommonActionDialog(title = R.string.dialog_replace_recording_title,
+                    message = R.string.dialog_replace_recording_message,
+                    positiveText = R.string.dialog_replace_recording_positive_text,
+                    negativeText = R.string.discard,
+                    onPositiveClick = {
+                        binding.layoutAudioView.root.gone()
+                        arkRecorderViewModel.onStartStopClick() },
+
+                    onNegativeClicked = {  }
+                ).show(parentFragmentManager, CommonActionDialog.TAG)
+            } else {
+                arkRecorderViewModel.onStartStopClick()
+            }
         }
 
         ivPauseResume.setOnClickListener {
             arkRecorderViewModel.onPauseResumeClick()
         }
 
+        binding.layoutAudioRecord.ivStartOver.setOnClickListener {
+            binding.layoutAudioRecord.tvDuration.setText(R.string.ark_memo_duration_default)
+            arkRecorderViewModel.onStartStopClick()
+        }
+
         btnSave.setOnClickListener {
+            saveNote()
+        }
+
+        binding.toolbar.ivRightActionIcon.setOnClickListener {
             val note = VoiceNote(
-                title = title.ifEmpty { defaultTitle },
+                title = title.ifEmpty { defaultNoteTitle },
                 path = arkRecorderViewModel.getRecordingPath()
             )
-            notesViewModel.onSaveClick(note) { show ->
-                activity.showProgressBar(show)
-            }
+            CommonActionDialog(title = R.string.delete_note,
+                message = R.string.ark_memo_delete_warn,
+                positiveText = R.string.action_delete,
+                negativeText = R.string.ark_memo_cancel,
+                isAlert = true,
+                onPositiveClick = {
+                notesViewModel.onDeleteConfirmed(note)
+                toast(requireContext(), getString(R.string.note_deleted))
+                activity.onBackPressedDispatcher.onBackPressed()
+            }, onNegativeClicked = {
+            }).show(parentFragmentManager, CommonActionDialog.TAG)
         }
     }
 
@@ -135,24 +176,43 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
             RecorderSideEffect.StartRecording -> {
                 val stopIcon = ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.ic_stop,
+                    R.drawable.ic_record_ongoing,
                     null
                 )
                 waveView.resetWave()
                 ivRecord.setImageDrawable(stopIcon)
+                ivRecord.backgroundTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(activity, R.color.warning_50)
+                )
                 ivPauseResume.isEnabled = true
                 btnSave.isEnabled = false
+                binding.layoutAudioRecord.animRecording.visible()
+                binding.layoutAudioRecord.animSoundWave.visible()
+                binding.layoutAudioRecord.ivPauseResume.visible()
+                binding.layoutAudioRecord.ivStartOver.visible()
+                binding.layoutAudioView.root.gone()
+                binding.layoutAudioRecord.tvRecordGuide.gone()
             }
             RecorderSideEffect.StopRecording -> {
                 val recordIcon = ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.ic_record,
+                    R.drawable.ic_record_big,
                     null
                 )
                 ivRecord.setImageDrawable(recordIcon)
+                ivRecord.backgroundTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(activity, R.color.warning)
+                )
                 ivPauseResume.isEnabled = false
                 btnSave.isEnabled = true
                 showPauseIcon()
+                binding.layoutAudioRecord.animRecording.gone()
+                binding.layoutAudioRecord.animSoundWave.gone()
+                binding.layoutAudioRecord.ivPauseResume.gone()
+                binding.layoutAudioRecord.ivStartOver.gone()
+                binding.layoutAudioView.root.visible()
+                binding.layoutAudioRecord.tvRecordGuide.visible()
+                binding.layoutAudioRecord.tvDuration.setText(R.string.ark_memo_duration_default)
             }
             RecorderSideEffect.PauseRecording -> {
                 val resumeIcon = ResourcesCompat.getDrawable(
@@ -180,6 +240,32 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
             null
         )
         ivPauseResume.setImageDrawable(pauseIcon)
+    }
+
+    private fun showSaveNoteDialog() {
+        val saveNoteDialog = CommonActionDialog(
+            title = R.string.dialog_save_note_title,
+            message = R.string.dialog_save_note_message,
+            positiveText = R.string.save,
+            negativeText = R.string.discard,
+            isAlert = false,
+            onPositiveClick = {
+                saveNote()
+            },
+            onNegativeClicked = {
+                activity.onBackPressedDispatcher.onBackPressed()
+            })
+        saveNoteDialog.show(parentFragmentManager, CommonActionDialog.TAG)
+    }
+
+    private fun saveNote() {
+        val note = VoiceNote(
+            title = binding.edtTitle.text.toString().ifEmpty { defaultNoteTitle },
+            path = arkRecorderViewModel.getRecordingPath()
+        )
+        notesViewModel.onSaveClick(note) { show ->
+            activity.showProgressBar(show)
+        }
     }
 
     companion object {

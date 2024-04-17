@@ -9,4 +9,31 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#FF757575</color>
     <color name="red">#EA0505</color>
+    <color name="yellow_700">#A15C07</color>
+
+    <!-- New UI -->
+    <color name="bg_primary">#FFFFFF</color>
+    <color name="fg_primary">#101828</color>
+    <color name="border_primary">#D0D5DD</color>
+    <color name="border_secondary">#EAECF0</color>
+    <color name="text_tertiary">#475467</color>
+    <color name="text_primary">#101828</color>
+    <color name="warning">#FEC84B</color>
+    <color name="warning_50">#FFFAEB</color>
+    <color name="warning_100">#FEF0C7</color>
+    <color name="warning_300">#FEC84B</color>
+    <color name="warning_700">#B54708</color>
+    <color name="text_secondary">#344054</color>
+    <color name="text_tag">#B54708</color>
+    <color name="bg_tag">#FFFAEB</color>
+    <color name="fg_secondary">#344054</color>
+    <color name="bg_error">#F04438</color>
+    <color name="brush_color_black">#101828</color>
+    <color name="brush_color_grey">#667085</color>
+    <color name="brush_color_red">#F04438</color>
+    <color name="brush_color_orange">#F79009</color>
+    <color name="brush_color_green">#17B26A</color>
+    <color name="brush_color_blue">#0BA5EC</color>
+    <color name="brush_color_purple">#7A5AF8</color>
+
 </resources>

@@ -11,7 +11,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
+import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 
 @AndroidEntryPoint
@@ -55,16 +57,15 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
                 data = s?.toString() ?: ""
             }
         }
-        val noteTitle = binding.noteTitle
+        val noteTitle = binding.edtTitle
         val editNote = binding.editNote
-        val btnSave = binding.btnSave
         val noteTitleChangeListener = object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 title = s?.toString() ?: ""
                 if (title.isEmpty()) {
-                    binding.noteTitle.hint = getString(R.string.hint_new_text_note)
+                    binding.edtTitle.hint = getString(R.string.hint_new_text_note)
                 }
             }
 
@@ -85,22 +86,66 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         if(noteStr != null)
             editNote.setText(noteStr)
 
-        btnSave.setOnClickListener {
-            val note = TextNote(
-                title = title,
-                description = binding.editTextDescription.text.toString(),
-                text = data,
-                resource = note.resource
-            )
-            notesViewModel.onSaveClick(note) { show ->
+        binding.tvSave.setOnClickListener {
+            notesViewModel.onSaveClick(createNewNote()) { show ->
                 activity.showProgressBar(show)
             }
         }
 
         binding.editTextDescription.setText(this.note.description)
+        binding.toolbar.ivBack.setOnClickListener {
+            showSaveNoteDialog()
+        }
+        binding.toolbar.ivRightActionIcon.setImageResource(R.drawable.ic_delete_note)
+        binding.toolbar.ivRightActionIcon.setOnClickListener {
+            showDeleteNoteDialog()
+        }
     }
+
+    private fun showSaveNoteDialog() {
+        val saveNoteDialog = CommonActionDialog(
+            title = R.string.dialog_save_note_title,
+            message = R.string.dialog_save_note_message,
+            positiveText = R.string.save,
+            negativeText = R.string.discard,
+            isAlert = false,
+            onPositiveClick = {
+                notesViewModel.onSaveClick(createNewNote()) { show ->
+                    activity.showProgressBar(show)
+                }
+            },
+            onNegativeClicked = {
+                activity.onBackPressedDispatcher.onBackPressed()
+            })
+        saveNoteDialog.show(parentFragmentManager, CommonActionDialog.TAG)
+    }
+
+    private fun showDeleteNoteDialog() {
+        CommonActionDialog(
+            title = R.string.delete_note,
+            message = R.string.ark_memo_delete_warn ,
+            positiveText = R.string.action_delete,
+            negativeText = R.string.ark_memo_cancel,
+            isAlert = true,
+            onPositiveClick = {
+            notesViewModel.onDeleteConfirmed(note)
+            activity.onBackPressedDispatcher.onBackPressed()
+            toast(requireContext(), getString(R.string.note_deleted))
+        }, onNegativeClicked = {
+        }).show(parentFragmentManager, CommonActionDialog.TAG)
+    }
+
+    private fun createNewNote(): TextNote {
+        return TextNote(
+            title = binding.edtTitle.text.toString(),
+            description = binding.editTextDescription.text.toString(),
+            text = binding.editNote.text.toString(),
+            resource = note.resource
+        )
+    }
+
     companion object{
-        const val TAG = "Edit Text Notes"
+        const val TAG = "EditTextNotesFragment"
         private const val NOTE_STRING_KEY = "note string"
         private const val NOTE_KEY = "note key"
 

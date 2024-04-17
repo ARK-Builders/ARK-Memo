@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ARK Memo</string>
+    <string name="app_author">ARK Builders</string>
+    <string name="app_copyright">Copyright ©2024</string>
     <string name="app_name_debug">ARK Memo [Debug]</string>
     <string name="crash_dialog_desc">Sorry, the application crashed. Please send a report to the developers.</string>
     <string name="crash_dialog_title">Crash</string>
@@ -17,14 +19,14 @@
     <string name="your_notes">Your notes</string>
     <string name="save">Save</string>
     <string name="edit_note">Edit note</string>
-    <string name="delete">Delete note</string>
+    <string name="delete_note">Delete note</string>
     <string name="note_deleted">Note deleted successfully</string>
     <string name="start_text_note">Start editing your text note here</string>
     <string name="paste">Paste</string>
     <string name="nothing_to_paste">Nothing to paste</string>
     <string name="ark_memo_ok">OK</string>
     <string name="ark_memo_cancel">Cancel</string>
-    <string name="ark_memo_delete_warn">Are you sure to delete note?</string>
+    <string name="ark_memo_delete_warn">Are you sure you want to delete this note? This action cannot be undone.</string>
     <string name="ark_memo_note_existing">Note already exists</string>
     <string name="ark_memo_note_saved">Note saved successfully</string>
     <string name="note_title">Title</string>
@@ -41,5 +43,38 @@
     <string name="hint_new_text_note">New text note</string>
     <string name="hint_new_graphical_note">New graphical note</string>
     <string name="hint_new_note_description">Put description for this note</string>
+
+    <!-- New UI design -->
+    <string name="ark_memo_no_notes_instructions">Tap "+" to create your first memo.\nCapture ideas, tasks, and notes all in one place.</string>
+    <string name="ark_memo_no_notes_header">Empty Here, But Full of Possibilities!</string>
+    <string name="ark_memo_new_memo">New Memo</string>
+    <string name="ark_memo_paste">Paste</string>
+    <string name="ark_memo_done">Done</string>
+    <string name="ark_memo_notes_title_pinned">Pinned</string>
+    <string name="ark_memo_notes_title_recent">Recent</string>
+    <string name="ark_memo_search">Search</string>
+    <string name="photo_and_video">Photo &amp; Video</string>
+    <string name="fab_create_drawing_text">Drawing</string>
+    <string name="fab_attach_file">Attach File</string>
+    <string name="fab_record_voice">Record Voice</string>
+    <string name="fab_simple_memo">Simple Memo</string>
+    <string name="light_mode">Light Mode</string>
+    <string name="terms_of_service">Terms of service</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="support">Support</string>
+    <string name="dialog_save_note_title">Save changes</string>
+    <string name="dialog_save_note_message">Are you sure you want to leave without saving your changes?</string>
+    <string name="discard">Discard</string>
+    <string name="ark_memo_default_text_note_title">Untitled</string>
+    <string name="action_delete">Delete</string>
+    <string name="dialog_replace_recording_title">Are you sure</string>
+    <string name="dialog_replace_recording_message">Are you sure you want to replace the recording with a new one?</string>
+    <string name="dialog_replace_recording_positive_text">Replace</string>
+    <string name="graphic_control_brush">Brush</string>
+    <string name="graphic_control_eraser">Eraser</string>
+    <string name="graphic_control_color">Color</string>
+    <string name="brush_size_label">Size</string>
+    <string name="audio_record_guide_text">Tap “microphone button” to \nreplace with a new one</string>
 
 </resources>

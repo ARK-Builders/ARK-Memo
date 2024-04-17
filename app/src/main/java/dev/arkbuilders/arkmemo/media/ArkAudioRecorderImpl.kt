@@ -53,7 +53,7 @@ class ArkAudioRecorderImpl @Inject constructor(
         recorder = null
     }
 
-    override fun maxAmplitude(): Int = recorder?.maxAmplitude!!
+    override fun maxAmplitude(): Int = recorder?.maxAmplitude ?: 0
 
     override fun getRecording(): Path = tempFile.toPath()
 }

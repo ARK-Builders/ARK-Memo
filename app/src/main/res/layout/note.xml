@@ -61,7 +61,7 @@
             android:layout_height="50dp"
             android:layout_margin="5dp"
             android:background="@null"
-            android:contentDescription="@string/delete"
+            android:contentDescription="@string/delete_note"
             android:src="@drawable/delete" />
     </androidx.appcompat.widget.LinearLayoutCompat>
     <View

@@ -103,4 +103,6 @@ dependencies {
     implementation 'ch.acra:acra-http:5.9.6'
     implementation 'ch.acra:acra-dialog:5.9.6'
     implementation 'com.simplemobiletools:commons:5.29.20'
+
+    implementation 'com.airbnb.android:lottie:6.4.0'
 }
