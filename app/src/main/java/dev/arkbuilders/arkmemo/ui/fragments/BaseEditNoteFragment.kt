@@ -1,17 +1,27 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesV2Binding
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
 
-open class BaseEditNoteFragment: Fragment(R.layout.fragment_edit_notes_v2) {
+open class BaseEditNoteFragment: Fragment() {
 
-    val binding by viewBinding(FragmentEditNotesV2Binding::bind)
+    lateinit var binding: FragmentEditNotesV2Binding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentEditNotesV2Binding.inflate(layoutInflater)
+        return binding.root
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

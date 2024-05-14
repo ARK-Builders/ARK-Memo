@@ -19,13 +19,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesV2Binding
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
@@ -54,11 +56,11 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
 
     private val notesViewModel: NotesViewModel by activityViewModels()
     private val arkRecorderViewModel: ArkRecorderViewModel by viewModels()
+    private val mediaPlayViewModel: ArkMediaPlayerViewModel by viewModels()
 
     private lateinit var ivRecord: ImageView
     private lateinit var ivPauseResume: ImageView
     private lateinit var tvDuration: TextView
-    private lateinit var btnSave: ExtendedFloatingActionButton
     private lateinit var waveView: WaveView
 
     private val defaultNoteTitle by lazy { getString(
@@ -77,7 +79,9 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.CREATED) {
                     arkRecorderViewModel.collect(
-                        stateToUI = { showState(it) },
+                        stateToUI = {
+                            showState(it)
+                        },
                         handleSideEffect = { handleSideEffect(it) }
                     )
                 }
@@ -89,6 +93,7 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initUI()
+        observeViewModel()
     }
 
     private fun initUI() {
@@ -110,14 +115,13 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
         binding.toolbar.ivRightActionIcon.setImageResource(R.drawable.ic_delete_note)
 
         binding.layoutAudioRecord.root.visible()
-        btnSave = binding.btnSave
         ivRecord = binding.layoutAudioRecord.ivRecord
         ivPauseResume = binding.layoutAudioRecord.ivPauseResume
         tvDuration = binding.layoutAudioRecord.tvDuration
         waveView = binding.recorderViewBinding.waveView
 
         ivPauseResume.isEnabled = false
-        btnSave.isEnabled = false
+        binding.layoutAudioRecord.tvSaveRecording.isEnabled = false
 
         etTitle.hint = defaultNoteTitle
         etTitle.addTextChangedListener(etTitleWatcher)
@@ -144,11 +148,16 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
         }
 
         binding.layoutAudioRecord.ivStartOver.setOnClickListener {
-            binding.layoutAudioRecord.tvDuration.setText(R.string.ark_memo_duration_default)
-            arkRecorderViewModel.onStartStopClick()
+            arkRecorderViewModel.onStartOverClick()
         }
 
-        btnSave.setOnClickListener {
+        binding.layoutAudioView.ivPlayAudio.setOnClickListener {
+            val recordingPath = arkRecorderViewModel.getRecordingPath().toString()
+            mediaPlayViewModel.initPlayer(recordingPath)
+            mediaPlayViewModel.onPlayOrPauseClick(recordingPath)
+        }
+
+        binding.layoutAudioRecord.tvSaveRecording.setOnClickListener {
             saveNote()
         }
 
@@ -185,7 +194,7 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
                     ContextCompat.getColor(activity, R.color.warning_50)
                 )
                 ivPauseResume.isEnabled = true
-                btnSave.isEnabled = false
+                binding.layoutAudioRecord.tvSaveRecording.isEnabled = false
                 binding.layoutAudioRecord.animRecording.visible()
                 binding.layoutAudioRecord.animSoundWave.visible()
                 binding.layoutAudioRecord.ivPauseResume.visible()
@@ -193,7 +202,7 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
                 binding.layoutAudioView.root.gone()
                 binding.layoutAudioRecord.tvRecordGuide.gone()
             }
-            RecorderSideEffect.StopRecording -> {
+            is RecorderSideEffect.StopRecording -> {
                 val recordIcon = ResourcesCompat.getDrawable(
                     resources,
                     R.drawable.ic_record_big,
@@ -204,13 +213,14 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
                     ContextCompat.getColor(activity, R.color.warning)
                 )
                 ivPauseResume.isEnabled = false
-                btnSave.isEnabled = true
+                binding.layoutAudioRecord.tvSaveRecording.isEnabled = true
                 showPauseIcon()
                 binding.layoutAudioRecord.animRecording.gone()
                 binding.layoutAudioRecord.animSoundWave.gone()
                 binding.layoutAudioRecord.ivPauseResume.gone()
                 binding.layoutAudioRecord.ivStartOver.gone()
                 binding.layoutAudioView.root.visible()
+                binding.layoutAudioView.tvDuration.text = effect.duration
                 binding.layoutAudioRecord.tvRecordGuide.visible()
                 binding.layoutAudioRecord.tvDuration.setText(R.string.ark_memo_duration_default)
             }
@@ -228,9 +238,30 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
         }
     }
 
+    private fun handlePlaySideEffect(effect: ArkMediaPlayerSideEffect) {
+        when (effect) {
+            ArkMediaPlayerSideEffect.StartPlaying -> {
+                binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
+            }
+            ArkMediaPlayerSideEffect.StopPlaying -> {
+                binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
+            }
+            ArkMediaPlayerSideEffect.PausePlaying -> {
+                binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
+            }
+            ArkMediaPlayerSideEffect.ResumePlaying -> {
+                binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
+            }
+        }
+    }
+
     private fun showState(state: RecorderState) {
         tvDuration.text = state.progress
         waveView.invalidateWave(state.maxAmplitude)
+    }
+
+    private fun showPlayState(state: ArkMediaPlayerState) {
+        binding.layoutAudioView.tvDuration.text = state.duration
     }
 
     private fun showPauseIcon() {
@@ -265,6 +296,17 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
         )
         notesViewModel.onSaveClick(note) { show ->
             activity.showProgressBar(show)
+        }
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mediaPlayViewModel.collect(
+                    stateToUI = { showPlayState(it) },
+                    handleSideEffect = { handlePlaySideEffect(it) }
+                )
+            }
         }
     }
 

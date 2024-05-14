@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
@@ -14,7 +15,9 @@ import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
+import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
+import java.lang.StringBuilder
 
 @AndroidEntryPoint
 class EditTextNotesFragment: BaseEditNoteFragment() {
@@ -27,6 +30,17 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
     private var note = TextNote()
     private var noteStr: String? = null
+
+    private val pasteNoteClickListener = View.OnClickListener {
+        val clipBoardText = requireContext().getTextFromClipBoard()
+        if (clipBoardText != null) {
+            val newTextBuilder = StringBuilder()
+            newTextBuilder.append(binding.editNote.text.toString()).append(clipBoardText)
+            binding.editNote.setText(newTextBuilder.toString())
+            binding.editNote.setSelection(binding.editNote.text.length)
+        }
+        else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +106,8 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
             }
         }
 
+        binding.tvPaste.setOnClickListener(pasteNoteClickListener)
+
         binding.editTextDescription.setText(this.note.description)
         binding.toolbar.ivBack.setOnClickListener {
             showSaveNoteDialog()
@@ -100,6 +116,11 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         binding.toolbar.ivRightActionIcon.setOnClickListener {
             showDeleteNoteDialog()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        observeClipboardContent()
     }
 
     private fun showSaveNoteDialog() {
@@ -142,6 +163,16 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
             text = binding.editNote.text.toString(),
             resource = note.resource
         )
+    }
+
+    private fun observeClipboardContent() {
+        context?.getTextFromClipBoard()?.let {
+            binding.tvPaste.alpha = 1f
+            binding.tvPaste.isClickable = true
+        } ?: let {
+            binding.tvPaste.alpha = 0.4f
+            binding.tvPaste.isClickable = false
+        }
     }
 
     companion object{

@@ -17,7 +17,7 @@ import kotlin.concurrent.timer
 sealed class RecorderSideEffect {
     object StartRecording: RecorderSideEffect()
 
-    object StopRecording: RecorderSideEffect()
+    data class StopRecording(val duration: String) : RecorderSideEffect()
 
     object PauseRecording: RecorderSideEffect()
 
@@ -58,6 +58,10 @@ class ArkRecorderViewModel @Inject constructor(
         } else {
             onPauseRecordingClick()
         }
+    }
+
+    fun onStartOverClick() {
+        onStartOverRecordingClick()
     }
 
     fun collect(
@@ -104,9 +108,22 @@ class ArkRecorderViewModel @Inject constructor(
             arkAudioRecorder.stop()
             isRecording.value = false
             if (isPaused.value) isPaused.value = false
+            val lastDuration = duration
             duration = 0
             stopTimer()
-            recorderSideEffect.value = RecorderSideEffect.StopRecording
+            recorderSideEffect.value = RecorderSideEffect.StopRecording(duration = tenthSecondsToString(lastDuration))
+        }
+    }
+
+    private fun onStartOverRecordingClick() {
+        viewModelScope.launch {
+            arkAudioRecorder.stop()
+            duration = 0
+            stopTimer()
+
+            arkAudioRecorder.init()
+            arkAudioRecorder.start()
+            startTimer()
         }
     }
 
