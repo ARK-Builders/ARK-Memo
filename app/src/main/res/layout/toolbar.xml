@@ -50,7 +50,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:padding="@dimen/note_action_menu_padding"
-        android:src="@drawable/ic_pin"
+        android:src="@drawable/ic_delete_note"
         app:layout_constraintBottom_toBottomOf="@+id/iv_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/iv_back" />

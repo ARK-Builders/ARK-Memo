@@ -1,14 +1,7 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.SeekBar
-import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -21,7 +14,10 @@ import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
+import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.launch
+import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -34,17 +30,7 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
 
     private val arkMediaPlayerViewModel: ArkMediaPlayerViewModel by viewModels()
 
-    private lateinit var seekBar: SeekBar
-    private lateinit var ivPlayPause: ImageView
-    private lateinit var tvDuration: TextView
-    private lateinit var etTitle: EditText
-
     private lateinit var note: VoiceNote
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arkMediaPlayerViewModel.initPlayer(note.path.toString())
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,40 +44,28 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
             R.string.ark_memo_voice_note,
             LocalDate.now().format(DateTimeFormatter.ISO_DATE)
         )
-        var title = note.title
-        val textWatcher = object: TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        binding.edtTitle.hint = defaultTitle
+        binding.edtTitle.setText(note.title)
 
-            override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                title = s?.toString() ?: defaultTitle
-            }
-
-            override fun afterTextChanged(p0: Editable?) {}
-
-        }
-        val seekBarChangeListener = object: OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, isFromUser: Boolean) {
-                if (isFromUser) arkMediaPlayerViewModel.onSeekTo(progress)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+        if (File(note.path.toString()).exists()) {
+            binding.layoutAudioView.root.visible()
+            binding.layoutAudioView.tvDuration.text = note.duration
+        } else {
+            binding.layoutAudioView.root.gone()
         }
 
-        etTitle.hint = defaultTitle
-        etTitle.setText(title)
-        etTitle.addTextChangedListener(textWatcher)
-        ivPlayPause.setOnClickListener {
-            arkMediaPlayerViewModel.onPlayOrPauseClick(note.path.toString())
+        binding.layoutAudioView.ivPlayAudio.setOnClickListener {
+            val recordingPath = note.path.toString()
+            arkMediaPlayerViewModel.initPlayer(recordingPath)
+            arkMediaPlayerViewModel.onPlayOrPauseClick(recordingPath)
         }
-        seekBar.setOnSeekBarChangeListener(seekBarChangeListener)
+
+        binding.layoutAudioRecord.root.gone()
 
     }
 
     private fun showState(state: ArkMediaPlayerState) {
-        seekBar.progress = state.progress.toInt()
-        tvDuration.text = state.duration
+        binding.layoutAudioView.tvDuration.text = state.duration
     }
 
     private fun handleSideEffect(effect: ArkMediaPlayerSideEffect) {
@@ -129,19 +103,19 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
     private fun showPlayIcon() {
         val playIcon = ResourcesCompat.getDrawable(
             activity.resources,
-            R.drawable.ic_play,
+            R.drawable.ic_play_circle,
             null
         )
-        ivPlayPause.setImageDrawable(playIcon)
+        binding.layoutAudioView.ivPlayAudio.setImageDrawable(playIcon)
     }
 
     private fun showPauseIcon() {
         val playIcon = ResourcesCompat.getDrawable(
             activity.resources,
-            R.drawable.ic_pause,
+            R.drawable.ic_pause_circle,
             null
         )
-        ivPlayPause.setImageDrawable(playIcon)
+        binding.layoutAudioView.ivPlayAudio.setImageDrawable(playIcon)
     }
 
     companion object {
