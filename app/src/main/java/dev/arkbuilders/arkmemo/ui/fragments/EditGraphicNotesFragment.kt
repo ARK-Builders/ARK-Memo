@@ -6,14 +6,12 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.GraphicNote
-import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
-import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.visible
@@ -21,12 +19,7 @@ import dev.arkbuilders.arkmemo.utils.visible
 @AndroidEntryPoint
 class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
-    private val activity by lazy {
-        requireActivity() as MainActivity
-    }
-
     private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
-    private val notesViewModel: NotesViewModel by activityViewModels()
 
     private var note = GraphicNote()
 
@@ -67,9 +60,9 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
         }
 
-        activity.title = getString(R.string.edit_note)
-        activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        activity.showSettingsButton(false)
+        hostActivity.title = getString(R.string.edit_note)
+        hostActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        hostActivity.showSettingsButton(false)
 
         noteTitle.hint = getString(R.string.hint_new_graphical_note)
         noteTitle.setText(title)
@@ -77,21 +70,25 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         notesCanvas.isVisible = true
         notesCanvas.setViewModel(graphicNotesViewModel)
         btnSave.setOnClickListener {
-            val svg = graphicNotesViewModel.svg()
-            val note = GraphicNote(
-                title = binding.edtTitle.text.toString(),
-                svg = svg,
-                description = binding.editTextDescription.text.toString(),
-                resource = note.resource
-            )
+            val note = createNewNote()
             notesViewModel.onSaveClick(note) { show ->
-                activity.showProgressBar(show)
+                hostActivity.showProgressBar(show)
             }
         }
 
+        binding.tvLastModified.gone()
         binding.editTextDescription.setText(this.note.description)
         initBottomControls()
 
+    }
+
+    override fun createNewNote(): Note {
+        return GraphicNote(
+            title = binding.edtTitle.text.toString(),
+            svg = graphicNotesViewModel.svg(),
+            description = binding.editTextDescription.text.toString(),
+            resource = note.resource
+        )
     }
 
     private fun initBottomControls() {
@@ -137,7 +134,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
     override fun onResume() {
         super.onResume()
-        activity.fragment = this
+        hostActivity.fragment = this
     }
 
     companion object {

@@ -37,7 +37,7 @@
         android:inputType="text"
         android:layout_marginHorizontal="@dimen/common_padding"
         android:layout_marginTop="4dp"
-        android:textColorHint="@color/text_primary"
+        android:textColorHint="@color/gray_400"
         android:textSize="24sp"
         android:textStyle="bold" />
 

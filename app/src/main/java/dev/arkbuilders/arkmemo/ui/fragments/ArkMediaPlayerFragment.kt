@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
@@ -39,7 +40,16 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
         observeViewModel()
     }
 
+    override fun createNewNote(): Note {
+        return note
+    }
+
     private fun initUI() {
+
+        binding.toolbar.ivRightActionIcon.setOnClickListener {
+            showDeleteNoteDialog(note)
+        }
+
         val defaultTitle = getString(
             R.string.ark_memo_voice_note,
             LocalDate.now().format(DateTimeFormatter.ISO_DATE)
