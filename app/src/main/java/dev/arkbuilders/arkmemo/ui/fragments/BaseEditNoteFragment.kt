@@ -5,14 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesV2Binding
+import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
+import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
+import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
 
-open class BaseEditNoteFragment: Fragment() {
+abstract class BaseEditNoteFragment: Fragment() {
 
     lateinit var binding: FragmentEditNotesV2Binding
+    val notesViewModel: NotesViewModel by activityViewModels()
+    val hostActivity by lazy { activity as MainActivity }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,4 +79,39 @@ open class BaseEditNoteFragment: Fragment() {
             binding.toolbar.ivRightActionIcon.visible()
         }
     }
+
+    fun showSaveNoteDialog() {
+        val saveNoteDialog = CommonActionDialog(
+            title = R.string.dialog_save_note_title,
+            message = R.string.dialog_save_note_message,
+            positiveText = R.string.save,
+            negativeText = R.string.discard,
+            isAlert = false,
+            onPositiveClick = {
+                notesViewModel.onSaveClick(createNewNote()) { show ->
+                    hostActivity.showProgressBar(show)
+                }
+            },
+            onNegativeClicked = {
+                hostActivity.onBackPressedDispatcher.onBackPressed()
+            })
+        saveNoteDialog.show(parentFragmentManager, CommonActionDialog.TAG)
+    }
+
+    fun showDeleteNoteDialog(note: Note) {
+        CommonActionDialog(
+            title = R.string.delete_note,
+            message = R.string.ark_memo_delete_warn ,
+            positiveText = R.string.action_delete,
+            negativeText = R.string.ark_memo_cancel,
+            isAlert = true,
+            onPositiveClick = {
+                notesViewModel.onDeleteConfirmed(note)
+                hostActivity.onBackPressedDispatcher.onBackPressed()
+                toast(requireContext(), getString(R.string.note_deleted))
+            }, onNegativeClicked = {
+            }).show(parentFragmentManager, CommonActionDialog.TAG)
+    }
+
+    abstract fun createNewNote(): Note
 }

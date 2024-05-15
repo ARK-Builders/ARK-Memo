@@ -7,26 +7,16 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
-import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
-import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
-import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import java.lang.StringBuilder
 
 @AndroidEntryPoint
 class EditTextNotesFragment: BaseEditNoteFragment() {
-
-    private val activity: MainActivity by lazy{
-        requireActivity() as MainActivity
-    }
-
-    private val notesViewModel: NotesViewModel by activityViewModels()
 
     private var note = TextNote()
     private var noteStr: String? = null
@@ -60,17 +50,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var title = this.note.title
-        var data = note.text
-        val editTextListener = object: TextWatcher{
-            override fun afterTextChanged(s: Editable?) = Unit
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                data = s?.toString() ?: ""
-            }
-        }
+        var title: String
         val noteTitle = binding.edtTitle
         val editNote = binding.editNote
         val noteTitleChangeListener = object: TextWatcher {
@@ -86,15 +66,14 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        activity.title = getString(R.string.edit_note)
-        activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        activity.showSettingsButton(false)
+        hostActivity.title = getString(R.string.edit_note)
+        hostActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        hostActivity.showSettingsButton(false)
 
         noteTitle.setText(this.note.title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
         editNote.isVisible = true
         editNote.requestFocus()
-        editNote.addTextChangedListener(editTextListener)
         editNote.setText(this.note.text)
 
         if(noteStr != null)
@@ -102,7 +81,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
         binding.tvSave.setOnClickListener {
             notesViewModel.onSaveClick(createNewNote()) { show ->
-                activity.showProgressBar(show)
+                hostActivity.showProgressBar(show)
             }
         }
 
@@ -110,12 +89,21 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
         binding.editTextDescription.setText(this.note.description)
         binding.toolbar.ivBack.setOnClickListener {
-            showSaveNoteDialog()
+            if (isContentChanged()) {
+                showSaveNoteDialog()
+            } else {
+                hostActivity.onBackPressedDispatcher.onBackPressed()
+            }
         }
         binding.toolbar.ivRightActionIcon.setImageResource(R.drawable.ic_delete_note)
         binding.toolbar.ivRightActionIcon.setOnClickListener {
-            showDeleteNoteDialog()
+            showDeleteNoteDialog(note)
         }
+    }
+
+    private fun isContentChanged(): Boolean {
+        return note.title != binding.edtTitle.text.toString()
+                || note.text != binding.editNote.text.toString()
     }
 
     override fun onResume() {
@@ -123,40 +111,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         observeClipboardContent()
     }
 
-    private fun showSaveNoteDialog() {
-        val saveNoteDialog = CommonActionDialog(
-            title = R.string.dialog_save_note_title,
-            message = R.string.dialog_save_note_message,
-            positiveText = R.string.save,
-            negativeText = R.string.discard,
-            isAlert = false,
-            onPositiveClick = {
-                notesViewModel.onSaveClick(createNewNote()) { show ->
-                    activity.showProgressBar(show)
-                }
-            },
-            onNegativeClicked = {
-                activity.onBackPressedDispatcher.onBackPressed()
-            })
-        saveNoteDialog.show(parentFragmentManager, CommonActionDialog.TAG)
-    }
-
-    private fun showDeleteNoteDialog() {
-        CommonActionDialog(
-            title = R.string.delete_note,
-            message = R.string.ark_memo_delete_warn ,
-            positiveText = R.string.action_delete,
-            negativeText = R.string.ark_memo_cancel,
-            isAlert = true,
-            onPositiveClick = {
-            notesViewModel.onDeleteConfirmed(note)
-            activity.onBackPressedDispatcher.onBackPressed()
-            toast(requireContext(), getString(R.string.note_deleted))
-        }, onNegativeClicked = {
-        }).show(parentFragmentManager, CommonActionDialog.TAG)
-    }
-
-    private fun createNewNote(): TextNote {
+    override fun createNewNote(): Note {
         return TextNote(
             title = binding.edtTitle.text.toString(),
             description = binding.editTextDescription.text.toString(),
