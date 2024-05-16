@@ -90,7 +90,7 @@ class NotesFragment: Fragment() {
             }, onCloseClicked = {
                     noteToDelete.pendingForDelete = false
                     binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
-            }).show(parentFragmentManager, CommonActionDialog.TAG)
+            }).show(childFragmentManager, CommonActionDialog.TAG)
         }
 
     }

@@ -17,7 +17,8 @@
         android:src="@drawable/ic_chevron_left"
         app:layout_constraintBottom_toTopOf="@+id/toolbar_divider"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/content_desc_back_button"/>
 
     <TextView
         android:id="@+id/tv_title"
@@ -53,7 +54,8 @@
         android:src="@drawable/ic_delete_note"
         app:layout_constraintBottom_toBottomOf="@+id/iv_back"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/iv_back" />
+        app:layout_constraintTop_toTopOf="@+id/iv_back"
+        android:contentDescription="@string/delete"/>
 
     <TextView
         android:id="@+id/tv_right_action_text"

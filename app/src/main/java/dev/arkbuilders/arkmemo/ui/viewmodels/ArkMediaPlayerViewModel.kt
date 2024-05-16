@@ -1,6 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.util.Log
+import android.media.MediaMetadataRetriever
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 sealed class ArkMediaPlayerSideEffect {
@@ -50,6 +51,10 @@ class ArkMediaPlayerViewModel @Inject constructor(
                 )
             }
         )
+    }
+
+    fun setPath(path: String) {
+        currentPlayingVoiceNotePath = path
     }
 
     fun onPlayOrPauseClick(path: String) {
@@ -123,5 +128,18 @@ class ArkMediaPlayerViewModel @Inject constructor(
     private fun onPauseClick() {
         arkMediaPlayer.pause()
         arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.PausePlaying
+    }
+
+    fun getDurationMillis(onSuccess: (duration: Long) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val metadataRetriever = MediaMetadataRetriever()
+            metadataRetriever.setDataSource(currentPlayingVoiceNotePath)
+            val duration = metadataRetriever.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_DURATION
+            )?.toLong() ?: 0L
+            withContext(Dispatchers.Main) {
+                onSuccess.invoke(duration)
+            }
+        }
     }
 }

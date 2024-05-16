@@ -16,6 +16,7 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.launch
 import java.io.File
@@ -58,8 +59,12 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
         binding.edtTitle.setText(note.title)
 
         if (File(note.path.toString()).exists()) {
+            arkMediaPlayerViewModel.setPath(note.path.toString())
             binding.layoutAudioView.root.visible()
-            binding.layoutAudioView.tvDuration.text = note.duration
+            arkMediaPlayerViewModel.getDurationMillis { duration ->
+                binding.layoutAudioView.tvDuration.text = millisToString(duration)
+            }
+
         } else {
             binding.layoutAudioView.root.gone()
         }
@@ -82,15 +87,19 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
         when (effect) {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 showPauseIcon()
+                binding.layoutAudioView.animAudioPlaying.playAnimation()
             }
             ArkMediaPlayerSideEffect.StopPlaying -> {
                 showPlayIcon()
+                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
             }
             ArkMediaPlayerSideEffect.PausePlaying -> {
                 showPlayIcon()
+                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
             }
             ArkMediaPlayerSideEffect.ResumePlaying -> {
                 showPauseIcon()
+                binding.layoutAudioView.animAudioPlaying.playAnimation()
             }
         }
     }

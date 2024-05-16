@@ -242,15 +242,19 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
         when (effect) {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
+                binding.layoutAudioView.animAudioPlaying.playAnimation()
             }
             ArkMediaPlayerSideEffect.StopPlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
+                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
             }
             ArkMediaPlayerSideEffect.PausePlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
+                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
             }
             ArkMediaPlayerSideEffect.ResumePlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
+                binding.layoutAudioView.animAudioPlaying.playAnimation()
             }
         }
     }
