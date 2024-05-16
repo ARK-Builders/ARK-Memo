@@ -76,5 +76,6 @@
     <string name="graphic_control_color">Color</string>
     <string name="brush_size_label">Size</string>
     <string name="audio_record_guide_text">Tap “microphone button” to \nreplace with a new one</string>
+    <string name="content_desc_back_button">Back</string>
 
 </resources>

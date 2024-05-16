@@ -1,8 +1,9 @@
 package dev.arkbuilders.arkmemo.ui.dialogs
 
-import android.app.Dialog
 import android.os.Bundle
-import android.view.WindowManager
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
 import dev.arkbuilders.arkmemo.R
@@ -25,23 +26,26 @@ class CommonActionDialog(@StringRes private val title: Int,
         val TAG = CommonActionDialog::class.java.name
     }
     private lateinit var mBinding: DialogCommonActionBinding
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        mBinding = DialogCommonActionBinding.inflate(layoutInflater)
-        val dialog = Dialog(requireContext(), R.style.MemoDialog)
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialog.setContentView(mBinding.root)
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        mBinding = DialogCommonActionBinding.inflate(inflater)
+        initViews()
+        return mBinding.root
+    }
+
+    private fun initViews() {
+
+        dialog?.setCanceledOnTouchOutside(false)
+
         if (isAlert) {
             mBinding.tvPositive.setTextAppearance(R.style.AlertButton)
             mBinding.tvPositive.setBackgroundResource(R.drawable.bg_red_button)
         }
-        initViews()
-        return dialog
-    }
 
-    private fun initViews() {
         mBinding.tvTitle.setText(title)
         mBinding.tvMessage.setText(message)
         mBinding.tvPositive.setText(positiveText)
@@ -60,6 +64,12 @@ class CommonActionDialog(@StringRes private val title: Int,
             onNegativeClicked?.invoke()
             dismiss()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
 }
