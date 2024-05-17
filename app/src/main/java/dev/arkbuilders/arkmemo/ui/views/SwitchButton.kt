@@ -69,67 +69,67 @@ class SwitchButton : View, Checkable {
         uncheckCircleColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_uncheckcircle_color,
-            -0x555556
-        ) //0XffAAAAAA;
+            R.color.sb_unchecked_circle_color
+        )
         uncheckCircleWidth = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_uncheckcircle_width,
             dp2pxInt(1.5f)
-        ) //dp2pxInt(1.5f);
+        )
         uncheckCircleOffsetX = 10f.dp2Px()
         uncheckCircleRadius = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_uncheckcircle_radius,
             4f.dp2Px()
-        ) //dp2px(4);
+        )
         checkedLineOffsetX = 4f.dp2Px()
         checkedLineOffsetY = 4f.dp2Px()
         shadowRadius = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_shadow_radius,
             dp2pxInt(2.5f)
-        ) //dp2pxInt(2.5f);
+        )
         shadowOffset = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_shadow_offset,
             dp2pxInt(1.5f)
-        ) //dp2pxInt(1.5f);
+        )
         shadowColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_shadow_color,
-            0X33000000
-        ) //0X33000000;
+            R.color.sb_shadow_color
+        )
         uncheckColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_uncheck_color,
-            -0x222223
-        ) //0XffDDDDDD;
+            R.color.sb_unchecked_color
+        )
         checkedColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_checked_color,
-            -0xae2c99
-        ) //0Xff51d367;
+            R.color.sb_checked_color
+        )
         borderWidth = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_border_width,
             dp2pxInt(1f)
-        ) //dp2pxInt(1);
+        )
         checkLineColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_checkline_color,
             Color.WHITE
-        ) //Color.WHITE;
+        )
         checkLineWidth = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_checkline_width,
             dp2pxInt(1f)
-        ) //dp2pxInt(1.0f);
+        )
         checkLineLength = 6f.dp2Px()
         val buttonColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_button_color,
             Color.WHITE
-        ) //Color.WHITE;
+        )
         uncheckButtonColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_uncheckbutton_color,
@@ -144,7 +144,7 @@ class SwitchButton : View, Checkable {
             typedArray,
             R.styleable.SwitchButton_sb_effect_duration,
             300
-        ) //300;
+        )
         isChecked = optBoolean(
             typedArray,
             R.styleable.SwitchButton_sb_checked,
@@ -159,7 +159,7 @@ class SwitchButton : View, Checkable {
             typedArray,
             R.styleable.SwitchButton_sb_background,
             Color.WHITE
-        ) //Color.WHITE;
+        )
         enableEffect = optBoolean(
             typedArray,
             R.styleable.SwitchButton_sb_enable_effect,
@@ -819,7 +819,7 @@ class SwitchButton : View, Checkable {
         override fun onAnimationRepeat(animation: Animator) {}
     }
 
-    private class ViewState() {
+    private class ViewState {
         var buttonX = 0f
         var checkStateColor = 0
         var checkedLineColor = 0

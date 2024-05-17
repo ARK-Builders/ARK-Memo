@@ -61,9 +61,9 @@ class NotesListAdapter(
         if (note is TextNote) {
             holder.contentPreview.text = note.text
         }
-        holder.layoutAudioView.isVisible = false
+        holder.layoutAudioView.root.isVisible = false
         if (note is VoiceNote) {
-            holder.layoutAudioView.isVisible = true
+            holder.layoutAudioView.root.isVisible = true
             holder.btnPlayPause.setOnClickListener {
                 onPlayPauseClick(note.path.toString())
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
@@ -105,7 +105,7 @@ class NotesListAdapter(
     private fun showPlayIcon(holder: NoteViewHolder) {
         val playIcon = ResourcesCompat.getDrawable(
             activity.resources,
-            R.drawable.ic_play,
+            R.drawable.ic_play_circle,
             null
         )
         holder.btnPlayPause.setImageDrawable(playIcon)
@@ -114,7 +114,7 @@ class NotesListAdapter(
     private fun showPauseIcon(holder: NoteViewHolder) {
         val playIcon = ResourcesCompat.getDrawable(
             activity.resources,
-            R.drawable.ic_pause,
+            R.drawable.ic_pause_circle,
             null
         )
         holder.btnPlayPause.setImageDrawable(playIcon)
@@ -127,7 +127,7 @@ class NotesListAdapter(
 
         val title = binding.tvTitle
         val contentPreview = binding.tvContentPreview
-        val btnPlayPause = binding.ivPlayAudio
+        val btnPlayPause = binding.layoutAudioView.ivPlayAudio
         val layoutAudioView = binding.layoutAudioView
         val canvasGraphicThumb = binding.canvasGraphicThumb
         val tvDelete = binding.tvDelete

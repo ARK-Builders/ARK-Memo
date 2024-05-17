@@ -129,10 +129,9 @@ class NotesFragment: Fragment() {
                         arkMediaPlayerViewModel.onPlayOrPauseClick(path)
                     },
                     onThumbPrepare = { graphicNote, noteCanvas ->
-//                        val tempNoteViewModel: GraphicNotesViewModel by viewModels()
-//                        noteCanvas.setViewModel(viewModel = /*graphicNotesViewModel*/tempNoteViewModel)
+                        val tempNoteViewModel: GraphicNotesViewModel by viewModels()
+                        noteCanvas.setViewModel(viewModel = /*graphicNotesViewModel*/tempNoteViewModel)
 //                        tempNoteViewModel.onNoteOpened(graphicNote)
-//                        noteCanvas.invalidate()
 
                     }
                 )

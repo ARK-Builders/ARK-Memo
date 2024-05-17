@@ -37,4 +37,10 @@
     <color name="brush_color_blue">#0BA5EC</color>
     <color name="brush_color_purple">#7A5AF8</color>
 
+    <!-- Custom SwitchButton -->
+    <color name="sb_unchecked_circle_color">#FFAAAAAA</color>
+    <color name="sb_unchecked_color">#FFDDDDDD</color>
+    <color name="sb_shadow_color">#33000000</color>
+    <color name="sb_checked_color">#FF51D367</color>
+
 </resources>

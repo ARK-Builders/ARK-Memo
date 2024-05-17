@@ -8,8 +8,8 @@
     android:clickable="true"
     android:layout_marginBottom="@dimen/note_item_padding"
     android:foreground="?attr/selectableItemBackgroundBorderless">
-    
-    <androidx.constraintlayout.widget.ConstraintLayout
+
+    <include layout="@layout/media_player_view_v2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,42 +18,7 @@
         android:id="@+id/layout_audio_view"
         android:paddingVertical="12dp"
         android:paddingHorizontal="13dp"
-        android:background="@color/yellow_700"
-        android:visibility="visible">
-
-        <ImageButton
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@drawable/ic_play_circle"
-            android:id="@+id/iv_play_audio" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@+id/iv_play_audio"
-            app:layout_constraintTop_toTopOf="@+id/iv_play_audio"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_play_audio"
-            app:layout_constraintEnd_toStartOf="@+id/tv_duration"
-            android:layout_marginEnd="8dp"
-            android:scaleType="fitXY"
-            android:layout_marginStart="6dp"
-            android:src="@drawable/ic_audio_wave"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/TextMedium"
-            android:textStyle="normal"
-            android:text="09.32"
-            android:id="@+id/tv_duration"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textColor="@color/white"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:background="@color/yellow_700" />
     
     <TextView
         android:layout_width="0dp"
