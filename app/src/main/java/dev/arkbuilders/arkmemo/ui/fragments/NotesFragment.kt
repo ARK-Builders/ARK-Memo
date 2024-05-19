@@ -115,8 +115,8 @@ class NotesFragment: Fragment() {
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         binding.ivSettings.setOnClickListener {
-            activity.fragment = SettingFragmentsV2()
-            activity.replaceFragment(activity.fragment, SettingFragmentsV2::class.java.name)
+            activity.fragment = SettingsFragmentV2()
+            activity.replaceFragment(activity.fragment, SettingsFragmentV2::class.java.name)
         }
         showingFloatingButtons = false
         initBottomControlViews()

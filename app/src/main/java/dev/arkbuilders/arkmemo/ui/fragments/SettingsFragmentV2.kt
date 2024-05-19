@@ -5,12 +5,11 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesV2Binding
 import dev.arkbuilders.arkmemo.databinding.FragmentSettingsBinding
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
 
-open class SettingFragmentsV2: Fragment(R.layout.fragment_settings) {
+open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
 
     val binding by viewBinding(FragmentSettingsBinding::bind)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
