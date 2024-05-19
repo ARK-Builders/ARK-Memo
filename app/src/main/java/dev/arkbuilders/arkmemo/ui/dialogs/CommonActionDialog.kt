@@ -72,4 +72,8 @@ class CommonActionDialog(@StringRes private val title: Int,
             ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
+    override fun getTheme(): Int {
+        return R.style.MemoDialog
+    }
+
 }

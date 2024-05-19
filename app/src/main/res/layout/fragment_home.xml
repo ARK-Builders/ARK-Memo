@@ -29,6 +29,8 @@
         android:drawablePadding="8dp"
         android:id="@+id/edt_search"
         android:hint="@string/ark_memo_search"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
         android:paddingHorizontal="16dp"
         android:layout_marginStart="16dp"/>
 

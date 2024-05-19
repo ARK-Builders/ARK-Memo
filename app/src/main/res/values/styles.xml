@@ -78,9 +78,6 @@
     </style>
 
     <style name="MemoDialog" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">false</item>
-        <item name="android:windowIsFloating">false</item>
         <item name="dialogCornerRadius">@dimen/radius_medium</item>
     </style>
 
