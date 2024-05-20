@@ -18,9 +18,11 @@ import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
+import dev.arkbuilders.arkmemo.repo.voices.VoiceNotesRepo
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.io.path.pathString
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
@@ -111,6 +113,9 @@ class NotesViewModel @Inject constructor(
         val notes = this.notes.value.toMutableList()
         note.resource?.let {
             notes.removeIf { it.resource?.id == note.resource?.id }
+        }
+        if (note is VoiceNote) {
+            note.duration = (voiceNotesRepo as VoiceNotesRepo).extractDuration(note.path.pathString)
         }
         notes.add(note)
         this.notes.value = notes

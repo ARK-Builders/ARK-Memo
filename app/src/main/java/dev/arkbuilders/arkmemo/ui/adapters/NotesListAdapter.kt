@@ -64,6 +64,7 @@ class NotesListAdapter(
         holder.layoutAudioView.root.isVisible = false
         if (note is VoiceNote) {
             holder.layoutAudioView.root.isVisible = true
+            holder.layoutAudioView.tvDuration.text = note.duration
             holder.btnPlayPause.setOnClickListener {
                 onPlayPauseClick(note.path.toString())
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
