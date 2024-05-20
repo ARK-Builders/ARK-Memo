@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.repo.voices
 
+import android.media.MediaMetadataRetriever
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
@@ -10,6 +11,7 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
+import dev.arkbuilders.arkmemo.utils.millisToString
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
@@ -20,6 +22,7 @@ import kotlin.io.path.fileSize
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
+import kotlin.io.path.pathString
 
 class VoiceNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
@@ -94,8 +97,23 @@ class VoiceNotesRepo @Inject constructor(
                 title = userNoteProperties.title,
                 description = userNoteProperties.description,
                 path = path,
+                duration = extractDuration(path.pathString),
                 resource = resource
             )
+        }
+    }
+
+    fun extractDuration(path: String): String {
+        return try {
+            val metadataRetriever = MediaMetadataRetriever()
+            metadataRetriever.setDataSource(path)
+            val duration = metadataRetriever.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_DURATION
+            )?.toLong() ?: 0L
+            millisToString(duration)
+        } catch (e: IllegalArgumentException) {
+            Log.e(VOICES_REPO, "extractDuration exception: " + e.message)
+            ""
         }
     }
 }
