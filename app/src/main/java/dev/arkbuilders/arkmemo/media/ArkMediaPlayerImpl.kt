@@ -12,8 +12,14 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
     private var onPreparedHandler: () -> Unit = {}
 
     override fun init(path: String, onCompletion: () -> Unit, onPrepared: () -> Unit) {
+        if (player?.isPlaying == true) {
+            player?.stop()
+            onCompletionHandler()
+        }
+
         onCompletionHandler = onCompletion
         onPreparedHandler = onPrepared
+
         player = MediaPlayer().apply {
             setOnCompletionListener(this@ArkMediaPlayerImpl)
             setOnPreparedListener(this@ArkMediaPlayerImpl)
@@ -48,7 +54,7 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
         player?.seekTo(position)
     }
 
-    override fun duration(): Int = player?.duration!!
+    override fun duration(): Int = player?.duration ?: 0
 
     override fun currentPosition(): Int = player?.currentPosition!!
 
