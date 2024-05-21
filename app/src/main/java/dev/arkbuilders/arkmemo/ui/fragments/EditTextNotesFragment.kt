@@ -120,6 +120,10 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         )
     }
 
+    override fun getCurrentNote(): Note {
+        return note
+    }
+
     private fun observeClipboardContent() {
         context?.getTextFromClipBoard()?.let {
             binding.tvPaste.alpha = 1f

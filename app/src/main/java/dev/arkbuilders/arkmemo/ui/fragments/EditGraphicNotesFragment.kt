@@ -91,6 +91,10 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         )
     }
 
+    override fun getCurrentNote(): Note {
+        return note
+    }
+
     private fun initBottomControls() {
         val tvBrushSize = binding.layoutGraphicsControl.tvBrushSize
         tvBrushSize.setOnClickListener {
