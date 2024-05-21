@@ -29,7 +29,7 @@ import dev.arkbuilders.arkmemo.utils.visible
 
 class NotesListAdapter(
     private val notes: List<Note>,
-    private val onPlayPauseClick: (String) -> Unit,
+    private val onPlayPauseClick: (path: String, pos: Int?, stopCallback: ((pos: Int) -> Unit)?) -> Unit,
     private val onThumbPrepare : (note: GraphicNote, holder: NotesCanvas) -> Unit
 ): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
@@ -66,7 +66,9 @@ class NotesListAdapter(
             holder.layoutAudioView.root.isVisible = true
             holder.layoutAudioView.tvDuration.text = note.duration
             holder.btnPlayPause.setOnClickListener {
-                onPlayPauseClick(note.path.toString())
+                onPlayPauseClick(note.path.toString(), position) { stopPos ->
+                    showPlayIcon(holder)
+                }
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
             }
         } else if (note is GraphicNote) {

@@ -57,13 +57,14 @@ class ArkMediaPlayerViewModel @Inject constructor(
         currentPlayingVoiceNotePath = path
     }
 
-    fun onPlayOrPauseClick(path: String) {
+    fun onPlayOrPauseClick(path: String, pos: Int? = null, onStop: ((pos: Int) -> Unit)? = null) {
         if (currentPlayingVoiceNotePath != path) {
             currentPlayingVoiceNotePath = path
             arkMediaPlayer.init(
                 path,
                 onCompletion = {
                     arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.StopPlaying
+                    onStop?.invoke(pos ?: 0)
                 },
                 onPrepared = {
                     arkMediaPlayerState.value = ArkMediaPlayerState(
@@ -108,12 +109,13 @@ class ArkMediaPlayerViewModel @Inject constructor(
     private fun startProgressMonitor() {
         viewModelScope.launch(Dispatchers.Default) {
             var progress: Float
+            val duration = millisToString(arkMediaPlayer.duration().toLong())
             do {
                 progress = (arkMediaPlayer.currentPosition().toFloat() /
                         arkMediaPlayer.duration().toFloat()) * 100
                 arkMediaPlayerState.value = ArkMediaPlayerState(
                     progress = progress,
-                    duration = millisToString(arkMediaPlayer.duration().toLong())
+                    duration = duration
                 )
             } while(arkMediaPlayer.isPlaying())
         }

@@ -125,8 +125,8 @@ class NotesFragment: Fragment() {
                 notes = it
                 val adapter = NotesListAdapter(
                     it,
-                    onPlayPauseClick = { path ->
-                        arkMediaPlayerViewModel.onPlayOrPauseClick(path)
+                    onPlayPauseClick = { path, pos, onStop ->
+                        arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
                     },
                     onThumbPrepare = { graphicNote, noteCanvas ->
                         val tempNoteViewModel: GraphicNotesViewModel by viewModels()
