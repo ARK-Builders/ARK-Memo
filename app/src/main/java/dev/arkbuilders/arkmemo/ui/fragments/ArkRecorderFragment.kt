@@ -12,23 +12,19 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesV2Binding
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
-import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
@@ -42,10 +38,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
-class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
+class ArkRecorderFragment: BaseEditNoteFragment() {
 
     private val activity by lazy { requireActivity() as MainActivity }
-    private val binding by viewBinding(FragmentEditNotesV2Binding::bind)
 
     private var shouldRecord = false
     private val audioRecordingPermissionLauncher =
@@ -54,7 +49,6 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
             if (!shouldRecord) activity.onBackPressedDispatcher.onBackPressed()
         }
 
-    private val notesViewModel: NotesViewModel by activityViewModels()
     private val arkRecorderViewModel: ArkRecorderViewModel by viewModels()
     private val mediaPlayViewModel: ArkMediaPlayerViewModel by viewModels()
 
@@ -277,28 +271,19 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes_v2) {
         ivPauseResume.setImageDrawable(pauseIcon)
     }
 
-    private fun showSaveNoteDialog() {
-        val saveNoteDialog = CommonActionDialog(
-            title = R.string.dialog_save_note_title,
-            message = R.string.dialog_save_note_message,
-            positiveText = R.string.save,
-            negativeText = R.string.discard,
-            isAlert = false,
-            onPositiveClick = {
-                saveNote()
-            },
-            onNegativeClicked = {
-                activity.onBackPressedDispatcher.onBackPressed()
-            })
-        saveNoteDialog.show(parentFragmentManager, CommonActionDialog.TAG)
-    }
-
-    private fun saveNote() {
-        val note = VoiceNote(
+    override fun createNewNote(): Note {
+        return VoiceNote(
             title = binding.edtTitle.text.toString().ifEmpty { defaultNoteTitle },
             path = arkRecorderViewModel.getRecordingPath()
         )
-        notesViewModel.onSaveClick(note) { show ->
+    }
+
+    override fun getCurrentNote(): Note {
+        return createNewNote()
+    }
+
+    private fun saveNote() {
+        notesViewModel.onSaveClick(createNewNote()) { show ->
             activity.showProgressBar(show)
         }
     }

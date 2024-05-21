@@ -45,6 +45,10 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
         return note
     }
 
+    override fun getCurrentNote(): Note {
+        return note
+    }
+
     private fun initUI() {
 
         binding.toolbar.ivRightActionIcon.setOnClickListener {

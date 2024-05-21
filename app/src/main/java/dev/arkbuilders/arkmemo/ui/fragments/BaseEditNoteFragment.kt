@@ -1,6 +1,7 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,8 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
+import java.util.Calendar
+import java.util.Locale
 
 abstract class BaseEditNoteFragment: Fragment() {
 
@@ -62,9 +65,13 @@ abstract class BaseEditNoteFragment: Fragment() {
             binding.toolbar.tvRightActionText.gone()
             binding.layoutAudioRecord.root.gone()
 
-            if (this is EditTextNotesFragment) {
+            if (this is EditTextNotesFragment || this is ArkRecorderFragment) {
                 binding.layoutGraphicsControl.root.gone()
-                binding.groupTextControls.visible()
+
+                if (this is EditTextNotesFragment) {
+                    binding.groupTextControls.visible()
+                }
+
             } else {
                 binding.layoutGraphicsControl.root.visible()
                 binding.groupTextControls.gone()
@@ -77,6 +84,18 @@ abstract class BaseEditNoteFragment: Fragment() {
         } else {
             binding.toolbar.tvRightActionText.gone()
             binding.toolbar.ivRightActionIcon.visible()
+        }
+
+        if (getCurrentNote().resource == null) {
+            binding.tvLastModified.gone()
+        } else {
+            binding.tvLastModified.visible()
+            val calendar = Calendar.getInstance(Locale.ENGLISH)
+            calendar.timeInMillis = getCurrentNote().resource?.modified?.toMillis()
+                ?: System.currentTimeMillis()
+            val lastModifiedTime = DateFormat.format(
+                "dd MMM yyyy', 'hh:mm aa", calendar).toString()
+            binding.tvLastModified.text = getString(R.string.note_last_modified_time, lastModifiedTime)
         }
     }
 
@@ -114,4 +133,5 @@ abstract class BaseEditNoteFragment: Fragment() {
     }
 
     abstract fun createNewNote(): Note
+    abstract fun getCurrentNote(): Note
 }
