@@ -166,7 +166,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/group_empty_state"
-        app:constraint_referenced_ids="iv_empty_state,tv_header,tv_instructions,tv_new_memo,iv_record,iv_draw,tv_paste"/>
+        app:constraint_referenced_ids="iv_empty_state,tv_header,tv_instructions,tv_new_memo,iv_record,iv_draw,tv_paste"
+        android:visibility="gone"/>
 
     <View
         android:layout_width="match_parent"
@@ -413,5 +414,19 @@
         android:id="@+id/layout_bottom_control"
         android:visibility="gone"
         app:constraint_referenced_ids="tv_bottom_panel_paste,fab_new_action,divider_bottom_control"/>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:indeterminate="true"
+        android:indeterminateDrawable="@drawable/ic_animated_loading"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

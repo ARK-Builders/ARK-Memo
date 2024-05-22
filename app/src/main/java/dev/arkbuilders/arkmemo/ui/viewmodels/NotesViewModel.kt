@@ -13,7 +13,6 @@ import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
-import dev.arkbuilders.arkmemo.media.ArkMediaPlayer
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
@@ -29,8 +28,7 @@ class NotesViewModel @Inject constructor(
     @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     private val textNotesRepo: NotesRepo<TextNote>,
     private val graphicNotesRepo: NotesRepo<GraphicNote>,
-    private val voiceNotesRepo: NotesRepo<VoiceNote>,
-    private val arkMediaPlayer: ArkMediaPlayer
+    private val voiceNotesRepo: NotesRepo<VoiceNote>
 ) : ViewModel() {
 
     private val notes = MutableStateFlow(listOf<Note>())
@@ -48,9 +46,14 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun readAllNotes() {
+    fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
+            notes.collectLatest {
+                withContext(Dispatchers.Main) {
+                    onSuccess(it)
+                }
+            }
         }
     }
 

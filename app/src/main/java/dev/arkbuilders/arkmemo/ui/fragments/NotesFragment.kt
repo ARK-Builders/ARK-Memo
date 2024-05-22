@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -98,7 +97,6 @@ class NotesFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = FragmentHomeBinding.inflate(layoutInflater)
-        notesViewModel.apply {  init { readAllNotes() } }
     }
 
     override fun onCreateView(
@@ -120,51 +118,57 @@ class NotesFragment: Fragment() {
         }
         showingFloatingButtons = false
         initBottomControlViews()
-        lifecycleScope.launchWhenStarted {
-            notesViewModel.getNotes {
-                notes = it
-                val adapter = NotesListAdapter(
-                    it,
-                    onPlayPauseClick = { path, pos, onStop ->
-                        arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
-                    },
-                    onThumbPrepare = { graphicNote, noteCanvas ->
-                        val tempNoteViewModel: GraphicNotesViewModel by viewModels()
-                        noteCanvas.setViewModel(viewModel = /*graphicNotesViewModel*/tempNoteViewModel)
-//                        tempNoteViewModel.onNoteOpened(graphicNote)
-
-                    }
-                )
-                val layoutManager = LinearLayoutManager(requireContext())
-                arkMediaPlayerViewModel.collect(
-                    stateToUI = { state -> adapter.observeItemState = { state } },
-                    handleSideEffect = { effect -> adapter.observeItemSideEffect = { effect } }
-                )
-                adapter.setActivity(activity)
-                adapter.setFragmentManager(childFragmentManager)
-                binding.rvPinnedNotes.apply {
-                    this.layoutManager = layoutManager
-                    this.adapter = adapter
-                }
-                ItemTouchHelper(mItemTouchCallback).attachToRecyclerView(binding.rvPinnedNotes)
-
-                if (it.isNotEmpty()) {
-                    binding.layoutBottomControl.visible()
-                    binding.groupEmptyState.gone()
-                    binding.rvPinnedNotes.visible()
-                    binding.edtSearch.visible()
-                    binding.scrollViewNotes.visible()
-                } else {
-                    binding.layoutBottomControl.gone()
-                    binding.groupEmptyState.visible()
-                    binding.rvPinnedNotes.gone()
-                    binding.edtSearch.gone()
-                    binding.scrollViewNotes.gone()
-                }
-            }
-        }
 
         initEmptyStateViews()
+
+        binding.pbLoading.visible()
+        notesViewModel.apply {
+            init { readAllNotes {
+                onNotesLoaded(it)
+            } }
+        }
+    }
+
+    private fun onNotesLoaded(notes: List<Note>) {
+        binding.pbLoading.gone()
+        val adapter = NotesListAdapter(
+            notes,
+            onPlayPauseClick = { path, pos, onStop ->
+                arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
+            },
+            onThumbPrepare = { graphicNote, noteCanvas ->
+                val tempNoteViewModel: GraphicNotesViewModel by viewModels()
+                noteCanvas.setViewModel(viewModel = /*graphicNotesViewModel*/tempNoteViewModel)
+//                        tempNoteViewModel.onNoteOpened(graphicNote)
+
+            }
+        )
+        val layoutManager = LinearLayoutManager(requireContext())
+        arkMediaPlayerViewModel.collect(
+            stateToUI = { state -> adapter.observeItemState = { state } },
+            handleSideEffect = { effect -> adapter.observeItemSideEffect = { effect } }
+        )
+        adapter.setActivity(activity)
+        adapter.setFragmentManager(childFragmentManager)
+        binding.rvPinnedNotes.apply {
+            this.layoutManager = layoutManager
+            this.adapter = adapter
+        }
+        ItemTouchHelper(mItemTouchCallback).attachToRecyclerView(binding.rvPinnedNotes)
+
+        if (notes.isNotEmpty()) {
+            binding.layoutBottomControl.visible()
+            binding.groupEmptyState.gone()
+            binding.rvPinnedNotes.visible()
+            binding.edtSearch.visible()
+            binding.scrollViewNotes.visible()
+        } else {
+            binding.layoutBottomControl.gone()
+            binding.groupEmptyState.visible()
+            binding.rvPinnedNotes.gone()
+            binding.edtSearch.gone()
+            binding.scrollViewNotes.gone()
+        }
     }
 
     override fun onResume() {
