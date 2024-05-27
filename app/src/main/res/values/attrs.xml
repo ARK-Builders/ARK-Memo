@@ -12,4 +12,15 @@
         <attr name="gct_selected" format="reference|boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="SupportTextView">
+        <attr name="support_text" format="reference|string"/>
+        <attr name="support_icon" format="reference|integer"/>
+        <attr name="support_enabled" format="reference|boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="WebLinkTextView">
+        <attr name="web_link_text" format="reference|string"/>
+        <attr name="web_link_icon" format="reference|integer"/>
+    </declare-styleable>
+
 </resources>

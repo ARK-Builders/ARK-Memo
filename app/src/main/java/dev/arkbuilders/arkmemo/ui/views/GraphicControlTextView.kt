@@ -45,7 +45,7 @@ class GraphicControlTextView @JvmOverloads constructor(
             )
         } else {
             this.background = ContextCompat.getDrawable(
-                context, R.drawable.bg_search_bar
+                context, R.drawable.bg_border_r8
             )
             val selectedColor = ContextCompat.getColor(context, R.color.text_tertiary)
 

@@ -138,8 +138,7 @@ class NotesFragment: Fragment() {
             },
             onThumbPrepare = { graphicNote, noteCanvas ->
                 val tempNoteViewModel: GraphicNotesViewModel by viewModels()
-                noteCanvas.setViewModel(viewModel = /*graphicNotesViewModel*/tempNoteViewModel)
-//                        tempNoteViewModel.onNoteOpened(graphicNote)
+                noteCanvas.setViewModel(viewModel = tempNoteViewModel)
 
             }
         )
