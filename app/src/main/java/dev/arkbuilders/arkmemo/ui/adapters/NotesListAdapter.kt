@@ -56,8 +56,6 @@ class NotesListAdapter(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val note = notes[position]
         holder.title.text = note.getAutoTitle(activity)
-//        holder.date.text = note.resource?.modified?.toString() ?:
-//                activity.getString(R.string.ark_memo_just_now)
         if (note is TextNote) {
             holder.contentPreview.text = note.text
         }

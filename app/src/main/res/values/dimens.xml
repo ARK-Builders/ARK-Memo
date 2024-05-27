@@ -7,6 +7,7 @@
     <dimen name="home_toolbar_icon_size">44dp</dimen>
     <dimen name="text_small">14sp</dimen>
     <dimen name="text_x_large">20sp</dimen>
+    <dimen name="text_huge">24sp</dimen>
     <dimen name="common_button_corner_radius">8dp</dimen>
     <dimen name="corner_radius_big">16dp</dimen>
     <dimen name="corner_radius_huge">32dp</dimen>
@@ -25,8 +26,13 @@
 
     <!-- Settings -->
     <dimen name="setting_item_margin_top">12dp</dimen>
+    <dimen name="setting_item_margin_start">12dp</dimen>
 
     <!-- Graphic note -->
     <dimen name="brush_size_icon">36dp</dimen>
     <dimen name="brush_color_indicator_padding">2dp</dimen>
+
+    <!-- Settings -->
+    <dimen name="setting_support_icon_size">20dp</dimen>
+    <dimen name="setting_support_qr_size">300dp</dimen>
 </resources>

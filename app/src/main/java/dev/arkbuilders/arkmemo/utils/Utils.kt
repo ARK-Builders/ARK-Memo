@@ -1,18 +1,21 @@
 package dev.arkbuilders.arkmemo.utils
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.ui.views.toast
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.forEachLine
-import kotlin.streams.toList
+
 
 fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
     result.observe(this) {
@@ -55,9 +58,21 @@ fun Context.getTextFromClipBoard(): String?{
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }
 
+fun Context.copyToClipboard(label: String, text: String) {
+    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+    val clip = ClipData.newPlainText(label, text)
+    clipboard?.setPrimaryClip(clip)
+}
+
 fun <R> Path.listFiles(extension: String, process: (Path) -> R): List<R> =
-    Files.list(this).toList().filter { it.extension == extension }.map {
-        process(it)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        Files.list(this).toList().filter { it.extension == extension }.map {
+            process(it)
+        }
+    } else {
+        File(this.toString()).listFiles()?.filter { it.extension == extension }?.map { it ->
+            process(it.toPath())
+        } ?: emptyList()
     }
 
 fun <R> Path.readLines(useLines: (String) -> R): R {

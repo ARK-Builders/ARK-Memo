@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace 'dev.arkbuilders.arkmemo'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "dev.arkbuilders.arkmemo"
@@ -90,8 +90,8 @@ dependencies {
     implementation 'dev.arkbuilders:arklib:0.3.3'
 
     implementation 'androidx.preference:preference:1.2.0'
-    implementation "com.google.dagger:hilt-android:2.42"
-    kapt "com.google.dagger:hilt-compiler:2.42"
+    implementation "com.google.dagger:hilt-android:2.48"
+    kapt "com.google.dagger:hilt-compiler:2.48"
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
 
     implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
@@ -105,4 +105,6 @@ dependencies {
     implementation 'com.simplemobiletools:commons:5.29.20'
 
     implementation 'com.airbnb.android:lottie:6.4.0'
+    implementation 'com.github.androidmads:QRGenerator:1.0.1'
+    implementation("io.coil-kt:coil:2.6.0")
 }

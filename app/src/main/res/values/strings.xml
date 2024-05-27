@@ -78,5 +78,23 @@
     <string name="audio_record_guide_text">Tap “microphone button” to \nreplace with a new one</string>
     <string name="content_desc_back_button">Back</string>
     <string name="note_last_modified_time">Last edited %s</string>
+    <string name="setting_app_version">Version %s</string>
+    <string name="setting_telegram_title">Telegram</string>
+    <string name="setting_discord_title">Discord</string>
+    <string name="setting_support_us_title">Support Us</string>
+    <string name="setting_support_us_description">We greatly appreciate every bit of support</string>
+    <string name="setting_website">Website</string>
+    <string name="setting_donate_btc">Donate using BTC</string>
+    <string name="setting_donate_wallet_clipboard_label">Wallet address</string>
+    <string name="setting_donate_eth">Donate using ETH</string>
+    <string name="setting_donate_patreon">Donate on Patreon</string>
+    <string name="setting_donate_coffee">Buy us a coffee</string>
+    <string name="setting_contribute_title">Contribute with us</string>
+    <string name="setting_contribute_issues">Discover issues to work on</string>
+    <string name="setting_contribute_bounties">See open bounties</string>
+    <string name="dialog_donate_qr_message">Send us the transaction id by email support@ark-builders.dev to receive premium support. We’ll make our best to help you with any issue you encounter while using our Software.</string>
+    <string name="dialog_donate_qr_copy">Copy</string>
+    <string name="dialog_donate_qr_download">Download QR image</string>
+    <string name="toast_save_qr_success">QR saved at %s</string>
 
 </resources>

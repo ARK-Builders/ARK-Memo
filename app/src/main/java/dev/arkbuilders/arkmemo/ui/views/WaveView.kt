@@ -17,11 +17,11 @@ class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
 
     private val bars = ArrayDeque<Rect>()
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (bars.isNotEmpty()) {
             bars.forEach {
-                canvas?.drawRect(it, paint)
+                canvas.drawRect(it, paint)
             }
         }
     }
