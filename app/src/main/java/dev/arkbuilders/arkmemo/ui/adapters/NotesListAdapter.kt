@@ -24,11 +24,12 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.views.NotesCanvas
 import dev.arkbuilders.arkmemo.utils.getAutoTitle
 import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.highlightWord
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 import dev.arkbuilders.arkmemo.utils.visible
 
 class NotesListAdapter(
-    private val notes: List<Note>,
+    private var notes: List<Note>,
     private val onPlayPauseClick: (path: String, pos: Int?, stopCallback: ((pos: Int) -> Unit)?) -> Unit,
     private val onThumbPrepare : (note: GraphicNote, holder: NotesCanvas) -> Unit
 ): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
@@ -38,6 +39,9 @@ class NotesListAdapter(
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
     lateinit var observeItemState: () -> ArkMediaPlayerState
+
+    private var isFromSearch: Boolean = false
+    private var searchKeyWord: String = ""
 
     fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
@@ -56,6 +60,11 @@ class NotesListAdapter(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val note = notes[position]
         holder.title.text = note.getAutoTitle(activity)
+
+        if (isFromSearch) {
+            holder.title.highlightWord(searchKeyWord)
+        }
+
         if (note is TextNote) {
             holder.contentPreview.text = note.text
         }
@@ -119,6 +128,13 @@ class NotesListAdapter(
             null
         )
         holder.btnPlayPause.setImageDrawable(playIcon)
+    }
+
+    fun updateData(newNotes: List<Note>, fromSearch: Boolean? = null, keyword: String? = null) {
+        notes = newNotes
+        isFromSearch = fromSearch ?: false
+        searchKeyWord = keyword ?: ""
+        notifyDataSetChanged()
     }
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

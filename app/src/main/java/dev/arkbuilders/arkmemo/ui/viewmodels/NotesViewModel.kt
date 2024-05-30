@@ -18,6 +18,8 @@ import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.repo.voices.VoiceNotesRepo
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 import javax.inject.Named
@@ -33,6 +35,7 @@ class NotesViewModel @Inject constructor(
 
     private val notes = MutableStateFlow(listOf<Note>())
     private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
+    private var searchJob: Job? = null
 
     fun init(extraBlock: () -> Unit) {
         val initJob = viewModelScope.launch(iODispatcher) {
@@ -52,6 +55,23 @@ class NotesViewModel @Inject constructor(
             notes.collectLatest {
                 withContext(Dispatchers.Main) {
                     onSuccess(it)
+                }
+            }
+        }
+    }
+
+    fun searchNote(keyword: String, onSuccess: (notes: List<Note>) -> Unit) {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch(iODispatcher) {
+
+            //Add a delay to restart the search job if there are 2 consecutive search events
+            //triggered within 0.5 second window.
+            delay(500)
+            notes.collectLatest {
+                val filteredNotes = it.filter { note
+                    -> note.title.lowercase().contains(keyword.lowercase()) }
+                withContext(Dispatchers.Main) {
+                    onSuccess(filteredNotes)
                 }
             }
         }
