@@ -53,6 +53,7 @@
     <string name="ark_memo_notes_title_pinned">Pinned</string>
     <string name="ark_memo_notes_title_recent">Recent</string>
     <string name="ark_memo_search">Search</string>
+    <string name="ark_memo_search_result_empty">No result</string>
     <string name="photo_and_video">Photo &amp; Video</string>
     <string name="fab_create_drawing_text">Drawing</string>
     <string name="fab_attach_file">Attach File</string>

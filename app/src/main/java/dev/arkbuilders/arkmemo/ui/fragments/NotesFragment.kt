@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.simplemobiletools.commons.extensions.onTextChangeListener
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentHomeBinding
@@ -41,7 +42,7 @@ class NotesFragment: Fragment() {
 
     private val notesViewModel: NotesViewModel by activityViewModels()
     private val arkMediaPlayerViewModel: ArkMediaPlayerViewModel by activityViewModels()
-    private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
+    private var notesAdapter: NotesListAdapter? = null
 
     private var notes = listOf<Note>()
 
@@ -118,7 +119,6 @@ class NotesFragment: Fragment() {
         }
         showingFloatingButtons = false
         initBottomControlViews()
-
         initEmptyStateViews()
 
         binding.pbLoading.visible()
@@ -126,6 +126,22 @@ class NotesFragment: Fragment() {
             init { readAllNotes {
                 onNotesLoaded(it)
             } }
+        }
+        initSearch()
+    }
+
+    private fun initSearch() {
+        binding.edtSearch.onTextChangeListener {
+            binding.pbLoading.visible()
+            notesViewModel.searchNote(keyword = it) { notes ->
+                if (notes.isEmpty()) {
+                    binding.groupSearchResultEmpty.visible()
+                } else {
+                    binding.groupSearchResultEmpty.gone()
+                }
+                notesAdapter?.updateData(notes, fromSearch = true, keyword = it)
+                binding.pbLoading.gone()
+            }
         }
     }
 
@@ -149,6 +165,7 @@ class NotesFragment: Fragment() {
         )
         adapter.setActivity(activity)
         adapter.setFragmentManager(childFragmentManager)
+        notesAdapter = adapter
         binding.rvPinnedNotes.apply {
             this.layoutManager = layoutManager
             this.adapter = adapter
