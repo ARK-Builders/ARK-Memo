@@ -18,7 +18,9 @@ fun Note.getAutoTitle(context: Context? = null): String {
             String.format(context.getString(R.string.ark_memo_graphic_note), this.resource?.id)
         }
     } else if (this is VoiceNote && context != null) {
-        String.format(context.getString(R.string.ark_memo_voice_note), this.resource?.id)
+        this.title.ifEmpty {
+            String.format(context.getString(R.string.ark_memo_voice_note), this.resource?.id)
+        }
     } else {
         ""
     }

@@ -44,8 +44,6 @@ class NotesFragment: Fragment() {
     private val arkMediaPlayerViewModel: ArkMediaPlayerViewModel by activityViewModels()
     private var notesAdapter: NotesListAdapter? = null
 
-    private var notes = listOf<Note>()
-
     private var showingFloatingButtons = false
 
     private val newTextNoteClickListener = View.OnClickListener {
@@ -72,7 +70,9 @@ class NotesFragment: Fragment() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             val deletePosition = viewHolder.bindingAdapterPosition
-            val noteToDelete = notes[deletePosition].apply { pendingForDelete = true }
+            val noteToDelete = notesAdapter?.getNotes()?.getOrNull(deletePosition)?.apply {
+                pendingForDelete = true
+            } ?: return
             binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
 
             CommonActionDialog(title = R.string.delete_note,

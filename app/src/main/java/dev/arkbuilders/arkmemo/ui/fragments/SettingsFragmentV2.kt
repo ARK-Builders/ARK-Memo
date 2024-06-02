@@ -11,6 +11,7 @@ import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.dialogs.DonateDialog
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.openLink
+import dev.arkbuilders.arkmemo.utils.showAvailabilityToolTip
 import dev.arkbuilders.arkmemo.utils.visible
 
 open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
@@ -22,7 +23,7 @@ open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
         binding.toolbarCustom.ivBack.setOnClickListener {
             activity?.onBackPressedDispatcher?.onBackPressed()
         }
-        binding.toolbarCustom.tvTitle.text = getString(R.string.settings)
+        binding.toolbarCustom.tvTitle.text = getString(R.string.about)
         binding.toolbarCustom.tvTitle.visible()
 
         binding.toolbarCustom.tvRightActionText.gone()
@@ -41,6 +42,10 @@ open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
 
         binding.tvTelegram.setOnClickListener {
             context?.openLink("https://t.me/ark_builders")
+        }
+
+        binding.tvDiscord.setOnClickListener {
+            it.showAvailabilityToolTip()
         }
 
         binding.tvDonatePatreon.setOnClickListener {
@@ -68,6 +73,14 @@ open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
         binding.tvDiscoverIssues.setOnClickListener {
             context?.openLink("https://www.ark-builders.dev/contribute/?tab=goodFirstIssue")
         }
+
+        binding.tvBounties.setOnClickListener {
+        }
+
+//        if (binding.tvBounties.isEnabled) {
+//            binding.tvBounties.setOnClickListener {
+//            }
+//        }
 
     }
 }

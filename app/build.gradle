@@ -107,4 +107,5 @@ dependencies {
     implementation 'com.airbnb.android:lottie:6.4.0'
     implementation 'com.github.androidmads:QRGenerator:1.0.1'
     implementation("io.coil-kt:coil:2.6.0")
+    implementation("com.github.skydoves:balloon:1.6.4")
 }

@@ -9,6 +9,8 @@ import androidx.core.content.ContextCompat
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.LayoutSupportTextBinding
 import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.setOnDebounceTouchListener
+import dev.arkbuilders.arkmemo.utils.showAvailabilityToolTip
 
 class SupportTextView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ConstraintLayout(context, attrs) {
@@ -35,6 +37,10 @@ class SupportTextView @JvmOverloads constructor(context: Context, attrs: Attribu
         if (!enabled) {
             binding.tvText.setTextColor(ContextCompat.getColor(context, R.color.gray_400))
             binding.tvText.isEnabled = false
+            setOnDebounceTouchListener { v, event ->
+                showAvailabilityToolTip()
+                binding.tvText.isEnabled = true
+            }
         }
 
         typedArray.recycle()
