@@ -137,6 +137,10 @@ class NotesListAdapter(
         notifyDataSetChanged()
     }
 
+    fun getNotes(): List<Note> {
+        return notes
+    }
+
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val binding by viewBinding {
             AdapterTextNoteBinding.bind(itemView)

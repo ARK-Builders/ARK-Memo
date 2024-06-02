@@ -13,6 +13,7 @@
     <string name="note">Note</string>
     <string name="date">Date</string>
     <string name="settings">Settings</string>
+    <string name="about">About</string>
     <string name="path_pref_key">Path</string>
     <string name="choose_folder">Choose folder to save your notes</string>
     <string name="no_folder">No folder</string>
@@ -97,5 +98,6 @@
     <string name="dialog_donate_qr_copy">Copy</string>
     <string name="dialog_donate_qr_download">Download QR image</string>
     <string name="toast_save_qr_success">QR saved at %s</string>
+    <string name="tips_will_be_available_soon">Will be available soon!</string>
 
 </resources>

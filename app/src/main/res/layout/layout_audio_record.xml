@@ -87,11 +87,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/divider_top_duration"
         android:text="@string/save"
+        android:padding="8dp"
         android:textSize="16sp"
         android:textColor="@color/text_tertiary"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:layout_marginEnd="@dimen/common_padding"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="12dp"
         android:textStyle="bold"/>
 
     <View
@@ -102,7 +103,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tv_save_recording"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="12dp"/>
 
     <androidx.constraintlayout.widget.Barrier
         android:layout_width="wrap_content"
