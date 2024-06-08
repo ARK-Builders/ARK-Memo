@@ -68,7 +68,7 @@ class TextNotesRepo @Inject constructor(
         val resourcePath = root.resolve("$id.$NOTE_EXT")
         if (resourcePath.exists()) {
             if (isPropertiesChanged) {
-                callback(SaveNoteResult.SUCCESS)
+                callback(SaveNoteResult.SUCCESS_UPDATED)
             } else {
                 Log.d(TEXT_REPO, "resource with similar content already exists")
                 callback(SaveNoteResult.ERROR_EXISTING)
@@ -83,7 +83,7 @@ class TextNotesRepo @Inject constructor(
             resourceId = id
         )
         Log.d(TEXT_REPO, "resource renamed to $resourcePath successfully")
-        callback(SaveNoteResult.SUCCESS)
+        callback(SaveNoteResult.SUCCESS_NEW)
     }
 
     private suspend fun readStorage(): List<TextNote> = withContext(iODispatcher) {
@@ -114,6 +114,6 @@ class TextNotesRepo @Inject constructor(
     }
 }
 
-private const val TEXT_REPO = "text-repo"
+private const val TEXT_REPO = "TextNotesRepo"
 private const val NOTE_EXT = "note"
 

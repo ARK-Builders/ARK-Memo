@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
@@ -35,7 +34,6 @@ class NotesListAdapter(
 ): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private lateinit var activity: MainActivity
-    private lateinit var fragmentManager: FragmentManager
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
     lateinit var observeItemState: () -> ArkMediaPlayerState
@@ -45,10 +43,6 @@ class NotesListAdapter(
 
     fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
-    }
-
-    fun setFragmentManager(manager: FragmentManager) {
-        fragmentManager = manager
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -139,6 +133,10 @@ class NotesListAdapter(
 
     fun getNotes(): List<Note> {
         return notes
+    }
+
+    fun setNotes(notes: List<Note>) {
+        this.notes = notes
     }
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

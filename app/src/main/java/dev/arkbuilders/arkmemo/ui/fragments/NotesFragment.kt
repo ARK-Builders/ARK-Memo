@@ -133,6 +133,9 @@ class NotesFragment: Fragment() {
     private fun initSearch() {
         binding.edtSearch.onTextChangeListener {
             binding.pbLoading.visible()
+
+            if (!binding.edtSearch.isFocused && it.isEmpty()) return@onTextChangeListener
+
             notesViewModel.searchNote(keyword = it) { notes ->
                 if (notes.isEmpty()) {
                     binding.groupSearchResultEmpty.visible()
@@ -147,28 +150,32 @@ class NotesFragment: Fragment() {
 
     private fun onNotesLoaded(notes: List<Note>) {
         binding.pbLoading.gone()
-        val adapter = NotesListAdapter(
-            notes,
-            onPlayPauseClick = { path, pos, onStop ->
-                arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
-            },
-            onThumbPrepare = { graphicNote, noteCanvas ->
-                val tempNoteViewModel: GraphicNotesViewModel by viewModels()
-                noteCanvas.setViewModel(viewModel = tempNoteViewModel)
+        if (notesAdapter == null) {
+            notesAdapter = NotesListAdapter(
+                notes,
+                onPlayPauseClick = { path, pos, onStop ->
+                    arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
+                },
+                onThumbPrepare = { graphicNote, noteCanvas ->
+                    val tempNoteViewModel: GraphicNotesViewModel by viewModels()
+                    noteCanvas.setViewModel(viewModel = tempNoteViewModel)
 
-            }
-        )
+                }
+            )
+
+        } else {
+            notesAdapter?.setNotes(notes)
+        }
+
         val layoutManager = LinearLayoutManager(requireContext())
         arkMediaPlayerViewModel.collect(
-            stateToUI = { state -> adapter.observeItemState = { state } },
-            handleSideEffect = { effect -> adapter.observeItemSideEffect = { effect } }
+            stateToUI = { state -> notesAdapter?.observeItemState = { state } },
+            handleSideEffect = { effect -> notesAdapter?.observeItemSideEffect = { effect } }
         )
-        adapter.setActivity(activity)
-        adapter.setFragmentManager(childFragmentManager)
-        notesAdapter = adapter
+        notesAdapter?.setActivity(activity)
         binding.rvPinnedNotes.apply {
             this.layoutManager = layoutManager
-            this.adapter = adapter
+            this.adapter = notesAdapter
         }
         ItemTouchHelper(mItemTouchCallback).attachToRecyclerView(binding.rvPinnedNotes)
 

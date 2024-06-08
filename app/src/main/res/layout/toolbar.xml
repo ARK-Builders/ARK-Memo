@@ -64,7 +64,7 @@
         style="@style/ActionTextView"
         android:layout_marginEnd="@dimen/common_padding"
         android:clickable="true"
-        android:text="@string/ark_memo_done"
+        android:text="@string/save"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/iv_back"
         app:layout_constraintEnd_toEndOf="parent"

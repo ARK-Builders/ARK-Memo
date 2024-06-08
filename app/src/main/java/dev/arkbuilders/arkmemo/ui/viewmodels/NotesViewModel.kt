@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arklib.ResourceId
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,14 +78,21 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onSaveClick(note: Note, showProgress: (Boolean) -> Unit) {
+    fun onSaveClick(note: Note, parentNote: Note? = null, showProgress: (Boolean) -> Unit) {
+        val parentResourceId = note.resource?.id
         viewModelScope.launch(iODispatcher) {
             withContext(Dispatchers.Main) {
                 showProgress(true)
             }
             fun handleResult(result: SaveNoteResult) {
-                if (result == SaveNoteResult.SUCCESS) {
-                    add(note)
+                if (result == SaveNoteResult.SUCCESS_NEW
+                    || result == SaveNoteResult.SUCCESS_UPDATED) {
+
+                    if (result == SaveNoteResult.SUCCESS_NEW) {
+                        parentNote?.let { onDeleteConfirmed(parentNote) }
+
+                    }
+                    add(note, parentResourceId)
                 }
                 mSaveNoteResultLiveData.postValue(result)
             }
@@ -122,20 +130,10 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun getNotes(emit: (List<Note>) -> Unit) {
-        viewModelScope.launch(iODispatcher) {
-            notes.collectLatest {
-                withContext(Dispatchers.Main) {
-                    emit(it)
-                }
-            }
-        }
-    }
-
-    private fun add(note: Note) {
+    private fun add(note: Note, parentResId: ResourceId? = null) {
         val notes = this.notes.value.toMutableList()
         note.resource?.let {
-            notes.removeIf { it.resource?.id == note.resource?.id }
+            notes.removeIf { it.resource?.id == parentResId ?: note.resource?.id }
         }
         if (note is VoiceNote) {
             note.duration = (voiceNotesRepo as VoiceNotesRepo).extractDuration(note.path.pathString)

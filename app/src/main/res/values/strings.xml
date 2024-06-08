@@ -77,7 +77,8 @@
     <string name="graphic_control_eraser">Eraser</string>
     <string name="graphic_control_color">Color</string>
     <string name="brush_size_label">Size</string>
-    <string name="audio_record_guide_text">Tap “microphone button” to \nreplace with a new one</string>
+    <string name="audio_record_guide_text_replace">Tap “microphone button” to \nreplace with a new one</string>
+    <string name="audio_record_guide_text_new">Tap “microphone button” to record</string>
     <string name="content_desc_back_button">Back</string>
     <string name="note_last_modified_time">Last edited %s</string>
     <string name="setting_app_version">Version %s</string>

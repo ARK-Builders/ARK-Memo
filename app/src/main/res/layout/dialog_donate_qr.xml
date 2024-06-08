@@ -74,7 +74,7 @@
             android:layout_marginVertical="@dimen/medium_margin"
             android:layout_marginHorizontal="12dp"
             android:lines="1"
-            android:ellipsize="end"
+            android:ellipsize="middle"
             tools:text="bc1qx8n9r4uwpgrhgnamt2uew53lmrxd8tuevp7lv5"
             app:layout_constraintHorizontal_weight="0.7"
             android:id="@+id/tv_address"/>

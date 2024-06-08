@@ -79,7 +79,7 @@ class VoiceNotesRepo @Inject constructor(
         )
         note.path = resourcePath
         Log.d(VOICES_REPO, "resource renamed to $resourcePath successfully")
-        callback(SaveNoteResult.SUCCESS)
+        callback(SaveNoteResult.SUCCESS_NEW)
     }
 
     private suspend fun readStorage(): List<VoiceNote> = withContext(iODispatcher) {

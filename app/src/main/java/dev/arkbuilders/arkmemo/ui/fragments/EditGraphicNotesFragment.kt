@@ -28,6 +28,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         notesViewModel.init {}
         observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         if (arguments != null) {
+            @Suppress("DEPRECATION")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 requireArguments().getParcelable(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
                     note = it
@@ -71,7 +72,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         notesCanvas.setViewModel(graphicNotesViewModel)
         btnSave.setOnClickListener {
             val note = createNewNote()
-            notesViewModel.onSaveClick(note) { show ->
+            notesViewModel.onSaveClick(note, parentNote = this.note) { show ->
                 hostActivity.showProgressBar(show)
             }
         }

@@ -1,16 +1,16 @@
 package dev.arkbuilders.arkmemo.ui.activities
 
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setStatusBarColor(ContextCompat.getColor(this, R.color.white), true)
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -144,6 +145,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         title = getString(R.string.edit_note)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         showSettingsButton(false)
+    }
+
+    private fun setStatusBarColor(color: Int, isLight: Boolean) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = color
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
     }
 
     companion object{

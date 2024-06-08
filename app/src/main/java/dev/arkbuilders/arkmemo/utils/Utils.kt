@@ -21,7 +21,7 @@ fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
     result.observe(this) {
         if (!isResumed) return@observe
 
-        if (it == SaveNoteResult.SUCCESS) {
+        if (it == SaveNoteResult.SUCCESS_NEW || it == SaveNoteResult.SUCCESS_UPDATED) {
             context?.let { ctx ->
                 toast(ctx, getString(R.string.ark_memo_note_saved))
                 activity?.onBackPressedDispatcher?.onBackPressed()
