@@ -80,7 +80,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
             editNote.setText(noteStr)
 
         binding.tvSave.setOnClickListener {
-            notesViewModel.onSaveClick(createNewNote()) { show ->
+            notesViewModel.onSaveClick(createNewNote(), parentNote = note) { show ->
                 hostActivity.showProgressBar(show)
             }
         }

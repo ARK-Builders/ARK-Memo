@@ -25,7 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/iv_record"
-        android:text="@string/audio_record_guide_text"
+        android:text="@string/audio_record_guide_text_new"
         android:id="@+id/tv_record_guide"
         android:gravity="center_horizontal"
         android:layout_marginBottom="24dp"/>

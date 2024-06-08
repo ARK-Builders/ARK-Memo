@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import javax.inject.Inject
+import kotlin.NullPointerException
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
@@ -80,15 +81,21 @@ class NotesRepoHelper @Inject constructor(
     }
 
     suspend fun deleteNote(note: Note): Unit = withContext(Dispatchers.IO) {
+        val id = note.resource?.id
+
         val path = root.resolve("${note.resource?.name}")
         path.deleteIfExists()
         note.resource?.id?.let { resourceId ->
-            propertiesStorage.remove(resourceId)
+            try {
+                propertiesStorage.remove(resourceId)
+            } catch (ex: NullPointerException) {
+                Log.e("NotesRepoHelper", "deleteNote exception: " + ex.message)
+            }
         }
 
         propertiesStorage.persist()
         note.resource?.name?.let { name ->
-            Log.d("repo", "${name} has been deleted")
+            Log.d("NotesRepoHelper", "${name} has been deleted. id: " + id)
         }
     }
 }
