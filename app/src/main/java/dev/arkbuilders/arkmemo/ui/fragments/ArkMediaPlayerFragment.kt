@@ -49,6 +49,10 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
         return note
     }
 
+    override fun isContentChanged(): Boolean {
+        return note.title != binding.edtTitle.text.toString()
+    }
+
     private fun initUI() {
 
         binding.toolbar.ivRightActionIcon.setOnClickListener {

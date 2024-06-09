@@ -96,6 +96,14 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         return note
     }
 
+    override fun isContentChanged(): Boolean {
+        val originalPaths = note.svg?.getPaths() ?: emptyList()
+        val newPaths = graphicNotesViewModel.svg().getPaths()
+
+        return note.title != binding.edtTitle.text.toString()
+                || ((newPaths.size != originalPaths.size) || (!newPaths.containsAll(originalPaths)))
+    }
+
     private fun initBottomControls() {
         val tvBrushSize = binding.layoutGraphicsControl.tvBrushSize
         tvBrushSize.setOnClickListener {

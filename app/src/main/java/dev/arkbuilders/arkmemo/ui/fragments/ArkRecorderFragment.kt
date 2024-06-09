@@ -103,9 +103,6 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        binding.toolbar.ivBack.setOnClickListener {
-            showSaveNoteDialog()
-        }
         binding.toolbar.ivRightActionIcon.setImageResource(R.drawable.ic_delete_note)
 
         binding.layoutAudioRecord.root.visible()
@@ -189,8 +186,10 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                 )
                 ivPauseResume.isEnabled = true
                 binding.layoutAudioRecord.tvSaveRecording.isEnabled = false
+                binding.layoutAudioRecord.animRecording.playAnimation()
                 binding.layoutAudioRecord.animRecording.visible()
                 binding.layoutAudioRecord.animSoundWave.visible()
+                binding.layoutAudioRecord.animSoundWave.playAnimation()
                 binding.layoutAudioRecord.ivPauseResume.visible()
                 binding.layoutAudioRecord.ivStartOver.visible()
                 binding.layoutAudioView.root.gone()
@@ -216,6 +215,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                 binding.layoutAudioView.root.visible()
                 binding.layoutAudioView.tvDuration.text = effect.duration
                 binding.layoutAudioRecord.tvRecordGuide.visible()
+                binding.layoutAudioRecord.tvRecordGuide.text =
+                    getString(R.string.audio_record_guide_text_replace)
                 binding.layoutAudioRecord.tvDuration.setText(R.string.ark_memo_duration_default)
             }
             RecorderSideEffect.PauseRecording -> {
@@ -225,9 +226,11 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                     null
                 )
                 ivPauseResume.setImageDrawable(resumeIcon)
+                pauseOrResumeRecordingAnimation(false)
             }
             RecorderSideEffect.ResumeRecording -> {
                 showPauseIcon()
+                pauseOrResumeRecordingAnimation(true)
             }
         }
     }
@@ -282,6 +285,11 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         return createNewNote()
     }
 
+    override fun isContentChanged(): Boolean {
+        return binding.edtTitle.text.toString().isNotEmpty()
+                || arkRecorderViewModel.isRecordExisting()
+    }
+
     private fun saveNote() {
         notesViewModel.onSaveClick(createNewNote()) { show ->
             activity.showProgressBar(show)
@@ -296,6 +304,16 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                     handleSideEffect = { handlePlaySideEffect(it) }
                 )
             }
+        }
+    }
+
+    private fun pauseOrResumeRecordingAnimation(resume: Boolean) {
+        if (resume) {
+            binding.layoutAudioRecord.animSoundWave.resumeAnimation()
+            binding.layoutAudioRecord.animRecording.resumeAnimation()
+        } else {
+            binding.layoutAudioRecord.animSoundWave.pauseAnimation()
+            binding.layoutAudioRecord.animRecording.pauseAnimation()
         }
     }
 
