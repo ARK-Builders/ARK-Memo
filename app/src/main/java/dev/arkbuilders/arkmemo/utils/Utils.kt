@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
@@ -53,9 +54,11 @@ fun AppCompatActivity.resumeFragment(fragment: Fragment){
     }
 }
 
-fun Context.getTextFromClipBoard(): String?{
-    val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
+fun Context.getTextFromClipBoard(view: View?, onSuccess: (text: String?) -> Unit) {
+    view?.post {
+        val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        onSuccess.invoke(clipboardManager.primaryClip?.getItemAt(0)?.text?.toString())
+    } ?: return
 }
 
 fun Context.copyToClipboard(label: String, text: String) {

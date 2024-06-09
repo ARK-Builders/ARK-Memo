@@ -51,12 +51,14 @@ class NotesFragment: Fragment() {
     }
 
     private val pasteNoteClickListener = View.OnClickListener {
-        val clipBoardText = requireContext().getTextFromClipBoard()
-        if (clipBoardText != null) {
-            activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
-            activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+        requireContext().getTextFromClipBoard(view) { clipBoardText ->
+            if (clipBoardText != null) {
+                activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
+                activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+            }
+            else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste),
+                Toast.LENGTH_SHORT).show()
         }
-        else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
     }
 
     private val mItemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -232,12 +234,14 @@ class NotesFragment: Fragment() {
     }
 
     private fun observeClipboardContent() {
-        context?.getTextFromClipBoard()?.let {
-            binding.tvPaste.alpha = 1f
-            binding.tvPaste.isClickable = true
-        } ?: let {
-            binding.tvPaste.alpha = 0.4f
-            binding.tvPaste.isClickable = false
+        context?.getTextFromClipBoard(view) {
+            if (it.isNullOrEmpty()) {
+                binding.tvPaste.alpha = 0.4f
+                binding.tvPaste.isClickable = false
+            } else {
+                binding.tvPaste.alpha = 1f
+                binding.tvPaste.isClickable = true
+            }
         }
     }
 

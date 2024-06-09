@@ -22,14 +22,16 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
     private var noteStr: String? = null
 
     private val pasteNoteClickListener = View.OnClickListener {
-        val clipBoardText = requireContext().getTextFromClipBoard()
-        if (clipBoardText != null) {
-            val newTextBuilder = StringBuilder()
-            newTextBuilder.append(binding.editNote.text.toString()).append(clipBoardText)
-            binding.editNote.setText(newTextBuilder.toString())
-            binding.editNote.setSelection(binding.editNote.text.length)
+        requireContext().getTextFromClipBoard(view) { clipBoardText ->
+            if (clipBoardText != null) {
+                val newTextBuilder = StringBuilder()
+                newTextBuilder.append(binding.editNote.text.toString()).append(clipBoardText)
+                binding.editNote.setText(newTextBuilder.toString())
+                binding.editNote.setSelection(binding.editNote.text.length)
+            }
+            else Toast.makeText(requireContext(),
+                getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
         }
-        else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,20 +90,13 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         binding.tvPaste.setOnClickListener(pasteNoteClickListener)
 
         binding.editTextDescription.setText(this.note.description)
-        binding.toolbar.ivBack.setOnClickListener {
-            if (isContentChanged()) {
-                showSaveNoteDialog()
-            } else {
-                hostActivity.onBackPressedDispatcher.onBackPressed()
-            }
-        }
         binding.toolbar.ivRightActionIcon.setImageResource(R.drawable.ic_delete_note)
         binding.toolbar.ivRightActionIcon.setOnClickListener {
             showDeleteNoteDialog(note)
         }
     }
 
-    private fun isContentChanged(): Boolean {
+    override fun isContentChanged(): Boolean {
         return note.title != binding.edtTitle.text.toString()
                 || note.text != binding.editNote.text.toString()
     }
@@ -125,12 +120,14 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
     }
 
     private fun observeClipboardContent() {
-        context?.getTextFromClipBoard()?.let {
-            binding.tvPaste.alpha = 1f
-            binding.tvPaste.isClickable = true
-        } ?: let {
-            binding.tvPaste.alpha = 0.4f
-            binding.tvPaste.isClickable = false
+        context?.getTextFromClipBoard(view) {
+            if (it.isNullOrEmpty()) {
+                binding.tvPaste.alpha = 0.4f
+                binding.tvPaste.isClickable = false
+            } else {
+                binding.tvPaste.alpha = 1f
+                binding.tvPaste.isClickable = true
+            }
         }
     }
 

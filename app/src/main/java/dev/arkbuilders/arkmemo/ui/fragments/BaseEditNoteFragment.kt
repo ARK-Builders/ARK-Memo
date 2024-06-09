@@ -51,7 +51,7 @@ abstract class BaseEditNoteFragment: Fragment() {
         }
 
         binding.toolbar.ivBack.setOnClickListener {
-            activity?.onBackPressedDispatcher?.onBackPressed()
+            handleBackPressed()
         }
 
         if (this is ArkMediaPlayerFragment) {
@@ -99,7 +99,7 @@ abstract class BaseEditNoteFragment: Fragment() {
         }
     }
 
-    fun showSaveNoteDialog() {
+    private fun showSaveNoteDialog() {
         val saveNoteDialog = CommonActionDialog(
             title = R.string.dialog_save_note_title,
             message = R.string.dialog_save_note_message,
@@ -132,6 +132,15 @@ abstract class BaseEditNoteFragment: Fragment() {
             }).show(parentFragmentManager, CommonActionDialog.TAG)
     }
 
+    private fun handleBackPressed() {
+        if (isContentChanged()) {
+            showSaveNoteDialog()
+        } else {
+            hostActivity.onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
     abstract fun createNewNote(): Note
     abstract fun getCurrentNote(): Note
+    abstract fun isContentChanged(): Boolean
 }
