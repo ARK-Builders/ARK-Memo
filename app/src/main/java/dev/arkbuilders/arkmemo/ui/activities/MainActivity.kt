@@ -21,6 +21,7 @@ import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
 import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.fragments.BaseEditNoteFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
@@ -151,6 +152,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = color
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
+    }
+
+    override fun onBackPressed() {
+        if (fragment is BaseEditNoteFragment) {
+            (fragment as? BaseEditNoteFragment)?.onBackPressed()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     companion object{

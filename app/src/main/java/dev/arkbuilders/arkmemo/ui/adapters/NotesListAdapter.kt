@@ -15,7 +15,7 @@ import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.fragments.ArkMediaPlayerFragment
+import dev.arkbuilders.arkmemo.ui.fragments.ArkRecorderFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
@@ -64,8 +64,14 @@ class NotesListAdapter(
         }
         holder.layoutAudioView.root.isVisible = false
         if (note is VoiceNote) {
-            holder.layoutAudioView.root.isVisible = true
-            holder.layoutAudioView.tvDuration.text = note.duration
+            val isRecordingExist = note.path.toFile().length() > 0L
+            if (isRecordingExist) {
+                holder.layoutAudioView.root.isVisible = true
+                holder.layoutAudioView.tvDuration.text = note.duration
+            } else {
+                holder.layoutAudioView.root.gone()
+            }
+
             holder.btnPlayPause.setOnClickListener {
                 onPlayPauseClick(note.path.toString(), position) { stopPos ->
                     showPlayIcon(holder)
@@ -160,8 +166,8 @@ class NotesListAdapter(
                     tag = EditGraphicNotesFragment.TAG
                 }
                 is VoiceNote -> {
-                    activity.fragment = ArkMediaPlayerFragment.newInstance(selectedNote)
-                    tag = ArkMediaPlayerFragment.TAG
+                    activity.fragment = ArkRecorderFragment.newInstance(selectedNote)
+                    tag = ArkRecorderFragment.TAG
                 }
             }
             activity.replaceFragment(activity.fragment, tag)

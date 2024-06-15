@@ -22,4 +22,6 @@ interface ArkMediaPlayer:
     fun currentPosition(): Int
 
     fun isPlaying(): Boolean
+
+    fun isInitialized(): Boolean
 }

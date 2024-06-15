@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 sealed class ArkMediaPlayerSideEffect {
@@ -133,6 +134,9 @@ class ArkMediaPlayerViewModel @Inject constructor(
     }
 
     fun getDurationMillis(onSuccess: (duration: Long) -> Unit) {
+        if (currentPlayingVoiceNotePath.isEmpty()
+            || File(currentPlayingVoiceNotePath).length() == 0L) return
+
         viewModelScope.launch(Dispatchers.IO) {
             val metadataRetriever = MediaMetadataRetriever()
             metadataRetriever.setDataSource(currentPlayingVoiceNotePath)
@@ -143,5 +147,9 @@ class ArkMediaPlayerViewModel @Inject constructor(
                 onSuccess.invoke(duration)
             }
         }
+    }
+
+    fun isPlayerInitialized(): Boolean{
+        return arkMediaPlayer.isInitialized()
     }
 }

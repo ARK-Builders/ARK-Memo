@@ -69,4 +69,8 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
     }
 
     override fun onSeekComplete(player: MediaPlayer?) {}
+
+    override fun isInitialized(): Boolean {
+        return player != null
+    }
 }

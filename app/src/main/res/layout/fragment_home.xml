@@ -352,6 +352,7 @@
         android:alpha="0.7"
         android:id="@+id/view_fab_background"
         android:visibility="gone"
+        android:clickable="true"
         app:layout_constraintBottom_toTopOf="@+id/divider_bottom_control"/>
 
 <!--    <TextView-->

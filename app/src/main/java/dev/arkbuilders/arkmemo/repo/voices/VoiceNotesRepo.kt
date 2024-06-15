@@ -57,6 +57,11 @@ class VoiceNotesRepo @Inject constructor(
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
 
+        val isPropertiesChanged = helper.persistNoteProperties(
+            resourceId = id,
+            noteTitle = note.title,
+            description = note.description)
+
         Log.d(VOICES_REPO, "initial resource name is ${tempPath.name}")
 
         helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
@@ -67,7 +72,11 @@ class VoiceNotesRepo @Inject constructor(
                 VOICES_REPO,
                 "resource with similar content already exists"
             )
-            callback(SaveNoteResult.ERROR_EXISTING)
+            if (isPropertiesChanged) {
+                callback(SaveNoteResult.SUCCESS_UPDATED)
+            } else {
+                callback(SaveNoteResult.ERROR_EXISTING)
+            }
             return@withContext
         }
 
@@ -111,12 +120,12 @@ class VoiceNotesRepo @Inject constructor(
                 MediaMetadataRetriever.METADATA_KEY_DURATION
             )?.toLong() ?: 0L
             millisToString(duration)
-        } catch (e: IllegalArgumentException) {
+        } catch (e: Exception) {
             Log.e(VOICES_REPO, "extractDuration exception: " + e.message)
             ""
         }
     }
 }
 
-private const val VOICES_REPO = "voices-repo"
+private const val VOICES_REPO = "VoiceNotesRepo"
 private const val VOICE_EXT = "3gp"
