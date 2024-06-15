@@ -69,12 +69,16 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
         if (File(note.path.toString()).exists()) {
             arkMediaPlayerViewModel.setPath(note.path.toString())
             binding.layoutAudioView.root.visible()
+            binding.layoutAudioRecord.root.visible()
+            binding.layoutAudioRecord.tvRecordGuide.text =
+                getString(R.string.audio_record_guide_text_replace)
             arkMediaPlayerViewModel.getDurationMillis { duration ->
                 binding.layoutAudioView.tvDuration.text = millisToString(duration)
             }
 
         } else {
             binding.layoutAudioView.root.gone()
+            binding.layoutAudioRecord.root.gone()
         }
 
         binding.layoutAudioView.ivPlayAudio.setOnClickListener {
@@ -82,8 +86,6 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
             arkMediaPlayerViewModel.initPlayer(recordingPath)
             arkMediaPlayerViewModel.onPlayOrPauseClick(recordingPath)
         }
-
-        binding.layoutAudioRecord.root.gone()
 
     }
 

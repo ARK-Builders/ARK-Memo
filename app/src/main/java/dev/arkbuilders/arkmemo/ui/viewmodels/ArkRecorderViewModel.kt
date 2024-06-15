@@ -167,4 +167,8 @@ class ArkRecorderViewModel @Inject constructor(
         timer?.cancel()
         timer = null
     }
+
+    fun isRecording(): Boolean {
+        return isRecording.value
+    }
 }

@@ -140,6 +140,10 @@ abstract class BaseEditNoteFragment: Fragment() {
         }
     }
 
+    fun onBackPressed() {
+        handleBackPressed()
+    }
+
     abstract fun createNewNote(): Note
     abstract fun getCurrentNote(): Note
     abstract fun isContentChanged(): Boolean

@@ -100,5 +100,6 @@
     <string name="dialog_donate_qr_download">Download QR image</string>
     <string name="toast_save_qr_success">QR saved at %s</string>
     <string name="tips_will_be_available_soon">Will be available soon!</string>
+    <string name="toast_invalid_recording">Invalid recording file</string>
 
 </resources>

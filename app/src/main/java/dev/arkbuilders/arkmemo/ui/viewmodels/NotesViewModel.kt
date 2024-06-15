@@ -79,7 +79,7 @@ class NotesViewModel @Inject constructor(
     }
 
     fun onSaveClick(note: Note, parentNote: Note? = null, showProgress: (Boolean) -> Unit) {
-        val parentResourceId = note.resource?.id
+        val noteResId = note.resource?.id
         viewModelScope.launch(iODispatcher) {
             withContext(Dispatchers.Main) {
                 showProgress(true)
@@ -92,7 +92,7 @@ class NotesViewModel @Inject constructor(
                         parentNote?.let { onDeleteConfirmed(parentNote) }
 
                     }
-                    add(note, parentResourceId)
+                    add(note, noteResId)
                 }
                 mSaveNoteResultLiveData.postValue(result)
             }

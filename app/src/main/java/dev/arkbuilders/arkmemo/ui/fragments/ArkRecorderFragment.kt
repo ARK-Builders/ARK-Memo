@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,11 +32,14 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
 import dev.arkbuilders.arkmemo.ui.views.WaveView
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.launch
+import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.io.path.Path
 
 @AndroidEntryPoint
 class ArkRecorderFragment: BaseEditNoteFragment() {
@@ -56,6 +60,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
     private lateinit var ivPauseResume: ImageView
     private lateinit var tvDuration: TextView
     private lateinit var waveView: WaveView
+
+    private var note: VoiceNote? = null
 
     private val defaultNoteTitle by lazy { getString(
         R.string.ark_memo_voice_note,
@@ -87,6 +93,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initUI()
+        initExistingNoteUI()
         observeViewModel()
     }
 
@@ -112,13 +119,16 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         waveView = binding.recorderViewBinding.waveView
 
         ivPauseResume.isEnabled = false
-        binding.layoutAudioRecord.tvSaveRecording.isEnabled = false
+        enableSaveText(false)
 
         etTitle.hint = defaultNoteTitle
         etTitle.addTextChangedListener(etTitleWatcher)
 
         ivRecord.setOnClickListener {
-            if (arkRecorderViewModel.isRecordExisting()) {
+            if (!arkRecorderViewModel.isRecording()
+                && (arkRecorderViewModel.isRecordExisting() ||
+                        File(getCurrentRecordingPath()).length() > 0L)) {
+
                 CommonActionDialog(title = R.string.dialog_replace_recording_title,
                     message = R.string.dialog_replace_recording_message,
                     positiveText = R.string.dialog_replace_recording_positive_text,
@@ -143,9 +153,16 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         }
 
         binding.layoutAudioView.ivPlayAudio.setOnClickListener {
-            val recordingPath = arkRecorderViewModel.getRecordingPath().toString()
-            mediaPlayViewModel.initPlayer(recordingPath)
-            mediaPlayViewModel.onPlayOrPauseClick(recordingPath)
+            val recordingPath = getCurrentRecordingPath()
+            if (recordingPath.isEmpty()) {
+                toast(requireContext(), getString(R.string.toast_invalid_recording))
+            } else {
+                if (!mediaPlayViewModel.isPlayerInitialized()) {
+                    mediaPlayViewModel.initPlayer(recordingPath)
+                }
+
+                mediaPlayViewModel.onPlayOrPauseClick(recordingPath)
+            }
         }
 
         binding.layoutAudioRecord.tvSaveRecording.setOnClickListener {
@@ -185,7 +202,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                     ContextCompat.getColor(activity, R.color.warning_50)
                 )
                 ivPauseResume.isEnabled = true
-                binding.layoutAudioRecord.tvSaveRecording.isEnabled = false
+                enableSaveText(false)
                 binding.layoutAudioRecord.animRecording.playAnimation()
                 binding.layoutAudioRecord.animRecording.visible()
                 binding.layoutAudioRecord.animSoundWave.visible()
@@ -206,7 +223,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                     ContextCompat.getColor(activity, R.color.warning)
                 )
                 ivPauseResume.isEnabled = false
-                binding.layoutAudioRecord.tvSaveRecording.isEnabled = true
+                enableSaveText(true)
                 showPauseIcon()
                 binding.layoutAudioRecord.animRecording.gone()
                 binding.layoutAudioRecord.animSoundWave.gone()
@@ -277,21 +294,30 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
     override fun createNewNote(): Note {
         return VoiceNote(
             title = binding.edtTitle.text.toString().ifEmpty { defaultNoteTitle },
-            path = arkRecorderViewModel.getRecordingPath()
+            path = Path(getCurrentRecordingPath())
         )
     }
 
     override fun getCurrentNote(): Note {
-        return createNewNote()
+        return note ?: createNewNote()
     }
 
     override fun isContentChanged(): Boolean {
-        return binding.edtTitle.text.toString().isNotEmpty()
-                || arkRecorderViewModel.isRecordExisting()
+        return if (note != null) {
+            val originalTitle = note?.title
+            val originalRecordingSize = note?.path?.toFile()?.length() ?: 0
+            val currentRecordingSize = arkRecorderViewModel.getRecordingPath().toFile().length()
+
+            (!originalTitle.equals(binding.edtTitle.text.toString())
+                    || (originalRecordingSize != currentRecordingSize && currentRecordingSize > 0))
+        } else {
+            (binding.edtTitle.text.toString().isNotEmpty()
+                    || arkRecorderViewModel.isRecordExisting())
+        }
     }
 
     private fun saveNote() {
-        notesViewModel.onSaveClick(createNewNote()) { show ->
+        notesViewModel.onSaveClick(createNewNote(), parentNote = note) { show ->
             activity.showProgressBar(show)
         }
     }
@@ -317,10 +343,57 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         }
     }
 
+    private fun enableSaveText(enabled: Boolean) {
+        binding.layoutAudioRecord.tvSaveRecording.isEnabled = enabled
+        if (enabled) {
+            binding.layoutAudioRecord.tvSaveRecording.alpha = 1f
+        } else {
+            binding.layoutAudioRecord.tvSaveRecording.alpha = 0.4f
+        }
+    }
+
+    private fun setNote(note: VoiceNote) {
+        this.note = note
+    }
+
+    private fun initExistingNoteUI() {
+        val notePath = note?.path.toString()
+        if (File(notePath).exists() && (note?.path?.toFile()?.length() ?: 0L) > 0L) {
+            mediaPlayViewModel.setPath(notePath)
+            binding.layoutAudioView.root.visible()
+            binding.layoutAudioRecord.tvRecordGuide.text =
+                getString(R.string.audio_record_guide_text_replace)
+            mediaPlayViewModel.getDurationMillis { duration ->
+                binding.layoutAudioView.tvDuration.text = millisToString(duration)
+            }
+
+        } else {
+            binding.layoutAudioView.root.gone()
+        }
+        binding.edtTitle.setText(note?.title)
+        binding.edtTitle.addTextChangedListener {
+            enableSaveText(it.toString() != note?.title)
+        }
+    }
+
+    private fun getCurrentRecordingPath(): String {
+
+        val tempRecordingPath = arkRecorderViewModel.getRecordingPath()
+        return if (tempRecordingPath.toFile().length() > 0) {
+            tempRecordingPath.toString()
+        } else if ((note?.path?.toFile()?.length() ?: 0) > 0) {
+            note?.path.toString()
+        } else {
+            tempRecordingPath.toString()
+        }
+    }
+
     companion object {
 
         const val TAG = "voice-notes-fragment"
 
-        fun newInstance() = ArkRecorderFragment()
+        fun newInstance(note: VoiceNote? = null) = ArkRecorderFragment().apply {
+            note?.let { this.setNote(note) }
+        }
     }
 }
