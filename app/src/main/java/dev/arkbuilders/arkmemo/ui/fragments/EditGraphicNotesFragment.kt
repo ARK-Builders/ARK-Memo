@@ -4,13 +4,29 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.ui.adapters.BrushAdapter
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlack
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlue
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGreen
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGrey
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorOrange
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorPurple
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorRed
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeHuge
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeLarge
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeMedium
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
+import dev.arkbuilders.arkmemo.ui.adapters.EqualSpacingItemDecoration
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
@@ -20,8 +36,19 @@ import dev.arkbuilders.arkmemo.utils.visible
 class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
     private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
-
     private var note = GraphicNote()
+
+    private val colorBrushes by lazy {
+        listOf(
+            BrushColorBlack, BrushColorGrey, BrushColorRed,
+            BrushColorOrange, BrushColorGreen, BrushColorBlue, BrushColorPurple)
+    }
+
+    private val sizeBrushes by lazy {
+        listOf(
+            BrushSizeTiny, BrushSizeSmall, BrushSizeMedium,
+            BrushSizeLarge, BrushSizeHuge)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,6 +137,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             tvBrushSize.setSelectState(!tvBrushSize.isSelectedState)
             if (tvBrushSize.isSelectedState) {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.visible()
+                showBrushSizeList()
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
                 binding.layoutGraphicsControl.tvEraser.setSelectState(false)
                 binding.layoutGraphicsControl.tvBrushColor.setSelectState(false)
@@ -123,6 +151,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             tvEraser.setSelectState(!tvEraser.isSelectedState)
             if (tvEraser.isSelectedState) {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.visible()
+                showBrushSizeList()
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
                 binding.layoutGraphicsControl.tvBrushSize.setSelectState(false)
                 binding.layoutGraphicsControl.tvBrushColor.setSelectState(false)
@@ -135,6 +164,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         tvColor.setOnClickListener {
             tvColor.setSelectState(!tvColor.isSelectedState)
             if (tvColor.isSelectedState) {
+                showBrushColorList()
                 binding.layoutGraphicsControl.layoutColorChooser.root.visible()
                 binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
                 binding.layoutGraphicsControl.tvBrushSize.setSelectState(false)
@@ -150,8 +180,64 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         hostActivity.fragment = this
     }
 
+    private fun showBrushSizeList() {
+
+        val brushSizeAdapter = BrushAdapter(
+            attributes = sizeBrushes.apply {
+                val selectedIndex = this.indexOfFirst { it.isSelected }
+                if (selectedIndex == -1) {
+                    sizeBrushes[0].isSelected = true
+                }
+            },
+            onItemClick = { attribute, pos ->
+                Log.v(TAG, "onSizeSelected: " + attribute)
+            }
+        )
+
+        val layoutMgr = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.layoutGraphicsControl.layoutSizeChooser.rvBrushSizes.apply {
+            while (this.itemDecorationCount > 0) {
+                this.removeItemDecorationAt(0)
+            }
+            addItemDecoration(EqualSpacingItemDecoration(context.resources.getDimensionPixelSize(
+                R.dimen.brush_size_item_margin), EqualSpacingItemDecoration.HORIZONTAL)
+            )
+            this.isNestedScrollingEnabled = false
+            layoutManager = layoutMgr
+            adapter = brushSizeAdapter
+        }
+    }
+
+    private fun showBrushColorList() {
+
+        val brushColorAdapter = BrushAdapter(
+            attributes = colorBrushes.apply {
+                val selectedIndex = this.indexOfFirst { it.isSelected }
+                if (selectedIndex == -1) {
+                    colorBrushes[0].isSelected = true
+                }
+            },
+            onItemClick = { attribute, pos ->
+                Log.v(TAG, "onColorSelected: " + attribute)
+            }
+        )
+
+        val layoutMgr = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.layoutGraphicsControl.layoutColorChooser.rvBrushColors.apply {
+            while (this.itemDecorationCount > 0) {
+                this.removeItemDecorationAt(0)
+            }
+            addItemDecoration(EqualSpacingItemDecoration(context.resources.getDimensionPixelSize(
+                R.dimen.brush_color_item_margin), EqualSpacingItemDecoration.HORIZONTAL)
+            )
+            this.isNestedScrollingEnabled = false
+            layoutManager = layoutMgr
+            adapter = brushColorAdapter
+        }
+    }
+
     companion object {
-        const val TAG = "graphical notes"
+        const val TAG = "EditGraphicNotesFragment"
         private const val GRAPHICAL_NOTE_KEY = "graphical note"
 
         fun newInstance() = EditGraphicNotesFragment()

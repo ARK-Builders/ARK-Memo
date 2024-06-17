@@ -76,11 +76,5 @@ open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
 
         binding.tvBounties.setOnClickListener {
         }
-
-//        if (binding.tvBounties.isEnabled) {
-//            binding.tvBounties.setOnClickListener {
-//            }
-//        }
-
     }
 }
