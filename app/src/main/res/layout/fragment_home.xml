@@ -104,7 +104,8 @@
         android:id="@+id/iv_record"
         android:clickable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
-        android:background="@drawable/bg_rect_button"/>
+        android:background="@drawable/bg_rect_button"
+        android:contentDescription="@string/ark_memo_record" />
 
 <!--    <ImageView-->
 <!--        android:layout_width="@dimen/common_button_height"-->
@@ -133,7 +134,8 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         android:padding="14dp"
         android:id="@+id/iv_draw"
-        android:background="@drawable/bg_rect_button"/>
+        android:background="@drawable/bg_rect_button"
+        android:contentDescription="@string/hint_new_graphical_note" />
 
 <!--    <ImageView-->
 <!--        android:layout_width="@dimen/common_button_height"-->
@@ -293,7 +295,8 @@
         app:layout_constraintBottom_toTopOf="@+id/fab_new_action"
         android:visibility="gone"
         tools:visibility="visible"
-        android:layout_marginBottom="@dimen/common_padding" />
+        android:layout_marginBottom="@dimen/common_padding"
+        android:contentDescription="@string/hint_new_graphical_note" />
 
 <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
 <!--        android:id="@+id/fab_attach_file"-->
@@ -319,7 +322,8 @@
         app:layout_constraintBottom_toTopOf="@+id/fab_draw"
         android:visibility="gone"
         tools:visibility="visible"
-        android:layout_marginBottom="@dimen/common_padding" />
+        android:layout_marginBottom="@dimen/common_padding"
+        android:contentDescription="@string/fab_record_voice" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_simple_memo"
@@ -332,7 +336,8 @@
         app:layout_constraintBottom_toTopOf="@+id/fab_record_voice"
         android:visibility="gone"
         tools:visibility="visible"
-        android:layout_marginBottom="@dimen/common_padding" />
+        android:layout_marginBottom="@dimen/common_padding"
+        android:contentDescription="@string/ark_memo_add_new_note" />
 
     <androidx.constraintlayout.widget.Group
         android:layout_width="wrap_content"

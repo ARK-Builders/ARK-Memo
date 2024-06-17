@@ -31,6 +31,13 @@
     <!-- Graphic note -->
     <dimen name="brush_size_icon">36dp</dimen>
     <dimen name="brush_color_indicator_padding">2dp</dimen>
+    <dimen name="brush_size_tiny_padding">12dp</dimen>
+    <dimen name="brush_size_small_padding">10dp</dimen>
+    <dimen name="brush_size_medium_padding">8dp</dimen>
+    <dimen name="brush_size_large_padding">6dp</dimen>
+    <dimen name="brush_size_huge_padding">2dp</dimen>
+    <dimen name="brush_size_item_margin">23dp</dimen>
+    <dimen name="brush_color_item_margin">14dp</dimen>
 
     <!-- Settings -->
     <dimen name="setting_support_icon_size">20dp</dimen>

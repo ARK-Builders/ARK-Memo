@@ -12,77 +12,18 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="8dp"
         android:text="@string/brush_size_label"
-        android:textFontWeight="700"
+        android:layout_marginStart="@dimen/common_padding"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/iv_size_x_small"
-        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/iv_size_x_small"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="12dp"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_size_label"
-        app:layout_constraintEnd_toStartOf="@+id/iv_size_small"
-        app:layout_constraintHorizontal_chainStyle="spread"
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@+id/tv_size_label"
-        app:layout_constraintTop_toTopOf="@+id/tv_size_label"
-        app:tint="@color/fg_primary" />
-
-    <ImageView
-        android:id="@+id/iv_size_small"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="10dp"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_size_label"
-        app:layout_constraintEnd_toStartOf="@+id/iv_size_medium"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_size_x_small"
-        app:layout_constraintTop_toTopOf="@+id/tv_size_label"
-        app:tint="@color/fg_primary" />
-
-    <ImageView
-        android:id="@+id/iv_size_medium"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="8dp"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_size_label"
-        app:layout_constraintEnd_toStartOf="@+id/iv_size_large"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_size_small"
-        app:layout_constraintTop_toTopOf="@+id/tv_size_label"
-        app:tint="@color/fg_primary" />
-
-    <ImageView
-        android:id="@+id/iv_size_large"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="6dp"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_size_label"
-        app:layout_constraintEnd_toStartOf="@+id/iv_size_huge"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_size_medium"
-        app:layout_constraintTop_toTopOf="@+id/tv_size_label"
-        app:tint="@color/fg_primary" />
-
-    <ImageView
-        android:id="@+id/iv_size_huge"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:layout_marginEnd="17dp"
-        android:padding="2dp"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_size_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_size_large"
-        app:layout_constraintTop_toTopOf="@+id/tv_size_label"
-        app:tint="@color/fg_primary" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/rv_brush_sizes"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,97 +5,13 @@
     android:layout_height="wrap_content"
     android:paddingBottom="4dp">
 
-    <ImageView
-        android:id="@+id/iv_color_black"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="@dimen/brush_color_indicator_padding"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/iv_color_grey"
-        app:layout_constraintHorizontal_chainStyle="spread"
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/brush_color_black" />
-
-    <ImageView
-        android:id="@+id/iv_color_grey"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="@dimen/brush_color_indicator_padding"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_color_black"
-        app:layout_constraintEnd_toStartOf="@+id/iv_color_red"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_color_black"
-        app:layout_constraintTop_toTopOf="@+id/iv_color_black"
-        app:tint="@color/brush_color_grey" />
-
-    <ImageView
-        android:id="@+id/iv_color_red"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="@dimen/brush_color_indicator_padding"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_color_black"
-        app:layout_constraintEnd_toStartOf="@+id/iv_color_orange"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_color_grey"
-        app:layout_constraintTop_toTopOf="@+id/iv_color_black"
-        app:tint="@color/brush_color_red" />
-
-    <ImageView
-        android:id="@+id/iv_color_orange"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="@dimen/brush_color_indicator_padding"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_color_black"
-        app:layout_constraintEnd_toStartOf="@+id/iv_color_green"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_color_red"
-        app:layout_constraintTop_toTopOf="@+id/iv_color_black"
-        app:tint="@color/brush_color_orange" />
-
-    <ImageView
-        android:id="@+id/iv_color_green"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:layout_marginEnd="17dp"
-        android:padding="@dimen/brush_color_indicator_padding"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_color_black"
-        app:layout_constraintEnd_toStartOf="@+id/iv_color_blue"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_color_orange"
-        app:layout_constraintTop_toTopOf="@+id/iv_color_black"
-        app:tint="@color/brush_color_green" />
-
-    <ImageView
-        android:id="@+id/iv_color_blue"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:layout_marginEnd="17dp"
-        android:padding="@dimen/brush_color_indicator_padding"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_color_black"
-        app:layout_constraintEnd_toStartOf="@+id/iv_color_purple"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_color_green"
-        app:layout_constraintTop_toTopOf="@+id/iv_color_black"
-        app:tint="@color/brush_color_blue" />
-
-    <ImageView
-        android:id="@+id/iv_color_purple"
-        android:layout_width="@dimen/brush_size_icon"
-        android:layout_height="@dimen/brush_size_icon"
-        android:padding="@dimen/brush_color_indicator_padding"
-        android:src="@drawable/bg_round_button"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_color_black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@+id/iv_color_blue"
-        app:layout_constraintTop_toTopOf="@+id/iv_color_black"
-        app:tint="@color/brush_color_purple" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/rv_brush_colors"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
