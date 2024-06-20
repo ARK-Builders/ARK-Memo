@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.Note
@@ -63,6 +64,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
                 if (title.isEmpty()) {
                     binding.edtTitle.hint = getString(R.string.hint_new_text_note)
                 }
+                enableSaveText(isContentChanged() && !isContentEmpty())
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -74,6 +76,9 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
         noteTitle.setText(this.note.title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
+        editNote.addTextChangedListener {
+            enableSaveText(isContentChanged() && !isContentEmpty())
+        }
         editNote.isVisible = true
         editNote.requestFocus()
         editNote.setText(this.note.text)
@@ -86,6 +91,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
                 hostActivity.showProgressBar(show)
             }
         }
+        enableSaveText(false)
 
         binding.tvPaste.setOnClickListener(pasteNoteClickListener)
 
@@ -99,6 +105,10 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
     override fun isContentChanged(): Boolean {
         return note.title != binding.edtTitle.text.toString()
                 || note.text != binding.editNote.text.toString()
+    }
+
+    override fun isContentEmpty(): Boolean {
+        return binding.editNote.text.toString().trim().isEmpty()
     }
 
     override fun onResume() {
@@ -121,13 +131,24 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
     private fun observeClipboardContent() {
         context?.getTextFromClipBoard(view) {
-            if (it.isNullOrEmpty()) {
+            val clipboardTextEmpty = it.isNullOrEmpty()
+            if (clipboardTextEmpty) {
                 binding.tvPaste.alpha = 0.4f
                 binding.tvPaste.isClickable = false
             } else {
                 binding.tvPaste.alpha = 1f
                 binding.tvPaste.isClickable = true
             }
+            enableSaveText(!clipboardTextEmpty && isContentChanged())
+        }
+    }
+
+    private fun enableSaveText(enabled: Boolean) {
+        binding.tvSave.isEnabled = enabled
+        if (enabled) {
+            binding.tvSave.alpha = 1f
+        } else {
+            binding.tvSave.alpha = 0.4f
         }
     }
 

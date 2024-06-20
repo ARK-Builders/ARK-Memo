@@ -316,6 +316,11 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         }
     }
 
+    override fun isContentEmpty(): Boolean {
+        return (!arkRecorderViewModel.isRecordExisting()
+                && ((note?.path?.toFile()?.length() ?: 0L) == 0L))
+    }
+
     private fun saveNote() {
         notesViewModel.onSaveClick(createNewNote(), parentNote = note) { show ->
             activity.showProgressBar(show)
@@ -372,7 +377,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         }
         binding.edtTitle.setText(note?.title)
         binding.edtTitle.addTextChangedListener {
-            enableSaveText(it.toString() != note?.title)
+            enableSaveText(isContentChanged() && !isContentEmpty())
         }
     }
 

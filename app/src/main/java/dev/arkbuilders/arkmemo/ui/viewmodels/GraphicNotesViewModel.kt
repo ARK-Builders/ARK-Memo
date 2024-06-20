@@ -3,6 +3,8 @@ package dev.arkbuilders.arkmemo.ui.viewmodels
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +36,8 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
     private val editPaths = ArrayDeque<DrawPath>()
 
     private var svg = SVG()
+    private val svgLiveData = MutableLiveData<SVG>()
+    val observableSvgLiveData = svgLiveData as LiveData<SVG>
 
     fun onNoteOpened(note: GraphicNote) {
         viewModelScope.launch {
@@ -46,6 +50,7 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
     fun onDrawPath(path: DrawPath) {
         editPaths.addLast(path)
         svg.addPath(path)
+        svgLiveData.postValue(svg)
     }
 
     fun onChangeColor(color: Int) {
