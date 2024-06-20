@@ -53,6 +53,10 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
         return note.title != binding.edtTitle.text.toString()
     }
 
+    override fun isContentEmpty(): Boolean {
+        return false
+    }
+
     private fun initUI() {
 
         binding.toolbar.ivRightActionIcon.setOnClickListener {

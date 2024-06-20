@@ -133,7 +133,7 @@ abstract class BaseEditNoteFragment: Fragment() {
     }
 
     private fun handleBackPressed() {
-        if (isContentChanged()) {
+        if (isContentChanged() && !isContentEmpty()) {
             showSaveNoteDialog()
         } else {
             hostActivity.onBackPressedDispatcher.onBackPressed()
@@ -147,4 +147,5 @@ abstract class BaseEditNoteFragment: Fragment() {
     abstract fun createNewNote(): Note
     abstract fun getCurrentNote(): Note
     abstract fun isContentChanged(): Boolean
+    abstract fun isContentEmpty(): Boolean
 }

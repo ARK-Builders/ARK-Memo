@@ -82,6 +82,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
                 if (title.isEmpty()) {
                     binding.edtTitle.hint = getString(R.string.hint_new_graphical_note)
                 }
+                enableSaveText(isContentChanged() && !isContentEmpty())
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -103,11 +104,18 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
                 hostActivity.showProgressBar(show)
             }
         }
+        enableSaveText(false)
 
         binding.tvLastModified.gone()
         binding.editTextDescription.setText(this.note.description)
         initBottomControls()
+        observeDrawEvent()
+    }
 
+    private fun observeDrawEvent() {
+        graphicNotesViewModel.observableSvgLiveData.observe(viewLifecycleOwner) {
+            enableSaveText(it.getPaths().isNotEmpty())
+        }
     }
 
     override fun createNewNote(): Note {
@@ -129,6 +137,10 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
         return note.title != binding.edtTitle.text.toString()
                 || ((newPaths.size != originalPaths.size) || (!newPaths.containsAll(originalPaths)))
+    }
+
+    override fun isContentEmpty(): Boolean {
+        return graphicNotesViewModel.svg().getPaths().isEmpty()
     }
 
     private fun initBottomControls() {
@@ -233,6 +245,15 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             this.isNestedScrollingEnabled = false
             layoutManager = layoutMgr
             adapter = brushColorAdapter
+        }
+    }
+
+    private fun enableSaveText(enabled: Boolean) {
+        binding.toolbar.tvRightActionText.isEnabled = enabled
+        if (enabled) {
+            binding.toolbar.tvRightActionText.alpha = 1f
+        } else {
+            binding.toolbar.tvRightActionText.alpha = 0.4f
         }
     }
 
