@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.ViewTreeObserver.OnWindowFocusChangeListener
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -33,6 +34,10 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
             else Toast.makeText(requireContext(),
                 getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private val windowFocusedListener = OnWindowFocusChangeListener {
+        observeClipboardContent()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,6 +105,8 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         binding.toolbar.ivRightActionIcon.setOnClickListener {
             showDeleteNoteDialog(note)
         }
+
+        view.viewTreeObserver.addOnWindowFocusChangeListener(windowFocusedListener)
     }
 
     override fun isContentChanged(): Boolean {
@@ -111,9 +118,9 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         return binding.editNote.text.toString().trim().isEmpty()
     }
 
-    override fun onResume() {
-        super.onResume()
-        observeClipboardContent()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.viewTreeObserver?.removeOnWindowFocusChangeListener(windowFocusedListener)
     }
 
     override fun createNewNote(): Note {
