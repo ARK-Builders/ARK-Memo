@@ -37,7 +37,9 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
     }
 
     private val windowFocusedListener = OnWindowFocusChangeListener {
-        observeClipboardContent()
+        if (it) {
+            observeClipboardContent()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
