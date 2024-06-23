@@ -21,7 +21,7 @@ constraintlayout = "2.1.4"
 navigationFragmentKtx = "2.5.2"
 preferenceKtx = "1.2.0"
 lifecycleViewmodelKtx = "2.5.1"
-arkFilepicker = "0.1.1"
+arkFilepicker = "0.2.0"
 arkLib = "0.3.5"
 googleHiltAndroid = "2.48"
 googleHiltCompiler = "2.48"
@@ -59,7 +59,7 @@ androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref
 androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidXTestEspresso" }
 skydoves-balloon = { group = "com.github.skydoves", name = "balloon", version.ref = "skydovesBalloon" }
 flexbox = { group = "com.google.android.flexbox", name = "flexbox", version.ref = "flexbox" }
-arkbuilders-arkfilepicker = { group = "dev.arkbuilders", name = "arkfilepicker", version.ref = "arkFilepicker" }
+arkbuilders-arkfilepicker = { group = "dev.arkbuilders.components", name = "filepicker", version.ref = "arkFilepicker" }
 arkbuilders-arklib = { group = "dev.arkbuilders", name = "arklib", version.ref = "arkLib" }
 airbnb-lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "airbnbLottie" }
 qr-generator = { group = "com.github.androidmads", name = "QRGenerator", version.ref = "qrgenerator" }
