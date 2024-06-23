@@ -2,7 +2,7 @@ package dev.arkbuilders.arkmemo
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
-import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
+import dev.arkbuilders.arklib.data.folders.FoldersRepo
 import dev.arkbuilders.arklib.initArkLib
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject

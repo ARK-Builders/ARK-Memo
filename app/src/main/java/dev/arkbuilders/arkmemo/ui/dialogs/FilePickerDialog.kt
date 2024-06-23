@@ -10,12 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import dagger.hilt.android.AndroidEntryPoint
-import dev.arkbuilders.arkfilepicker.ArkFilePickerConfig
-import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerFragment
-import dev.arkbuilders.arkfilepicker.presentation.filepicker.ArkFilePickerMode
 import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.components.filepicker.ArkFilePickerConfig
+import dev.arkbuilders.components.filepicker.ArkFilePickerFragment
+import dev.arkbuilders.components.filepicker.ArkFilePickerMode
 import javax.inject.Inject
 
 @AndroidEntryPoint
