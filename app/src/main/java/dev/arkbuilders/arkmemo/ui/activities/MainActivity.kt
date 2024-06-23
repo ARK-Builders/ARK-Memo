@@ -14,7 +14,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
@@ -23,6 +22,8 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.BaseEditNoteFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
+import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
+import dev.arkbuilders.components.filepicker.onArkPathPicked
 import javax.inject.Inject
 
 @AndroidEntryPoint
