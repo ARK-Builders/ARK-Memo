@@ -22,7 +22,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
         val paths = viewModel.paths()
         if (paths.isNotEmpty()) {
             paths.forEach {
-                canvas.drawPath(it.path, it.paint)
+                canvas.drawPath(it.path, it.paint.apply { color = it.paint.color })
             }
         }
     }
@@ -34,7 +34,9 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
                 viewModel.svg().apply {
-                    addCommand(SVGCommand.MoveTo(x, y))
+                    addCommand(SVGCommand.MoveTo(x, y).apply {
+                        paintColor = viewModel.paint.color.getStrokeColor()
+                    })
                 }
                 currentX = x
                 currentY = y
@@ -44,7 +46,9 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
                 val y2 = (currentY + y) / 2
                 path.quadTo(currentX, currentY, x2, y2)
                 viewModel.svg().apply {
-                    addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2))
+                    addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2).apply {
+                        paintColor = viewModel.paint.color.getStrokeColor()
+                    })
                 }
                 currentX = x
                 currentY = y
@@ -53,7 +57,9 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
                 path = Path()
             }
         }
-        val drawPath = DrawPath(path, viewModel.paint)
+        val drawPath = DrawPath(path, viewModel.paint.apply {
+            color = viewModel.paint.color
+        })
         viewModel.onDrawPath(drawPath)
         invalidate()
         return true

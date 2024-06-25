@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.graphics
 
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
 import android.graphics.Path as AndroidDrawPath
@@ -12,7 +11,7 @@ import kotlin.io.path.reader
 import kotlin.io.path.writer
 
 class SVG {
-    private var strokeColor = "black"
+    private var strokeColor = Color.BLACK.value
     private var fill = "none"
     private var viewBox = ViewBox()
     private val commands = ArrayDeque<SVGCommand>()
@@ -20,13 +19,39 @@ class SVG {
 
     private val paint
         get() = Paint().also {
-            it.color = Color.parseColor(strokeColor)
+            it.color = strokeColor.getColorCode()
             it.style = Paint.Style.STROKE
             it.strokeWidth = 10f
             it.strokeCap = Paint.Cap.ROUND
             it.strokeJoin = Paint.Join.ROUND
             it.isAntiAlias = true
         }
+
+    fun Int.getStrokeColor(): String {
+        return when (this) {
+            Color.BLACK.code  -> Color.BLACK.value
+            Color.GRAY.code   -> Color.GRAY.value
+            Color.RED.code    -> Color.RED.value
+            Color.GREEN.code  -> Color.GREEN.value
+            Color.BLUE.code   -> Color.BLUE.value
+            Color.PURPLE.code -> Color.PURPLE.value
+            Color.ORANGE.code -> Color.ORANGE.value
+            else              -> Color.BLACK.value
+        }
+    }
+
+    private fun String.getColorCode(): Int {
+        return when (this) {
+            Color.BLACK.value  -> Color.BLACK.code
+            Color.GRAY.value   -> Color.GRAY.code
+            Color.RED.value    -> Color.RED.code
+            Color.GREEN.value  -> Color.GREEN.code
+            Color.BLUE.value   -> Color.BLUE.code
+            Color.PURPLE.value -> Color.PURPLE.code
+            Color.ORANGE.value -> Color.ORANGE.code
+            else               -> Color.BLACK.code
+        }
+    }
 
     fun addCommand(command: SVGCommand) {
         commands.addLast(command)
@@ -80,6 +105,7 @@ class SVG {
             if (paths.isNotEmpty()) paths.clear()
             var path = AndroidDrawPath()
             commands.forEach { command ->
+                strokeColor = command.paintColor
                 when (command) {
                     is SVGCommand.MoveTo -> {
                         path = AndroidDrawPath()
@@ -94,7 +120,7 @@ class SVG {
                         path.lineTo(command.x, command.y)
                     }
                 }
-                paths.addLast(DrawPath(path, paint))
+                paths.addLast(DrawPath(path, paint.apply { color = strokeColor.getColorCode() }))
             }
         }
     }
@@ -139,15 +165,31 @@ class SVG {
                 pathData.split(COMMA).forEach {
                     val command = it.trim()
                     if (command.isEmpty()) return@forEach
+                    val commandElements = command.split(" ")
                     when (command.first()) {
                         SVGCommand.MoveTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(command))
+                            if (commandElements.size > 3) {
+                                strokeColor = commandElements[3]
+                            }
+                            commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
+                                paintColor = strokeColor
+                            })
                         }
                         SVGCommand.AbsLineTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(command))
+                            if (commandElements.size > 3) {
+                                strokeColor = commandElements[3]
+                            }
+                            commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
+                                paintColor = strokeColor
+                            })
                         }
                         SVGCommand.AbsQuadTo.CODE -> {
-                            commands.addLast(SVGCommand.AbsQuadTo.fromString(command))
+                            if (commandElements.size > 6) {
+                                strokeColor = commandElements[5]
+                            }
+                            commands.addLast(SVGCommand.AbsQuadTo.fromString(command).apply {
+                                paintColor = strokeColor
+                            })
                         }
                         else -> {}
                     }
@@ -193,20 +235,23 @@ data class ViewBox(
 
 sealed class SVGCommand {
 
+    var paintColor = Color.BLACK.value
+
     class MoveTo(
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE $x $y"
+        override fun toString(): String = "$CODE $x $y $paintColor"
 
         companion object {
             const val CODE = 'M'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").trim().split(" ")
-                val x = coords[0].toFloat()
-                val y = coords[1].toFloat()
-                return MoveTo(x, y)
+                val params = string.removePrefix("$CODE").trim().split(" ")
+                val x = params[0].toFloat()
+                val y = params[1].toFloat()
+                val colorCode = if (params.size > 2) params[0] else Color.BLACK.value
+                return MoveTo(x, y).apply { paintColor = colorCode }
             }
         }
     }
@@ -215,16 +260,17 @@ sealed class SVGCommand {
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE $x $y"
+        override fun toString(): String = "$CODE $x $y $paintColor"
 
         companion object {
             const val CODE = 'L'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").trim().split(" ")
-                val x = coords[0].toFloat()
-                val y = coords[1].toFloat()
-                return AbsLineTo(x, y)
+                val params = string.removePrefix("$CODE").trim().split(" ")
+                val x = params[0].toFloat()
+                val y = params[1].toFloat()
+                val colorCode = if (params.size > 2) params[0] else Color.BLACK.value
+                return AbsLineTo(x, y).apply { paintColor = colorCode}
             }
         }
     }
@@ -235,18 +281,19 @@ sealed class SVGCommand {
         val x2: Float,
         val y2: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE $x1 $y1 $x2 $y2"
+        override fun toString(): String = "$CODE $x1 $y1 $x2 $y2 $paintColor"
 
         companion object {
             const val CODE = 'Q'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").trim().split(" ")
-                val x1 = coords[0].toFloat()
-                val y1 = coords[1].toFloat()
-                val x2 = coords[2].toFloat()
-                val y2 = coords[3].toFloat()
-                return AbsQuadTo(x1, y1, x2, y2)
+                val params = string.removePrefix("$CODE").trim().split(" ")
+                val x1 = params[0].toFloat()
+                val y1 = params[1].toFloat()
+                val x2 = params[2].toFloat()
+                val y2 = params[3].toFloat()
+                val colorCode = if (params.size > 4) params[0] else Color.BLACK.value
+                return AbsQuadTo(x1, y1, x2, y2).apply { paintColor = colorCode }
             }
         }
     }
