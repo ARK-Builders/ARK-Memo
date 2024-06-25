@@ -14,6 +14,7 @@ import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.adapters.BrushAdapter
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColor
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlack
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlue
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGreen
@@ -231,6 +232,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             },
             onItemClick = { attribute, pos ->
                 Log.v(TAG, "onColorSelected: " + attribute)
+                graphicNotesViewModel.setPaintColor(attribute as BrushColor)
             }
         )
 

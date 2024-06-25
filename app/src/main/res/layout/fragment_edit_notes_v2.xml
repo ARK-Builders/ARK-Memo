@@ -200,7 +200,7 @@
     <TextView
         android:id="@+id/tv_paste"
         style="@style/ActionTextView"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:background="?attr/selectableItemBackground"
         android:foreground="@null"
         android:drawablePadding="6dp"
         android:text="@string/paste"

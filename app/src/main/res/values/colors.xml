@@ -29,7 +29,7 @@
     <color name="bg_tag">#FFFAEB</color>
     <color name="fg_secondary">#344054</color>
     <color name="bg_error">#F04438</color>
-    <color name="brush_color_black">#101828</color>
+    <color name="brush_color_black">#000000</color>
     <color name="brush_color_grey">#667085</color>
     <color name="brush_color_red">#F04438</color>
     <color name="brush_color_orange">#F79009</color>
