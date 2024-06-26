@@ -9,6 +9,8 @@ import android.view.View
 import dev.arkbuilders.arkmemo.graphics.SVGCommand
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.utils.getBrushSizeId
+import dev.arkbuilders.arkmemo.utils.getStrokeColor
 
 class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
 
@@ -22,7 +24,10 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
         val paths = viewModel.paths()
         if (paths.isNotEmpty()) {
             paths.forEach {
-                canvas.drawPath(it.path, it.paint.apply { color = it.paint.color })
+                canvas.drawPath(it.path, it.paint.apply {
+                    color = it.paint.color
+                    strokeWidth = it.paint.strokeWidth
+                })
             }
         }
     }
@@ -36,6 +41,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
                 viewModel.svg().apply {
                     addCommand(SVGCommand.MoveTo(x, y).apply {
                         paintColor = viewModel.paint.color.getStrokeColor()
+                        brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
                     })
                 }
                 currentX = x
@@ -48,6 +54,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
                 viewModel.svg().apply {
                     addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2).apply {
                         paintColor = viewModel.paint.color.getStrokeColor()
+                        brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
                     })
                 }
                 currentX = x

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.graphics.SVG
+import dev.arkbuilders.arkmemo.graphics.Size
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColor
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlack
@@ -17,19 +18,20 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGrey
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorOrange
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorPurple
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorRed
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSize
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeHuge
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeLarge
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeMedium
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GraphicNotesViewModel @Inject constructor(): ViewModel() {
 
-    private val _notes = MutableStateFlow(listOf<GraphicNote>())
-    val notes: StateFlow<List<GraphicNote>> = _notes
     private var paintColor = dev.arkbuilders.arkmemo.graphics.Color.BLACK.code
-
-    private var strokeWidth = 10f
+    private var strokeWidth = Size.TINY.value
 
     val paint get() = Paint().also {
         it.color = paintColor
@@ -60,14 +62,6 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
         svgLiveData.postValue(svg)
     }
 
-    fun onChangeColor(color: Int) {
-        paintColor = color
-    }
-
-    fun onChangeStrokeWidth(width: Float) {
-        strokeWidth = width
-    }
-
     fun paths(): Collection<DrawPath> = editPaths
 
     fun svg(): SVG = svg
@@ -81,6 +75,16 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
             is BrushColorGreen -> dev.arkbuilders.arkmemo.graphics.Color.GREEN.code
             is BrushColorBlue  -> dev.arkbuilders.arkmemo.graphics.Color.BLUE.code
             is BrushColorPurple -> dev.arkbuilders.arkmemo.graphics.Color.PURPLE.code
+        }
+    }
+
+    fun setBrushSize(size: BrushSize) {
+        strokeWidth = when(size) {
+            is BrushSizeTiny -> Size.TINY.value
+            is BrushSizeSmall -> Size.SMALL.value
+            is BrushSizeMedium -> Size.MEDIUM.value
+            is BrushSizeLarge -> Size.LARGE.value
+            is BrushSizeHuge -> Size.HUGE.value
         }
     }
 }
