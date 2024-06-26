@@ -22,6 +22,7 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGrey
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorOrange
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorPurple
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorRed
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSize
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeHuge
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeLarge
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeMedium
@@ -204,6 +205,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             },
             onItemClick = { attribute, pos ->
                 Log.v(TAG, "onSizeSelected: " + attribute)
+                graphicNotesViewModel.setBrushSize(attribute as BrushSize)
             }
         )
 
