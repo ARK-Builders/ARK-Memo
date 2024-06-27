@@ -15,6 +15,7 @@ import dev.arkbuilders.arkmemo.utils.copyToClipboard
 
 
 class DonateDialog(private val walletAddress: String,
+                   private val title: String,
                    private val onPositiveClick: (() -> Unit)? = null,
                    private val onCloseClicked: (() -> Unit)? = null,
 ): DialogFragment() {
@@ -43,6 +44,8 @@ class DonateDialog(private val walletAddress: String,
             onCloseClicked?.invoke()
             dismiss()
         }
+
+        binding.tvTitle.text = title
 
         binding.layoutDownloadQr.setOnClickListener {
             onPositiveClick?.invoke()

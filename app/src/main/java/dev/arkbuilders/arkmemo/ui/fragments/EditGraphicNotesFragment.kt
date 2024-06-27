@@ -99,7 +99,15 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         noteTitle.setText(title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
         notesCanvas.isVisible = true
-        notesCanvas.setViewModel(graphicNotesViewModel)
+        notesCanvas.setViewModel(graphicNotesViewModel.apply {
+            colorBrushes.firstOrNull { it.isSelected }?.let {
+                setPaintColor(it)
+            }
+
+            sizeBrushes.firstOrNull { it.isSelected }?.let {
+                setBrushSize(it)
+            }
+        })
         btnSave.setOnClickListener {
             val note = createNewNote()
             notesViewModel.onSaveClick(note, parentNote = this.note) { show ->

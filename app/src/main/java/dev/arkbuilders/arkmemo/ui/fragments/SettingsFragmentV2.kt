@@ -59,6 +59,7 @@ open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
         binding.tvDonateBtc.setOnClickListener {
             DonateDialog(
                 walletAddress = "bc1qx8n9r4uwpgrhgnamt2uew53lmrxd8tuevp7lv5",
+                title = getString(R.string.setting_donate_btc),
                 onPositiveClick = {
                 }).show(childFragmentManager, CommonActionDialog.TAG)
         }
@@ -66,6 +67,7 @@ open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
         binding.tvDonateEth.setOnClickListener {
             DonateDialog(
                 walletAddress = "0x9765C5aC38175BFbd2dC7a840b63e50762B80a1b",
+                title = getString(R.string.setting_donate_eth),
                 onPositiveClick = {
             }).show(childFragmentManager, CommonActionDialog.TAG)
         }
