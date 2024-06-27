@@ -59,20 +59,20 @@ jobs:
     - name: Build release APK
       run: ./gradlew assembleRelease
 
-    - name: Upload release arm64-v8a APK
+    - name: Upload Memo release arm64-v8a APK
       uses: actions/upload-artifact@v3
       with:
-        name: release-arm64-v8a-apk
+        name: ark-memo-release-arm64-v8a-apk
         path: ./app/build/outputs/apk/release/app-arm64-v8a-release.apk
 
-    - name: Upload release armeabi-v7a APK
+    - name: Upload Memo release armeabi-v7a APK
       uses: actions/upload-artifact@v3
       with:
-        name: release-armeabi-v7a-apk
+        name: ark-memo-release-armeabi-v7a-apk
         path: ./app/build/outputs/apk/release/app-armeabi-v7a-release.apk
 
-    - name: Upload release universal APK
+    - name: Upload Memo release universal APK
       uses: actions/upload-artifact@v3
       with:
-        name: release-universal-apk
+        name: ark-memo-release-universal-apk
         path: ./app/build/outputs/apk/release/app-universal-release.apk
