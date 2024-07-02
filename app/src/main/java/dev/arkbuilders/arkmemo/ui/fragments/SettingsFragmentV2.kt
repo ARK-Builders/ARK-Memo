@@ -45,7 +45,7 @@ open class SettingsFragmentV2: Fragment(R.layout.fragment_settings) {
         }
 
         binding.tvDiscord.setOnClickListener {
-            it.showAvailabilityToolTip()
+            context?.openLink("https://discord.gg/tPUJTxud")
         }
 
         binding.tvDonatePatreon.setOnClickListener {

@@ -30,8 +30,10 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 import dev.arkbuilders.arkmemo.ui.adapters.EqualSpacingItemDecoration
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.utils.getColorCode
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
+import dev.arkbuilders.arkmemo.utils.setDrawableColor
 import dev.arkbuilders.arkmemo.utils.visible
 
 @AndroidEntryPoint
@@ -100,8 +102,10 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         noteTitle.addTextChangedListener(noteTitleChangeListener)
         notesCanvas.isVisible = true
         notesCanvas.setViewModel(graphicNotesViewModel.apply {
-            colorBrushes.firstOrNull { it.isSelected }?.let {
-                setPaintColor(it)
+            colorBrushes.firstOrNull { it.isSelected }?.let { color ->
+                val colorCode = color.getColorCode()
+                setPaintColor(colorCode)
+                binding.layoutGraphicsControl.tvBrushColor.setDrawableColor(colorCode)
             }
 
             sizeBrushes.firstOrNull { it.isSelected }?.let {
@@ -242,7 +246,10 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             },
             onItemClick = { attribute, pos ->
                 Log.v(TAG, "onColorSelected: " + attribute)
-                graphicNotesViewModel.setPaintColor(attribute as BrushColor)
+                (attribute as BrushColor).getColorCode().let { colorCode ->
+                    graphicNotesViewModel.setPaintColor(colorCode)
+                    binding.layoutGraphicsControl.tvBrushColor.setDrawableColor(colorCode)
+                }
             }
         )
 
