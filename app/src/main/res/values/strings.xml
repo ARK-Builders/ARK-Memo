@@ -84,7 +84,7 @@
     <string name="setting_app_version">Version %s</string>
     <string name="setting_telegram_title">Telegram</string>
     <string name="setting_discord_title">Discord</string>
-    <string name="setting_support_us_title">Support Us</string>
+    <string name="setting_support_us_title">Support us</string>
     <string name="setting_support_us_description">We greatly appreciate every bit of support</string>
     <string name="setting_website">Website</string>
     <string name="setting_donate_btc">Donate using BTC</string>

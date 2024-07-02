@@ -10,14 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.graphics.Size
 import dev.arkbuilders.arkmemo.models.GraphicNote
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColor
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlack
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlue
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGreen
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGrey
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColorOrange
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColorPurple
-import dev.arkbuilders.arkmemo.ui.adapters.BrushColorRed
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSize
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeHuge
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeLarge
@@ -66,16 +58,8 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
 
     fun svg(): SVG = svg
 
-    fun setPaintColor(color: BrushColor) {
-        paintColor = when (color) {
-            is BrushColorBlack -> dev.arkbuilders.arkmemo.graphics.Color.BLACK.code
-            is BrushColorGrey  -> dev.arkbuilders.arkmemo.graphics.Color.GRAY.code
-            is BrushColorRed   -> dev.arkbuilders.arkmemo.graphics.Color.RED.code
-            is BrushColorOrange -> dev.arkbuilders.arkmemo.graphics.Color.ORANGE.code
-            is BrushColorGreen -> dev.arkbuilders.arkmemo.graphics.Color.GREEN.code
-            is BrushColorBlue  -> dev.arkbuilders.arkmemo.graphics.Color.BLUE.code
-            is BrushColorPurple -> dev.arkbuilders.arkmemo.graphics.Color.PURPLE.code
-        }
+    fun setPaintColor(color: Int) {
+        paintColor = color
     }
 
     fun setBrushSize(size: BrushSize) {

@@ -2,6 +2,14 @@ package dev.arkbuilders.arkmemo.utils
 
 import dev.arkbuilders.arkmemo.graphics.Color
 import dev.arkbuilders.arkmemo.graphics.Size
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColor
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlack
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlue
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGreen
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGrey
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorOrange
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorPurple
+import dev.arkbuilders.arkmemo.ui.adapters.BrushColorRed
 
 fun Int.getStrokeSize(): Float {
     return when(this) {
@@ -48,5 +56,17 @@ fun String.getColorCode(): Int {
         Color.PURPLE.value -> Color.PURPLE.code
         Color.ORANGE.value -> Color.ORANGE.code
         else               -> Color.BLACK.code
+    }
+}
+
+fun BrushColor.getColorCode(): Int {
+    return when (this) {
+        is BrushColorBlack -> Color.BLACK.code
+        is BrushColorGrey -> Color.GRAY.code
+        is BrushColorRed -> Color.RED.code
+        is BrushColorOrange -> Color.ORANGE.code
+        is BrushColorGreen -> Color.GREEN.code
+        is BrushColorBlue -> Color.BLUE.code
+        is BrushColorPurple -> Color.PURPLE.code
     }
 }
