@@ -12,6 +12,8 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -95,6 +97,20 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         initUI()
         initExistingNoteUI()
         observeViewModel()
+        observeKeyboardVisibility()
+    }
+
+    private fun observeKeyboardVisibility() {
+        val view = activity.window?.decorView ?: return
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val showingKeyboard = insets.isVisible(WindowInsetsCompat.Type.ime())
+            if (showingKeyboard) {
+                binding.layoutAudioRecord.groupRecordingViews.gone()
+            } else {
+                binding.layoutAudioRecord.groupRecordingViews.visible()
+            }
+            insets
+        }
     }
 
     private fun initUI() {
@@ -391,6 +407,12 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         } else {
             tempRecordingPath.toString()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val view = activity.window?.decorView ?: return
+        ViewCompat.setOnApplyWindowInsetsListener(view, null)
     }
 
     companion object {

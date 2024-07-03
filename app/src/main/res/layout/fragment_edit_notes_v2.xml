@@ -54,7 +54,8 @@
         app:layout_constraintTop_toBottomOf="@+id/edt_title"
         android:id="@+id/rv_tags"
         android:visibility="gone"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="12dp"
+        app:layout_goneMarginBottom="0dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -105,6 +106,7 @@
         android:layout_marginHorizontal="@dimen/common_padding"
         android:paddingTop="10dp"
         android:paddingBottom="80dp"
+        app:layout_goneMarginTop="0dp"
         android:textColorHint="#757575"
         android:visibility="gone"
         tools:visibility="visible" />
@@ -170,7 +172,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="gone"
-        tools:visibility="gone"/>
+        tools:visibility="visible"/>
 
     <include layout="@layout/layout_audio_record"
         android:layout_width="match_parent"
@@ -227,7 +229,6 @@
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="bottom_control_divider,tv_save,tv_paste"
         android:id="@+id/group_text_controls"
-        tools:visibility="visible"
         android:visibility="gone"/>
 
     <androidx.constraintlayout.widget.Barrier
