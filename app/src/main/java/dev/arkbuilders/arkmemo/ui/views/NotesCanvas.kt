@@ -20,14 +20,10 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     private var path = Path()
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
         val paths = viewModel.paths()
         if (paths.isNotEmpty()) {
-            paths.forEach {
-                canvas.drawPath(it.path, it.paint.apply {
-                    color = it.paint.color
-                    strokeWidth = it.paint.strokeWidth
-                })
+            paths.forEach { path ->
+                canvas.drawPath(path.path, path.paint)
             }
         }
     }
@@ -35,6 +31,8 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
+
+        var finishDrawing = false
         when(event.action) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
@@ -62,13 +60,16 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 path = Path()
+                finishDrawing = true
             }
         }
-        val drawPath = DrawPath(path, viewModel.paint.apply {
-            color = viewModel.paint.color
-        })
-        viewModel.onDrawPath(drawPath)
-        invalidate()
+
+        if (!finishDrawing) {
+            val drawPath = DrawPath(path, viewModel.paint)
+            viewModel.onDrawPath(drawPath)
+            invalidate()
+        }
+
         return true
     }
 

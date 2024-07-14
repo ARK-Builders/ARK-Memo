@@ -14,5 +14,7 @@ enum class Color(val code: Int, val value: String) {
 
     BLUE(ColorCode.blue, "blue"),
 
-    PURPLE(ColorCode.purple, "purple")
+    PURPLE(ColorCode.purple, "purple"),
+
+    WHITE(ColorCode.white, "white")
 }

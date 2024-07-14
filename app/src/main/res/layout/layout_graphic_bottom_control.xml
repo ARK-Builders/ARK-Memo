@@ -77,6 +77,7 @@
         style="@style/ActionTextView"
         android:drawableStart="@drawable/ic_selected_brush_type"
         app:gct_drawable="@drawable/ic_selected_brush_type"
+        app:gct_icon_tint="@color/black"
         android:drawablePadding="8dp"
         android:text="@string/graphic_control_color"
         android:textColor="@color/fg_secondary"

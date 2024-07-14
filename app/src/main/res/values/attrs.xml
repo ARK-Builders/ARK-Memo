@@ -10,6 +10,7 @@
     <declare-styleable name="GraphicControlTextView">
         <attr name="gct_drawable" format="reference|integer"/>
         <attr name="gct_selected" format="reference|boolean"/>
+        <attr name="gct_icon_tint" format="reference|integer"/>
     </declare-styleable>
 
     <declare-styleable name="SupportTextView">
