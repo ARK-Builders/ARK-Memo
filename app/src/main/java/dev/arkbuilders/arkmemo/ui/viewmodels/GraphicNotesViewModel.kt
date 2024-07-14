@@ -7,22 +7,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.arkbuilders.arkmemo.graphics.Color
 import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.graphics.Size
 import dev.arkbuilders.arkmemo.models.GraphicNote
-import dev.arkbuilders.arkmemo.ui.adapters.BrushSize
-import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeHuge
-import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeLarge
-import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeMedium
-import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
-import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GraphicNotesViewModel @Inject constructor(): ViewModel() {
 
-    private var paintColor = dev.arkbuilders.arkmemo.graphics.Color.BLACK.code
+    private var paintColor = Color.BLACK.code
+    private var lastPaintColor = paintColor
     private var strokeWidth = Size.TINY.value
 
     val paint get() = Paint().also {
@@ -60,20 +56,23 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
 
     fun setPaintColor(color: Int) {
         paintColor = color
+        lastPaintColor = paintColor
     }
 
-    fun setBrushSize(size: BrushSize) {
-        strokeWidth = when(size) {
-            is BrushSizeTiny -> Size.TINY.value
-            is BrushSizeSmall -> Size.SMALL.value
-            is BrushSizeMedium -> Size.MEDIUM.value
-            is BrushSizeLarge -> Size.LARGE.value
-            is BrushSizeHuge -> Size.HUGE.value
+    fun setBrushSize(size: Float) {
+        strokeWidth = size
+    }
+
+    fun setEraseMode(eraseMode: Boolean) {
+        paintColor = if (eraseMode) {
+            Color.WHITE.code
+        } else {
+            lastPaintColor
         }
     }
 }
 
 data class DrawPath(
     val path: Path,
-    val paint: Paint,
+    val paint: Paint
 )

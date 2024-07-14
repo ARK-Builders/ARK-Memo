@@ -24,7 +24,6 @@ class BrushAdapter(
         when (attribute) {
             is BrushSizeTiny -> {
                 holder.ivBrush.setImageResource(R.drawable.bg_brush_size)
-
                 val padding = holder.itemView.context.resources.getDimensionPixelSize(
                     R.dimen.brush_size_tiny_padding
                 )
@@ -57,7 +56,6 @@ class BrushAdapter(
 
             is BrushSizeHuge -> {
                 holder.ivBrush.setImageResource(R.drawable.bg_brush_size)
-
                 val padding = holder.itemView.context.resources.getDimensionPixelSize(
                     R.dimen.brush_size_huge_padding
                 )

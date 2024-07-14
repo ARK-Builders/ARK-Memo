@@ -10,6 +10,12 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushColorGrey
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorOrange
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorPurple
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorRed
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSize
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeHuge
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeLarge
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeMedium
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
+import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 
 fun Int.getStrokeSize(): Float {
     return when(this) {
@@ -42,6 +48,7 @@ fun Int.getStrokeColor(): String {
         Color.BLUE.code   -> Color.BLUE.value
         Color.PURPLE.code -> Color.PURPLE.value
         Color.ORANGE.code -> Color.ORANGE.value
+        Color.WHITE.code  -> Color.WHITE.value
         else              -> Color.BLACK.value
     }
 }
@@ -55,6 +62,7 @@ fun String.getColorCode(): Int {
         Color.BLUE.value   -> Color.BLUE.code
         Color.PURPLE.value -> Color.PURPLE.code
         Color.ORANGE.value -> Color.ORANGE.code
+        Color.WHITE.value  -> Color.WHITE.code
         else               -> Color.BLACK.code
     }
 }
@@ -68,5 +76,15 @@ fun BrushColor.getColorCode(): Int {
         is BrushColorGreen -> Color.GREEN.code
         is BrushColorBlue -> Color.BLUE.code
         is BrushColorPurple -> Color.PURPLE.code
+    }
+}
+
+fun BrushSize.getBrushSize(): Float {
+    return when(this) {
+        is BrushSizeTiny -> Size.TINY.value
+        is BrushSizeSmall -> Size.SMALL.value
+        is BrushSizeMedium -> Size.MEDIUM.value
+        is BrushSizeLarge -> Size.LARGE.value
+        is BrushSizeHuge -> Size.HUGE.value
     }
 }

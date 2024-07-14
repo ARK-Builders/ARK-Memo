@@ -14,6 +14,7 @@ class GraphicControlTextView @JvmOverloads constructor(
 ) : androidx.appcompat.widget.AppCompatTextView(context, attrs) {
 
     var isSelectedState = false
+    private var iconTintColor: Int
 
     init {
         val typedArray: TypedArray =
@@ -22,6 +23,7 @@ class GraphicControlTextView @JvmOverloads constructor(
             typedArray.getResourceId(R.styleable.GraphicControlTextView_gct_drawable, 0)
         val isSelected =
             typedArray.getBoolean(R.styleable.GraphicControlTextView_gct_selected, false)
+        iconTintColor = typedArray.getColor(R.styleable.GraphicControlTextView_gct_icon_tint, -1)
 
         drawableResId.let {
             this.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0)
@@ -48,11 +50,12 @@ class GraphicControlTextView @JvmOverloads constructor(
                 context, R.drawable.bg_border_r8
             )
             val selectedColor = ContextCompat.getColor(context, R.color.text_tertiary)
+            val drawableColor = if (iconTintColor != -1) iconTintColor else selectedColor
 
             this.setTextColor(selectedColor)
             TextViewCompat.setCompoundDrawableTintList(
                 this,
-                ColorStateList.valueOf(selectedColor)
+                ColorStateList.valueOf(drawableColor)
             )
         }
 

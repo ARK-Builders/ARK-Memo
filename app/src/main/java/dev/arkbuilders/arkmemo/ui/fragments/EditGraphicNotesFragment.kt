@@ -30,6 +30,7 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 import dev.arkbuilders.arkmemo.ui.adapters.EqualSpacingItemDecoration
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.utils.getBrushSize
 import dev.arkbuilders.arkmemo.utils.getColorCode
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
@@ -109,7 +110,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             }
 
             sizeBrushes.firstOrNull { it.isSelected }?.let {
-                setBrushSize(it)
+                setBrushSize(it.getBrushSize())
             }
         })
         btnSave.setOnClickListener {
@@ -167,6 +168,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
                 binding.layoutGraphicsControl.tvEraser.setSelectState(false)
                 binding.layoutGraphicsControl.tvBrushColor.setSelectState(false)
+                graphicNotesViewModel.setEraseMode(false)
             } else {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
             }
@@ -177,13 +179,15 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             tvEraser.setSelectState(!tvEraser.isSelectedState)
             if (tvEraser.isSelectedState) {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.visible()
-                showBrushSizeList()
+                showBrushSizeList(isEraseMode = true)
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
                 binding.layoutGraphicsControl.tvBrushSize.setSelectState(false)
                 binding.layoutGraphicsControl.tvBrushColor.setSelectState(false)
             } else {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
+                graphicNotesViewModel.setEraseMode(false)
             }
+            graphicNotesViewModel.setEraseMode(tvEraser.isSelectedState)
         }
 
         val tvColor = binding.layoutGraphicsControl.tvBrushColor
@@ -195,6 +199,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
                 binding.layoutGraphicsControl.tvBrushSize.setSelectState(false)
                 binding.layoutGraphicsControl.tvEraser.setSelectState(false)
+                graphicNotesViewModel.setEraseMode(false)
             } else {
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
             }
@@ -206,7 +211,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         hostActivity.fragment = this
     }
 
-    private fun showBrushSizeList() {
+    private fun showBrushSizeList(isEraseMode: Boolean = false) {
 
         val brushSizeAdapter = BrushAdapter(
             attributes = sizeBrushes.apply {
@@ -217,7 +222,8 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             },
             onItemClick = { attribute, pos ->
                 Log.v(TAG, "onSizeSelected: " + attribute)
-                graphicNotesViewModel.setBrushSize(attribute as BrushSize)
+                graphicNotesViewModel.setBrushSize((attribute as BrushSize).getBrushSize())
+                graphicNotesViewModel.setEraseMode(isEraseMode)
             }
         )
 

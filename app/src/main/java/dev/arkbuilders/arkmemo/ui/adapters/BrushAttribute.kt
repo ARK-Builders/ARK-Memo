@@ -13,7 +13,6 @@ sealed class BrushColor : BrushAttribute {
 }
 
 data object BrushSizeTiny : BrushSize()
-
 data object BrushSizeSmall : BrushSize()
 data object BrushSizeMedium : BrushSize()
 data object BrushSizeLarge : BrushSize()

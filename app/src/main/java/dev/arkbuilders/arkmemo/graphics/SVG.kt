@@ -38,14 +38,6 @@ class SVG {
         paths.addLast(path)
     }
 
-    fun setViewBox(width: Float, height: Float) {
-        viewBox = ViewBox(width = width, height = height)
-    }
-
-    fun getViewBox(): ViewBox {
-        return viewBox
-    }
-
     fun generate(path: Path) {
         if (commands.isNotEmpty()) {
             val xmlSerializer = Xml.newSerializer()
