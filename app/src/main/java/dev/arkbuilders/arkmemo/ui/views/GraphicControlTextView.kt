@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.TypedArray
 import android.util.AttributeSet
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import dev.arkbuilders.arkmemo.R
@@ -41,10 +42,7 @@ class GraphicControlTextView @JvmOverloads constructor(
             val selectedColor = ContextCompat.getColor(context, R.color.warning_700)
 
             this.setTextColor(selectedColor)
-            TextViewCompat.setCompoundDrawableTintList(
-                this,
-                ColorStateList.valueOf(selectedColor)
-            )
+            setDrawableTint(selectedColor)
         } else {
             this.background = ContextCompat.getDrawable(
                 context, R.drawable.bg_border_r8
@@ -53,12 +51,17 @@ class GraphicControlTextView @JvmOverloads constructor(
             val drawableColor = if (iconTintColor != -1) iconTintColor else selectedColor
 
             this.setTextColor(selectedColor)
-            TextViewCompat.setCompoundDrawableTintList(
-                this,
-                ColorStateList.valueOf(drawableColor)
-            )
+            setDrawableTint(drawableColor)
         }
 
         isSelectedState = selected
+    }
+
+    private fun setDrawableTint(@ColorInt color: Int) {
+        if (iconTintColor == -1) {
+            TextViewCompat.setCompoundDrawableTintList(this,
+                ColorStateList.valueOf(color)
+            )
+        }
     }
 }
