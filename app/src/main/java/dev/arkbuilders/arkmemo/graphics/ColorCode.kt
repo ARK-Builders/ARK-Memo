@@ -1,6 +1,6 @@
 package dev.arkbuilders.arkmemo.graphics
 
-object ColorCode {
+internal object ColorCode {
     val black by lazy { android.graphics.Color.parseColor("#000000") }
     val gray by lazy { android.graphics.Color.parseColor("#667085") }
     val red by lazy { android.graphics.Color.parseColor("#F04438") }
