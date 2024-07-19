@@ -55,7 +55,7 @@ class NotesViewModel @Inject constructor(
             notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
             notes.collectLatest {
                 withContext(Dispatchers.Main) {
-                    onSuccess(it)
+                    onSuccess(it.sortedByDescending { note -> note.resource?.modified })
                 }
             }
         }
