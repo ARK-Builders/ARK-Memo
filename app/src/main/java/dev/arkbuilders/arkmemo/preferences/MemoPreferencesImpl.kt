@@ -3,6 +3,7 @@ package dev.arkbuilders.arkmemo.preferences
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.arkbuilders.arkmemo.utils.CRASH_REPORT_ENABLE
 import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.Path
@@ -26,4 +27,13 @@ class MemoPreferencesImpl @Inject constructor(@ApplicationContext context: Conte
     override fun getPath(): String = sharedPreferences.getString(CURRENT_NOTES_PATH, "") ?: ""
 
     override fun getNotesStorage(): Path = Path(getPath())
+
+    override fun storeCrashReportEnabled(bool: Boolean) {
+        prefEditor.apply {
+            putBoolean(CRASH_REPORT_ENABLE, bool)
+            apply()
+        }
+    }
+
+    override fun getCrashReportEnabled(): Boolean = sharedPreferences.getBoolean(CRASH_REPORT_ENABLE, true)
 }
