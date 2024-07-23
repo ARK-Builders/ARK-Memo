@@ -56,7 +56,7 @@
         app:lottie_rawRes="@raw/anim_sound_wave"
         app:lottie_loop="true"
         android:visibility="gone"
-        tools:visibility="gone"
+        tools:visibility="visible"
         app:lottie_autoPlay="true"/>
 
     <TextView
@@ -144,7 +144,14 @@
     <androidx.constraintlayout.widget.Group
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/group_side_record_buttons"
+        android:visibility="gone"
+        app:constraint_referenced_ids="iv_start_over,iv_pause_resume" />
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/group_recording_views"
-        app:constraint_referenced_ids="iv_start_over,iv_pause_resume,tv_duration,tv_record_guide,iv_record,divider_top_duration"/>
+        app:constraint_referenced_ids="tv_duration,iv_record,divider_top_duration"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
