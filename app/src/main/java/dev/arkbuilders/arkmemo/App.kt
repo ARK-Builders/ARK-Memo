@@ -12,10 +12,14 @@ import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
 import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
-import dev.arkbuilders.arkmemo.utils.Config
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import javax.inject.Inject
 
 @HiltAndroidApp
 class App: Application() {
+
+    @Inject
+    lateinit var memoPreferences: MemoPreferences
 
     override fun onCreate() {
         super.onCreate()
@@ -26,7 +30,7 @@ class App: Application() {
     }
 
     private fun initAcra() = CoroutineScope(Dispatchers.IO).launch {
-        val enabled = Config.newInstance(context = baseContext).crashReport
+        val enabled = memoPreferences.getCrashReportEnabled()
         if (!enabled) return@launch
 
         initAcra {

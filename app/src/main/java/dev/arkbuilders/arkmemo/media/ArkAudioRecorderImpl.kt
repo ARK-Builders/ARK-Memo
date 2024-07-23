@@ -3,6 +3,7 @@ package dev.arkbuilders.arkmemo.media
 import android.content.Context
 import android.media.MediaRecorder
 import android.os.Build
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.nio.file.Path
 import javax.inject.Inject
@@ -12,8 +13,9 @@ class ArkAudioRecorderImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ): ArkAudioRecorder {
 
-    private var recorder: MediaRecorder? = null
+    private val TAG = "ArkAudioRecorderImpl"
 
+    private var recorder: MediaRecorder? = null
     private val tempFile = createTempFile().toFile()
 
     override fun init() {
@@ -47,13 +49,24 @@ class ArkAudioRecorderImpl @Inject constructor(
 
     override fun stop() {
         recorder?.let {
-            it.stop()
+            try {
+                it.stop()
+            } catch (e: RuntimeException) {
+                Log.e(TAG, "stop exception: " + e.message)
+            }
+
             it.release()
         }
         recorder = null
     }
 
-    override fun maxAmplitude(): Int = recorder?.maxAmplitude!!
+    override fun maxAmplitude(): Int {
+        try {
+            return recorder?.maxAmplitude ?: 0
+        } catch (e: Exception) {
+            return 0
+        }
+    }
 
     override fun getRecording(): Path = tempFile.toPath()
 }

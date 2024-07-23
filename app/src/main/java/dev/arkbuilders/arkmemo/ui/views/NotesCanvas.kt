@@ -9,6 +9,8 @@ import android.view.View
 import dev.arkbuilders.arkmemo.graphics.SVGCommand
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.utils.getBrushSizeId
+import dev.arkbuilders.arkmemo.utils.getStrokeColor
 
 class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
 
@@ -18,11 +20,10 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     private var path = Path()
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
         val paths = viewModel.paths()
         if (paths.isNotEmpty()) {
-            paths.forEach {
-                canvas.drawPath(it.path, it.paint)
+            paths.forEach { path ->
+                canvas.drawPath(path.path, path.paint)
             }
         }
     }
@@ -30,11 +31,16 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
+
+        var finishDrawing = false
         when(event.action) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
                 viewModel.svg().apply {
-                    addCommand(SVGCommand.MoveTo(x, y))
+                    addCommand(SVGCommand.MoveTo(x, y).apply {
+                        paintColor = viewModel.paint.color.getStrokeColor()
+                        brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
+                    })
                 }
                 currentX = x
                 currentY = y
@@ -44,18 +50,26 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
                 val y2 = (currentY + y) / 2
                 path.quadTo(currentX, currentY, x2, y2)
                 viewModel.svg().apply {
-                    addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2))
+                    addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2).apply {
+                        paintColor = viewModel.paint.color.getStrokeColor()
+                        brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
+                    })
                 }
                 currentX = x
                 currentY = y
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 path = Path()
+                finishDrawing = true
             }
         }
-        val drawPath = DrawPath(path, viewModel.paint)
-        viewModel.onDrawPath(drawPath)
-        invalidate()
+
+        if (!finishDrawing) {
+            val drawPath = DrawPath(path, viewModel.paint)
+            viewModel.onDrawPath(drawPath)
+            invalidate()
+        }
+
         return true
     }
 

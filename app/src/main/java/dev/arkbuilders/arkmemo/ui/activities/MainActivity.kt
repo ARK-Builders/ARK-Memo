@@ -1,16 +1,16 @@
 package dev.arkbuilders.arkmemo.ui.activities
 
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -21,6 +21,7 @@ import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
 import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.fragments.BaseEditNoteFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setStatusBarColor(ContextCompat.getColor(this, R.color.white), true)
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
@@ -146,6 +148,20 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         showSettingsButton(false)
     }
 
+    private fun setStatusBarColor(color: Int, isLight: Boolean) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = color
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
+    }
+
+    override fun onBackPressed() {
+        if (fragment is BaseEditNoteFragment) {
+            (fragment as? BaseEditNoteFragment)?.onBackPressed()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }
@@ -170,9 +186,4 @@ fun AppCompatActivity.resumeFragment(fragment: Fragment){
         show(fragment)
         commit()
     }
-}
-
-fun Context.getTextFromClipBoard(): String?{
-    val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-    return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }

@@ -8,6 +8,7 @@ import dev.arkbuilders.arkmemo.utils.tenthSecondsToString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.File
 import java.nio.file.Path
 import java.util.Timer
 import javax.inject.Inject
@@ -16,7 +17,7 @@ import kotlin.concurrent.timer
 sealed class RecorderSideEffect {
     object StartRecording: RecorderSideEffect()
 
-    object StopRecording: RecorderSideEffect()
+    data class StopRecording(val duration: String) : RecorderSideEffect()
 
     object PauseRecording: RecorderSideEffect()
 
@@ -59,6 +60,10 @@ class ArkRecorderViewModel @Inject constructor(
         }
     }
 
+    fun onStartOverClick() {
+        onStartOverRecordingClick()
+    }
+
     fun collect(
         stateToUI: (RecorderState) -> Unit,
         handleSideEffect:(RecorderSideEffect) -> Unit
@@ -83,6 +88,11 @@ class ArkRecorderViewModel @Inject constructor(
         return arkAudioRecorder.getRecording()
     }
 
+    fun isRecordExisting(): Boolean {
+        val recordFile = File(getRecordingPath().toUri())
+        return !isRecording.value && recordFile.exists() && recordFile.length() > 0
+    }
+
     private fun onStartRecordingClick() {
         viewModelScope.launch {
             arkAudioRecorder.init()
@@ -98,9 +108,22 @@ class ArkRecorderViewModel @Inject constructor(
             arkAudioRecorder.stop()
             isRecording.value = false
             if (isPaused.value) isPaused.value = false
+            val lastDuration = duration
             duration = 0
             stopTimer()
-            recorderSideEffect.value = RecorderSideEffect.StopRecording
+            recorderSideEffect.value = RecorderSideEffect.StopRecording(duration = tenthSecondsToString(lastDuration))
+        }
+    }
+
+    private fun onStartOverRecordingClick() {
+        viewModelScope.launch {
+            arkAudioRecorder.stop()
+            duration = 0
+            stopTimer()
+
+            arkAudioRecorder.init()
+            arkAudioRecorder.start()
+            startTimer()
         }
     }
 
@@ -143,5 +166,9 @@ class ArkRecorderViewModel @Inject constructor(
     private fun stopTimer() {
         timer?.cancel()
         timer = null
+    }
+
+    fun isRecording(): Boolean {
+        return isRecording.value
     }
 }

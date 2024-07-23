@@ -1,6 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.util.Log
+import android.media.MediaMetadataRetriever
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import javax.inject.Inject
 
 sealed class ArkMediaPlayerSideEffect {
@@ -52,13 +54,18 @@ class ArkMediaPlayerViewModel @Inject constructor(
         )
     }
 
-    fun onPlayOrPauseClick(path: String) {
+    fun setPath(path: String) {
+        currentPlayingVoiceNotePath = path
+    }
+
+    fun onPlayOrPauseClick(path: String, pos: Int? = null, onStop: ((pos: Int) -> Unit)? = null) {
         if (currentPlayingVoiceNotePath != path) {
             currentPlayingVoiceNotePath = path
             arkMediaPlayer.init(
                 path,
                 onCompletion = {
                     arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.StopPlaying
+                    onStop?.invoke(pos ?: 0)
                 },
                 onPrepared = {
                     arkMediaPlayerState.value = ArkMediaPlayerState(
@@ -103,12 +110,13 @@ class ArkMediaPlayerViewModel @Inject constructor(
     private fun startProgressMonitor() {
         viewModelScope.launch(Dispatchers.Default) {
             var progress: Float
+            val duration = millisToString(arkMediaPlayer.duration().toLong())
             do {
                 progress = (arkMediaPlayer.currentPosition().toFloat() /
                         arkMediaPlayer.duration().toFloat()) * 100
                 arkMediaPlayerState.value = ArkMediaPlayerState(
                     progress = progress,
-                    duration = millisToString(arkMediaPlayer.duration().toLong())
+                    duration = duration
                 )
             } while(arkMediaPlayer.isPlaying())
         }
@@ -123,5 +131,25 @@ class ArkMediaPlayerViewModel @Inject constructor(
     private fun onPauseClick() {
         arkMediaPlayer.pause()
         arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.PausePlaying
+    }
+
+    fun getDurationMillis(onSuccess: (duration: Long) -> Unit) {
+        if (currentPlayingVoiceNotePath.isEmpty()
+            || File(currentPlayingVoiceNotePath).length() == 0L) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val metadataRetriever = MediaMetadataRetriever()
+            metadataRetriever.setDataSource(currentPlayingVoiceNotePath)
+            val duration = metadataRetriever.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_DURATION
+            )?.toLong() ?: 0L
+            withContext(Dispatchers.Main) {
+                onSuccess.invoke(duration)
+            }
+        }
+    }
+
+    fun isPlayerInitialized(): Boolean{
+        return arkMediaPlayer.isInitialized()
     }
 }
