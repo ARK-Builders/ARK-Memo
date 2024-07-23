@@ -19,17 +19,17 @@ jobs:
     environment: Development
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'adopt'
         cache: gradle
 
     - name: Validate Gradle wrapper
-      uses: gradle/wrapper-validation-action@v1.0.5
+      uses: gradle/actions/wrapper-validation@v3
 
     - name: Build debug APK
       run: ./gradlew assembleDebug
@@ -39,17 +39,17 @@ jobs:
     environment: Development
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'adopt'
         cache: gradle
 
     - name: Validate Gradle wrapper
-      uses: gradle/wrapper-validation-action@v1.0.5
+      uses: gradle/actions/wrapper-validation@v3
 
     - name: Decrypt the keystore for signing
       run: |
@@ -60,19 +60,19 @@ jobs:
       run: ./gradlew assembleRelease
 
     - name: Upload release arm64-v8a APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-arm64-v8a-apk
         path: ./app/build/outputs/apk/release/app-arm64-v8a-release.apk
 
     - name: Upload release armeabi-v7a APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-armeabi-v7a-apk
         path: ./app/build/outputs/apk/release/app-armeabi-v7a-release.apk
 
     - name: Upload release universal APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: release-universal-apk
         path: ./app/build/outputs/apk/release/app-universal-release.apk
