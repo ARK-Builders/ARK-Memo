@@ -12,7 +12,6 @@ import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
 import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
-import dev.arkbuilders.arkmemo.utils.Config
 
 @HiltAndroidApp
 class App: Application() {
@@ -26,9 +25,6 @@ class App: Application() {
     }
 
     private fun initAcra() = CoroutineScope(Dispatchers.IO).launch {
-        val enabled = Config.newInstance(context = baseContext).crashReport
-        if (!enabled) return@launch
-
         initAcra {
             buildConfigClass = BuildConfig::class.java
             reportFormat = StringFormat.JSON
