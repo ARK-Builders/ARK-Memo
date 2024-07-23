@@ -57,7 +57,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/iv_back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/iv_back"
-        android:contentDescription="@string/delete"/>
+        android:contentDescription="@string/delete_note"/>
 
     <TextView
         android:id="@+id/tv_right_action_text"
