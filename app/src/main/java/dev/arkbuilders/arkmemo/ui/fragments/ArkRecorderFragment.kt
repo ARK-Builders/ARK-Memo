@@ -106,8 +106,18 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
             val showingKeyboard = insets.isVisible(WindowInsetsCompat.Type.ime())
             if (showingKeyboard) {
                 binding.layoutAudioRecord.groupRecordingViews.gone()
+                binding.layoutAudioRecord.groupSideRecordButtons.gone()
+                binding.layoutAudioRecord.tvRecordGuide.gone()
             } else {
                 binding.layoutAudioRecord.groupRecordingViews.visible()
+
+                if (arkRecorderViewModel.isRecording()) {
+                    binding.layoutAudioRecord.groupSideRecordButtons.visible()
+                    binding.layoutAudioRecord.tvRecordGuide.gone()
+                } else {
+                    binding.layoutAudioRecord.groupSideRecordButtons.gone()
+                    binding.layoutAudioRecord.tvRecordGuide.visible()
+                }
             }
             insets
         }
