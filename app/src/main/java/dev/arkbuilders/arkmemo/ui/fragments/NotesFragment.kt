@@ -7,13 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.simplemobiletools.commons.extensions.onTextChangeListener
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentHomeBinding
@@ -133,21 +133,23 @@ class NotesFragment: Fragment() {
     }
 
     private fun initSearch() {
-        binding.edtSearch.onTextChangeListener {
+        binding.edtSearch.addTextChangedListener(
+            onTextChanged = { text, _, _, _ ->
+
             binding.pbLoading.visible()
 
-            if (!binding.edtSearch.isFocused && it.isEmpty()) return@onTextChangeListener
+            if (!binding.edtSearch.isFocused && text.isNullOrEmpty()) return@addTextChangedListener
 
-            notesViewModel.searchNote(keyword = it) { notes ->
+            notesViewModel.searchNote(keyword = text.toString()) { notes ->
                 if (notes.isEmpty()) {
                     binding.groupSearchResultEmpty.visible()
                 } else {
                     binding.groupSearchResultEmpty.gone()
                 }
-                notesAdapter?.updateData(notes, fromSearch = true, keyword = it)
+                notesAdapter?.updateData(notes, fromSearch = true, keyword = text.toString())
                 binding.pbLoading.gone()
             }
-        }
+        })
     }
 
     private fun onNotesLoaded(notes: List<Note>) {
