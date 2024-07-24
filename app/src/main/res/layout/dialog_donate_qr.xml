@@ -71,7 +71,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/layout_copy"
-            android:layout_marginVertical="12dp"
+            android:layout_marginVertical="8dp"
             android:layout_marginHorizontal="12dp"
             android:lines="1"
             android:ellipsize="middle"

@@ -9,7 +9,7 @@ interface MemoPreferences {
 
     fun getNotesStorage(): Path
 
-    fun storeCrashReportEnabled(bool: Boolean)
+    fun storeCrashReportEnabled(enabled: Boolean)
 
     fun getCrashReportEnabled(): Boolean
 }
