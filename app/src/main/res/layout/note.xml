@@ -52,7 +52,7 @@
             android:layout_margin="5dp"
             android:background="@null"
             android:visibility="gone"
-            android:contentDescription="@string/ark_memo_play"
+            android:contentDescription="@string/ark_memo_play_pause"
             android:src="@drawable/ic_play"
             app:tint="@color/purple_700" />
         <ImageButton
