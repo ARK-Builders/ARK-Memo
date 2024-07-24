@@ -18,21 +18,15 @@ class MemoPreferencesImpl @Inject constructor(@ApplicationContext context: Conte
     private val prefEditor = sharedPreferences.edit()
 
     override fun storePath(path: String) {
-        prefEditor.apply {
-            putString(CURRENT_NOTES_PATH, path)
-            apply()
-        }
+        prefEditor.putString(CURRENT_NOTES_PATH, path).apply()
     }
 
     override fun getPath(): String = sharedPreferences.getString(CURRENT_NOTES_PATH, "") ?: ""
 
     override fun getNotesStorage(): Path = Path(getPath())
 
-    override fun storeCrashReportEnabled(bool: Boolean) {
-        prefEditor.apply {
-            putBoolean(CRASH_REPORT_ENABLE, bool)
-            apply()
-        }
+    override fun storeCrashReportEnabled(enabled: Boolean) {
+        prefEditor.putBoolean(CRASH_REPORT_ENABLE, enabled).apply()
     }
 
     override fun getCrashReportEnabled(): Boolean = sharedPreferences.getBoolean(CRASH_REPORT_ENABLE, true)
