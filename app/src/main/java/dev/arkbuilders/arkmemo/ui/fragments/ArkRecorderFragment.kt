@@ -212,6 +212,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
             }, onNegativeClicked = {
             }).show(parentFragmentManager, CommonActionDialog.TAG)
         }
+
+        note ?: binding.toolbar.ivRightActionIcon.gone()
     }
 
     private fun handleSideEffect(effect: RecorderSideEffect) {

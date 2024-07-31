@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,7 +12,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.utils.getParcelableCompat
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
+import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import java.lang.StringBuilder
 
@@ -47,11 +48,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         notesViewModel.init {}
         observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         if(arguments != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)?.let {
-                    note = it
-                }
-            else requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
+            requireArguments().getParcelableCompat(NOTE_KEY, TextNote::class.java)?.let {
                 note = it
             }
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
@@ -107,6 +104,8 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         binding.toolbar.ivRightActionIcon.setOnClickListener {
             showDeleteNoteDialog(note)
         }
+        arguments?.getParcelableCompat(NOTE_KEY, TextNote::class.java)
+            ?: binding.toolbar.ivRightActionIcon.gone()
 
         view.viewTreeObserver.addOnWindowFocusChangeListener(windowFocusedListener)
     }
