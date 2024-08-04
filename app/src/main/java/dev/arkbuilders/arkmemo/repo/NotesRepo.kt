@@ -13,4 +13,6 @@ interface NotesRepo<Note> {
     suspend fun read(): List<Note>
 
     suspend fun delete(note: Note)
+
+    suspend fun delete(notes: List<Note>)
 }

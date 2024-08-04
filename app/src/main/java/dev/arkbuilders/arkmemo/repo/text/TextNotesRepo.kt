@@ -46,6 +46,10 @@ class TextNotesRepo
             write(note) { callback(it) }
         }
 
+        override suspend fun delete(notes: List<TextNote>) {
+            helper.deleteNote(notes)
+        }
+
         override suspend fun delete(note: TextNote) {
             helper.deleteNote(note)
         }
