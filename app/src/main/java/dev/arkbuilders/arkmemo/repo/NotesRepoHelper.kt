@@ -91,6 +91,13 @@ class NotesRepoHelper
             return UserNoteProperties(title, description)
         }
 
+        suspend fun deleteNote(notes: List<Note>): Unit =
+            withContext(Dispatchers.IO) {
+                notes.forEach { note ->
+                    deleteNote(note)
+                }
+            }
+
         suspend fun deleteNote(note: Note): Unit =
             withContext(Dispatchers.IO) {
                 val id = note.resource?.id

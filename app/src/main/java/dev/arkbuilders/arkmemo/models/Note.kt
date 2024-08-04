@@ -7,4 +7,5 @@ interface Note {
     val description: String
     var resource: Resource?
     var pendingForDelete: Boolean
+    var selected: Boolean
 }

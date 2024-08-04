@@ -13,4 +13,5 @@ data class TextNote(
     @IgnoredOnParcel
     override var resource: Resource? = null,
     override var pendingForDelete: Boolean = false,
+    override var selected: Boolean = false,
 ) : Note, Parcelable
