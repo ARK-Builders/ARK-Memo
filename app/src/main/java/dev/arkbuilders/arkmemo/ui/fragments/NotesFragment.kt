@@ -56,6 +56,9 @@ class NotesFragment: BaseFragment() {
     private var playingAudioPosition = -1
     private var lastNoteItemPosition = 0
 
+    private var mIsActionMode = false
+    private var selectedCountForDelete = 0
+
     private val newTextNoteClickListener = View.OnClickListener {
         onFloatingActionButtonClicked()
     }
@@ -86,25 +89,22 @@ class NotesFragment: BaseFragment() {
             val noteToDelete = notesAdapter?.getNotes()?.getOrNull(deletePosition)?.apply {
                 pendingForDelete = true
             } ?: return
-
             val noteViewHolder = viewHolder as? NotesListAdapter.NoteViewHolder
             noteViewHolder?.isSwiping = true
-
             binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
 
-            CommonActionDialog(title = R.string.delete_note,
-                message = R.string.ark_memo_delete_warn,
+            CommonActionDialog(title = getString(R.string.delete_note),
+                message = resources.getQuantityString(R.plurals.delete_batch_note_message, 1),
                 positiveText = R.string.action_delete,
                 negativeText = R.string.ark_memo_cancel,
                 isAlert = true,
                 onPositiveClick = {
                     noteViewHolder?.isSwiping = false
-                    notesViewModel.onDeleteConfirmed(noteToDelete) {
+                    notesViewModel.onDeleteConfirmed(listOf(noteToDelete)) {
                         notesAdapter?.removeNote(noteToDelete)
                         toast(requireContext(), getString(R.string.note_deleted))
                         binding.rvPinnedNotes.adapter?.notifyItemRemoved(deletePosition)
                     }
-
             }, onNegativeClicked = {
                     noteViewHolder?.isSwiping = false
                     noteToDelete.pendingForDelete = false
@@ -217,6 +217,7 @@ class NotesFragment: BaseFragment() {
 
                 }
             )
+            observeSelectedNoteForDelete()
 
         } else {
             notesAdapter?.setNotes(notes)
@@ -226,6 +227,9 @@ class NotesFragment: BaseFragment() {
         observePlayerState()
         observePlayerSideEffect()
         notesAdapter?.setActivity(activity)
+        notesAdapter?.onItemLongPressed = {pos, note ->
+            toggleActionMode()
+        }
         binding.rvPinnedNotes.apply {
             this.layoutManager = layoutManager
             this.adapter = notesAdapter
@@ -236,7 +240,6 @@ class NotesFragment: BaseFragment() {
                 }
             }
         }
-
         mItemTouchHelper = ItemTouchHelper(mItemTouchCallback)
         mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
 
@@ -287,7 +290,6 @@ class NotesFragment: BaseFragment() {
                 arkMediaPlayerViewModel.playerSideEffect.collectLatest { sideEffect ->
                     sideEffect ?: return@collectLatest
                     notesAdapter?.observeItemSideEffect = { sideEffect }
-
                     if (sideEffect == ArkMediaPlayerSideEffect.StopPlaying) {
                         mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
                     }
@@ -304,6 +306,10 @@ class NotesFragment: BaseFragment() {
                 (notesAdapter?.getNotes()?.getOrNull(playingAudioPosition) as? VoiceNote)?.isPlaying = false
                 notesAdapter?.notifyItemChanged(playingAudioPosition)
             }
+        }
+
+        if (mIsActionMode) {
+            toggleActionMode()
         }
     }
 
@@ -322,6 +328,9 @@ class NotesFragment: BaseFragment() {
         activity.fragment = this
         observeClipboardContent()
         binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
+        if (notesAdapter?.observableSelectedNoteCount?.hasActiveObservers() == false) {
+            observeSelectedNoteForDelete()
+        }
     }
 
     private fun createTextNote() {
@@ -399,6 +408,94 @@ class NotesFragment: BaseFragment() {
             )
             binding.groupFabActions.visible()
             showingFloatingButtons = true
+        }
+    }
+
+    private fun toggleActionMode() {
+        if (mIsActionMode) {
+            binding.groupActionModeTexts.gone()
+            binding.layoutBottomControl.visible()
+            binding.edtSearch.visible()
+            binding.ivSettings.visible()
+        } else {
+            binding.groupActionModeTexts.visible()
+            updateSelectStateTexts(selectedCountForDelete)
+            binding.layoutBottomControl.gone()
+            binding.edtSearch.gone()
+            binding.ivSettings.gone()
+            binding.tvActionModeCancel.setOnClickListener {
+                toggleActionMode()
+            }
+            binding.tvActionModeSelectAll.setOnClickListener {
+
+                if (selectedCountForDelete == notesAdapter?.getNotes()?.size) {
+                    notesAdapter?.toggleSelectAllItems(selected = false)
+                } else {
+                    notesAdapter?.toggleSelectAllItems(selected = true)
+                }
+                updateSelectStateTexts(selectedCountForDelete)
+            }
+            binding.btnDelete.setOnClickListener {
+                showBatchDeletionDialog()
+            }
+        }
+        (binding.rvPinnedNotes.adapter as? NotesListAdapter)?.toggleActionMode()
+        mIsActionMode = !mIsActionMode
+    }
+
+    private fun showBatchDeletionDialog() {
+        CommonActionDialog(title = resources.getQuantityString(R.plurals.delete_note_count,
+            selectedCountForDelete, selectedCountForDelete),
+            message = resources.getQuantityString(R.plurals.delete_batch_note_message, selectedCountForDelete),
+            positiveText = R.string.action_delete,
+            negativeText = R.string.ark_memo_cancel,
+            isAlert = true,
+            onPositiveClick = {
+                binding.pbLoading.visible()
+                notesViewModel.onDeleteConfirmed(notesAdapter?.selectedNotedForDelete ?: emptyList()) {
+                    binding.pbLoading.gone()
+                    toast(requireContext(), getString(R.string.note_deleted))
+                    binding.rvPinnedNotes.adapter?.notifyDataSetChanged()
+                    toggleActionMode()
+                }
+            },
+            onNegativeClicked = {},
+            onCloseClicked = {}
+        ).show(childFragmentManager, CommonActionDialog.TAG)
+    }
+
+    private fun updateSelectStateTexts(selectedCount: Int) {
+        binding.tvSelectedNoteCount.text = resources.getQuantityString(
+            R.plurals.selected_note_count, selectedCount, selectedCount
+        )
+        binding.tvActionModeSelectAll.text =
+            if (selectedCount == (notesAdapter?.getNotes()?.size ?: 0)) {
+                getString(R.string.deselect_all)
+            } else {
+                getString(R.string.select_all)
+            }
+    }
+
+    private fun changeDeleteButtonState(enabled: Boolean) {
+        if (enabled) {
+            binding.btnDelete.isClickable = true
+            binding.btnDelete.alpha = 1f
+        } else {
+            binding.btnDelete.isClickable = false
+            binding.btnDelete.alpha = 0.4f
+        }
+    }
+
+    private fun observeSelectedNoteForDelete() {
+        notesAdapter?.observableSelectedNoteCount?.observe(viewLifecycleOwner) { count ->
+            selectedCountForDelete = count
+            updateSelectStateTexts(count)
+
+            if (count > 0) {
+                changeDeleteButtonState(enabled = true)
+            } else {
+                changeDeleteButtonState(enabled = false)
+            }
         }
     }
 

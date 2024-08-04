@@ -94,7 +94,7 @@ class NotesViewModel @Inject constructor(
                     || result == SaveNoteResult.SUCCESS_UPDATED) {
 
                     if (result == SaveNoteResult.SUCCESS_NEW) {
-                        parentNote?.let { onDeleteConfirmed(parentNote){} }
+                        parentNote?.let { onDeleteConfirmed(listOf(parentNote)){} }
 
                     }
                     add(note, noteResId)
@@ -124,16 +124,17 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteConfirmed(note: Note, onSuccess: () -> Unit) {
+    fun onDeleteConfirmed(notes: List<Note>, onSuccess: () -> Unit) {
         viewModelScope.launch(iODispatcher) {
-            when (note) {
-                is TextNote -> textNotesRepo.delete(note)
-                is GraphicNote -> graphicNotesRepo.delete(note)
-                is VoiceNote -> voiceNotesRepo.delete(note)
+            notes.forEach { note ->
+                when (note) {
+                    is TextNote -> textNotesRepo.delete(note)
+                    is GraphicNote -> graphicNotesRepo.delete(note)
+                    is VoiceNote -> voiceNotesRepo.delete(note)
+                }
             }
-
             this@NotesViewModel.notes.value = this@NotesViewModel.notes.value.toMutableList()
-                .apply { remove(note) }
+                .apply { removeAll(notes) }
             withContext(Dispatchers.Main) {
                 onSuccess.invoke()
             }

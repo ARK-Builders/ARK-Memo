@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_gravity="center"
     android:fitsSystemWindows="true">
 
@@ -38,7 +39,7 @@
         app:layout_constraintStart_toStartOf="@+id/tv_title"
         app:layout_constraintTop_toBottomOf="@+id/iv_close"
         app:layout_constraintEnd_toEndOf="@+id/iv_close"
-        android:text="@string/ark_memo_delete_warn"
+        tools:text="Are you sure you want to delete this note? This action cannot be undone."
         android:id="@+id/tv_message"/>
 
     <TextView

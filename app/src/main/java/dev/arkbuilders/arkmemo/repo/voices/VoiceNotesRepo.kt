@@ -40,6 +40,10 @@ class VoiceNotesRepo @Inject constructor(
         readStorage()
     }
 
+    override suspend fun delete(notes: List<VoiceNote>) {
+        helper.deleteNote(notes)
+    }
+
     override suspend fun delete(note: VoiceNote) {
         helper.deleteNote(note)
     }

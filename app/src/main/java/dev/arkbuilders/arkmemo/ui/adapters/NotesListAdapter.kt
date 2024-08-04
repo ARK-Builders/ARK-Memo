@@ -3,9 +3,11 @@ package dev.arkbuilders.arkmemo.ui.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
@@ -35,12 +37,20 @@ class NotesListAdapter(
 ): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private lateinit var activity: MainActivity
+    private var mActionMode = false
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
     lateinit var observeItemState: () -> ArkMediaPlayerState
 
     private var isFromSearch: Boolean = false
     private var searchKeyWord: String = ""
+
+    var onItemLongPressed: ((pos: Int, note: Note) -> Unit)? = null
+    var onItemClicked: (() -> Unit)? = null
+
+    private val selectedNoteCount by lazy { MutableLiveData<Int>() }
+    val observableSelectedNoteCount by lazy { selectedNoteCount }
+    val selectedNotedForDelete = mutableListOf<Note>()
 
     fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
@@ -74,13 +84,16 @@ class NotesListAdapter(
             }
 
             holder.btnPlayPause.setOnClickListener {
-                onPlayPauseClick(note.path.toString(), position) { stopPos ->
+                onPlayPauseClick(note.path.toString(), holder.bindingAdapterPosition) { stopPos ->
+                    val realPos =
+                        if (holder.bindingAdapterPosition >= 0) holder.bindingAdapterPosition
+                        else position
                     showPlaybackIdleState(holder)
-                    (notes[position] as VoiceNote).isPlaying = false
+                    (notes[realPos] as VoiceNote).isPlaying = false
                     holder.layoutAudioView.animAudioPlaying.resetWave()
                     holder.layoutAudioView.animAudioPlaying.invalidateWave(0)
                     holder.tvPlayingPosition.gone()
-                    notifyItemChanged(position)
+                    notifyItemChanged(realPos)
                 }
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
                 note.isPlaying = !note.isPlaying
@@ -113,6 +126,13 @@ class NotesListAdapter(
             holder.tvDelete.visible()
         } else {
             holder.tvDelete.gone()
+        }
+
+        holder.cbDelete.isChecked = note.selected
+        if (mActionMode) {
+            holder.cbDelete.visible()
+        } else {
+            holder.cbDelete.gone()
         }
     }
 
@@ -176,12 +196,33 @@ class NotesListAdapter(
         return notes
     }
 
+    fun removeNote(noteToRemove: Note) {
+        notes.remove(noteToRemove)
+    }
+
     fun setNotes(notes: List<Note>) {
         this.notes = notes.toMutableList()
     }
 
-    fun removeNote(noteToRemove: Note) {
-        notes.remove(noteToRemove)
+    fun toggleActionMode() {
+        mActionMode = !mActionMode
+        notes.forEach { it.selected = false }
+        selectedNoteCount.postValue(0)
+        notifyDataSetChanged()
+    }
+
+    fun toggleSelectAllItems(selected: Boolean) {
+        notes.forEach { it.selected = selected }
+        selectedNotedForDelete.clear()
+        selectedNoteCount.postValue(
+            if (selected) {
+                selectedNotedForDelete.addAll(notes)
+                notes.size
+            } else {
+                0
+            }
+        )
+        notifyDataSetChanged()
     }
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
@@ -196,6 +237,8 @@ class NotesListAdapter(
         val tvPlayingPosition = binding.layoutAudioView.tvPlayingPosition
         val canvasGraphicThumb = binding.canvasGraphicThumb
         val tvDelete = binding.tvDelete
+        val cbDelete = binding.cbDelete
+
         var isSwiping: Boolean = false
 
         private val clickNoteToEditListener = View.OnClickListener {
@@ -211,11 +254,39 @@ class NotesListAdapter(
                     tag = ArkRecorderFragment.TAG
                 }
             }
+            onItemClicked?.invoke()
             activity.replaceFragment(activity.fragment, tag)
+        }
+
+        private val noteCheckedListener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
+            if (!buttonView.isPressed) return@OnCheckedChangeListener
+            val selectedNote = notes[bindingAdapterPosition]
+            selectedNote.selected = isChecked
+            if (isChecked) {
+                selectedNoteCount.value?.let { count ->
+                    selectedNoteCount.postValue(count + 1)
+                }
+                selectedNotedForDelete.add(selectedNote)
+            } else {
+                selectedNoteCount.value?.let { count ->
+                    selectedNoteCount.postValue(count - 1)
+                }
+                selectedNotedForDelete.remove(selectedNote)
+            }
+
+            buttonView.post {
+                notifyItemChanged(bindingAdapterPosition)
+            }
         }
 
         init {
             binding.root.setOnClickListener(clickNoteToEditListener)
+            binding.root.setOnLongClickListener {
+                onItemLongPressed?.invoke(bindingAdapterPosition, notes[bindingAdapterPosition])
+                true
+            }
+            binding.cbDelete.setOnCheckedChangeListener(noteCheckedListener)
+            binding.layoutAudioView.root.setBackgroundResource(R.drawable.bg_audio_view_note_item)
         }
     }
 }

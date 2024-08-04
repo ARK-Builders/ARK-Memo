@@ -33,7 +33,7 @@
         android:inputType="text"
         android:imeOptions="actionSearch"
         android:paddingHorizontal="16dp"
-        android:layout_marginStart="16dp" />
+        android:layout_marginStart="@dimen/home_horizontal_margin" />
 
     <TextView
         android:layout_width="match_parent"
@@ -182,6 +182,87 @@
         android:layout_marginBottom="16dp"
         app:icon="@drawable/add"/>
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_selected_note_count"
+        tools:text="2 items selected"
+        style="@style/TextMedium"
+        android:textStyle="normal"
+        android:layout_marginTop="24dp"
+        app:layout_goneMarginTop="24dp"
+        android:layout_marginStart="@dimen/home_horizontal_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_search"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_action_mode_cancel"
+        android:text="@string/ark_memo_cancel"
+        style="@style/TextMedium500"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/warning_600"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="@dimen/home_horizontal_margin"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_selected_note_count"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_action_mode_select_all"
+        android:text="@string/select_all"
+        style="@style/TextMedium500"
+        android:textColor="@color/warning_600"
+        android:layout_marginEnd="@dimen/common_padding"
+        app:layout_constraintEnd_toStartOf="@+id/tv_action_mode_cancel"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_selected_note_count"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="tv_selected_note_count,tv_action_mode_cancel,tv_action_mode_select_all,btn_delete"
+        android:visibility="gone"
+        android:id="@+id/group_action_mode_texts"
+        tools:visibility="visible"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        android:id="@+id/barrier_top_note_list"
+        app:constraint_referenced_ids="tv_selected_note_count,edt_search" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/view_bottom_panel"
+        app:layout_constraintTop_toTopOf="@+id/view_bottom_panel"
+        android:layout_margin="@dimen/common_padding"
+        android:clickable="false"
+        android:alpha="0.4"
+        android:background="@drawable/bg_red_button"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:id="@+id/btn_delete">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextMedium"
+            android:textColor="@color/white"
+            android:paddingVertical="10dp"
+            android:text="@string/action_delete"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:gravity="center"
+            android:drawablePadding="6dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -191,7 +272,7 @@
         app:layout_constraintBottom_toTopOf="@+id/view_bottom_panel"
         android:paddingHorizontal="@dimen/home_horizontal_margin"
         android:id="@+id/rv_pinned_notes"
-        app:layout_constraintTop_toBottomOf="@+id/edt_search"/>
+        app:layout_constraintTop_toBottomOf="@+id/barrier_top_note_list"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_draw"
@@ -294,6 +375,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/layout_bottom_control"
         android:visibility="gone"
+        tools:visibility="visible"
         app:constraint_referenced_ids="tv_bottom_panel_paste,fab_new_action,divider_bottom_control"/>
 
     <ProgressBar
