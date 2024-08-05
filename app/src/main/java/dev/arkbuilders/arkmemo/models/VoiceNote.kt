@@ -16,5 +16,6 @@ class VoiceNote(
     var path: Path = createTempFile(),
     @IgnoredOnParcel
     override var resource: Resource? = null,
-    override var pendingForDelete: Boolean = false
+    override var pendingForDelete: Boolean = false,
+    var isPlaying: Boolean = false
 ): Note, Parcelable

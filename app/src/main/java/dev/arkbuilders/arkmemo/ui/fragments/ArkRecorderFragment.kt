@@ -421,6 +421,13 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (mediaPlayViewModel.isPlaying()) {
+            mediaPlayViewModel.onPlayOrPauseClick(getCurrentRecordingPath())
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         val view = activity.window?.decorView ?: return
