@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentHomeBinding
 import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
@@ -45,6 +46,8 @@ class NotesFragment: Fragment() {
     private var notesAdapter: NotesListAdapter? = null
 
     private var showingFloatingButtons = false
+    private var playingAudioPath: String? = null
+    private var playingAudioPosition = -1
 
     private val newTextNoteClickListener = View.OnClickListener {
         onFloatingActionButtonClicked()
@@ -158,6 +161,8 @@ class NotesFragment: Fragment() {
             notesAdapter = NotesListAdapter(
                 notes,
                 onPlayPauseClick = { path, pos, onStop ->
+                    playingAudioPath = path
+                    playingAudioPosition = pos ?: -1
                     arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
                 },
                 onThumbPrepare = { graphicNote, noteCanvas ->
@@ -195,6 +200,17 @@ class NotesFragment: Fragment() {
             binding.rvPinnedNotes.gone()
             binding.edtSearch.gone()
             binding.scrollViewNotes.gone()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (arkMediaPlayerViewModel.isPlaying()) {
+            playingAudioPath?.let {
+                arkMediaPlayerViewModel.onPlayOrPauseClick(it)
+                (notesAdapter?.getNotes()?.getOrNull(playingAudioPosition) as? VoiceNote)?.isPlaying = false
+                notesAdapter?.notifyItemChanged(playingAudioPosition)
+            }
         }
     }
 

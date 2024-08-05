@@ -152,4 +152,8 @@ class ArkMediaPlayerViewModel @Inject constructor(
     fun isPlayerInitialized(): Boolean{
         return arkMediaPlayer.isInitialized()
     }
+
+    fun isPlaying(): Boolean {
+        return arkMediaPlayer.isPlaying()
+    }
 }

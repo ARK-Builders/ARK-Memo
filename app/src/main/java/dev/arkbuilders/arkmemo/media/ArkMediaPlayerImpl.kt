@@ -56,9 +56,9 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
 
     override fun duration(): Int = player?.duration ?: 0
 
-    override fun currentPosition(): Int = player?.currentPosition!!
+    override fun currentPosition(): Int = player?.currentPosition ?: 0
 
-    override fun isPlaying(): Boolean = player?.isPlaying!!
+    override fun isPlaying(): Boolean = player?.isPlaying ?: false
 
     override fun onCompletion(player: MediaPlayer?) {
         onCompletionHandler()

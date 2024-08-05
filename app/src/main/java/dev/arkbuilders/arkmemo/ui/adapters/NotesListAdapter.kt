@@ -75,9 +75,19 @@ class NotesListAdapter(
             holder.btnPlayPause.setOnClickListener {
                 onPlayPauseClick(note.path.toString(), position) { stopPos ->
                     showPlayIcon(holder)
+                    (notes[position] as VoiceNote).isPlaying = false
+                    notifyItemChanged(position)
                 }
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
+                note.isPlaying = !note.isPlaying
             }
+
+            if (note.isPlaying) {
+                showPauseIcon(holder)
+            } else {
+                showPlayIcon(holder)
+            }
+
         } else if (note is GraphicNote) {
             holder.canvasGraphicThumb.visible()
             onThumbPrepare(note, holder.canvasGraphicThumb)
