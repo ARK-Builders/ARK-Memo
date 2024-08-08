@@ -33,15 +33,18 @@ class NotesRepoHelper @Inject constructor(
         propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
     }
 
-    suspend fun persistNoteProperties(resourceId: ResourceId,
-                                      noteTitle: String,
-                                      description: String? = null): Boolean {
+    suspend fun persistNoteProperties(
+        resourceId: ResourceId,
+        noteTitle: String,
+        description: String? = null
+    ): Boolean {
         with(propertiesStorage) {
             val properties = Properties(
                 setOf(noteTitle),
                 mutableSetOf<String>().apply {
                     description?.let { this.add(description) }
-            })
+                }
+            )
             val currentProperties = getProperties(resourceId)
             if (currentProperties.isEqual(properties)) {
                 return false
@@ -57,7 +60,7 @@ class NotesRepoHelper @Inject constructor(
         note: Note,
         tempPath: Path,
         resourcePath: Path,
-        resourceId: ResourceId,
+        resourceId: ResourceId
     ) {
         tempPath.moveTo(resourcePath)
         note.resource = Resource(

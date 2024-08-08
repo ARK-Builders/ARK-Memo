@@ -4,10 +4,10 @@ import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
-import dev.arkbuilders.arkmemo.models.GraphicNote
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.graphics.SVG
+import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
@@ -16,18 +16,18 @@ import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.io.path.createTempFile
+import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
-import kotlin.io.path.createTempFile
-import kotlin.io.path.exists
 
 class GraphicNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
     @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     private val helper: NotesRepoHelper
-): NotesRepo<GraphicNote> {
+) : NotesRepo<GraphicNote> {
 
     private lateinit var root: Path
 
@@ -63,9 +63,10 @@ class GraphicNotesRepo @Inject constructor(
         val isPropertiesChanged = helper.persistNoteProperties(
             resourceId = id,
             noteTitle = note.title,
-            description = note.description)
+            description = note.description
+        )
 
-        val resourcePath = root.resolve("${id}.$SVG_EXT")
+        val resourcePath = root.resolve("$id.$SVG_EXT")
         if (resourcePath.exists()) {
             if (isPropertiesChanged) {
                 callback(SaveNoteResult.SUCCESS)

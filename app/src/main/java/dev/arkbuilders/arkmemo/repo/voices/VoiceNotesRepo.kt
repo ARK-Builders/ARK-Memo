@@ -16,8 +16,8 @@ import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.io.path.exists
-import kotlin.io.path.fileSize
 import kotlin.io.path.extension
+import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
 
@@ -25,7 +25,7 @@ class VoiceNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
     @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     private val helper: NotesRepoHelper
-): NotesRepo<VoiceNote> {
+) : NotesRepo<VoiceNote> {
 
     private lateinit var root: Path
 
@@ -58,7 +58,7 @@ class VoiceNotesRepo @Inject constructor(
 
         helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
 
-        val resourcePath = root.resolve("${id}.$VOICE_EXT")
+        val resourcePath = root.resolve("$id.$VOICE_EXT")
         if (resourcePath.exists()) {
             Log.d(
                 VOICES_REPO,

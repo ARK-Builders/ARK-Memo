@@ -10,7 +10,7 @@ import dev.arkbuilders.arkmemo.graphics.SVGCommand
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 
-class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
+class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private var currentX = 0f
     private var currentY = 0f
@@ -30,7 +30,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
-        when(event.action) {
+        when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
                 viewModel.svg().apply {

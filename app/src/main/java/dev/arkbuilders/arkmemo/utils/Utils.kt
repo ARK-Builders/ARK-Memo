@@ -43,14 +43,14 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     }
 }
 
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
+fun AppCompatActivity.resumeFragment(fragment: Fragment) {
+    supportFragmentManager.beginTransaction().apply {
         show(fragment)
         commit()
     }
 }
 
-fun Context.getTextFromClipBoard(): String?{
+fun Context.getTextFromClipBoard(): String? {
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }
@@ -74,9 +74,9 @@ fun tenthSecondsToString(duration: Long): String {
     val minutes = seconds / 60
     val remainingSeconds = seconds % 60
     return "${
-        if (minutes <= 9) "0$minutes" else minutes
+    if (minutes <= 9) "0$minutes" else minutes
     }:${
-        if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
+    if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
     }:0$remainingMilliSeconds"
 }
 
@@ -85,8 +85,8 @@ fun millisToString(duration: Long): String {
     val minutes = seconds / 60
     val remainingSeconds = seconds % 60
     return "${
-        if (minutes <= 9) "0$minutes" else minutes
+    if (minutes <= 9) "0$minutes" else minutes
     }:${
-        if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
+    if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
     }"
 }

@@ -14,13 +14,13 @@ import javax.inject.Inject
 import kotlin.concurrent.timer
 
 sealed class RecorderSideEffect {
-    object StartRecording: RecorderSideEffect()
+    object StartRecording : RecorderSideEffect()
 
-    object StopRecording: RecorderSideEffect()
+    object StopRecording : RecorderSideEffect()
 
-    object PauseRecording: RecorderSideEffect()
+    object PauseRecording : RecorderSideEffect()
 
-    object ResumeRecording: RecorderSideEffect()
+    object ResumeRecording : RecorderSideEffect()
 }
 
 data class RecorderState(
@@ -31,7 +31,7 @@ data class RecorderState(
 @HiltViewModel
 class ArkRecorderViewModel @Inject constructor(
     private val arkAudioRecorder: ArkAudioRecorder
-): ViewModel() {
+) : ViewModel() {
 
     private val recorderSideEffect = MutableStateFlow<RecorderSideEffect?>(null)
     private val recorderState = MutableStateFlow<RecorderState?>(null)
@@ -61,7 +61,7 @@ class ArkRecorderViewModel @Inject constructor(
 
     fun collect(
         stateToUI: (RecorderState) -> Unit,
-        handleSideEffect:(RecorderSideEffect) -> Unit
+        handleSideEffect: (RecorderSideEffect) -> Unit
     ) {
         viewModelScope.launch {
             recorderState.collect {

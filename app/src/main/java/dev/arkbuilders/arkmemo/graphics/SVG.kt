@@ -3,13 +3,13 @@ package dev.arkbuilders.arkmemo.graphics
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
-import android.graphics.Path as AndroidDrawPath
 import android.util.Xml
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import org.xmlpull.v1.XmlPullParser
 import java.nio.file.Path
 import kotlin.io.path.reader
 import kotlin.io.path.writer
+import android.graphics.Path as AndroidDrawPath
 
 class SVG {
     private var strokeColor = "black"

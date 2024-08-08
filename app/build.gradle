@@ -6,6 +6,8 @@ plugins {
     id 'kotlin-parcelize'
 }
 
+apply from: "$projectDir/scripts/ktlint.gradle"
+
 android {
     namespace 'dev.arkbuilders.arkmemo'
     compileSdk 33

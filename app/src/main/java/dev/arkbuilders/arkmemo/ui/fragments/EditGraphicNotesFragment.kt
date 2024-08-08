@@ -17,7 +17,7 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 
 @AndroidEntryPoint
-class EditGraphicNotesFragment: BaseEditNoteFragment() {
+class EditGraphicNotesFragment : BaseEditNoteFragment() {
 
     private val activity by lazy {
         requireActivity() as MainActivity
@@ -33,14 +33,16 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         notesViewModel.init {}
         observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         if (arguments != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 requireArguments().getParcelable(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
                     note = it
                     graphicNotesViewModel.onNoteOpened(note)
                 }
-            else requireArguments().getParcelable<GraphicNote>(GRAPHICAL_NOTE_KEY)?.let {
-                note = it
-                graphicNotesViewModel.onNoteOpened(note)
+            } else {
+                requireArguments().getParcelable<GraphicNote>(GRAPHICAL_NOTE_KEY)?.let {
+                    note = it
+                    graphicNotesViewModel.onNoteOpened(note)
+                }
             }
         }
     }
@@ -51,7 +53,7 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         val notesCanvas = binding.notesCanvas
         val btnSave = binding.btnSave
         val noteTitle = binding.noteTitle
-        val noteTitleChangeListener = object: TextWatcher {
+        val noteTitleChangeListener = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -62,7 +64,6 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {}
-
         }
 
         activity.title = getString(R.string.edit_note)

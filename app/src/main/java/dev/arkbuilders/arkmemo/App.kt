@@ -2,7 +2,9 @@ package dev.arkbuilders.arkmemo
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
+import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
 import dev.arkbuilders.arklib.initArkLib
+import dev.arkbuilders.arkmemo.utils.Config
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,11 +13,9 @@ import org.acra.config.httpSender
 import org.acra.data.StringFormat
 import org.acra.ktx.initAcra
 import org.acra.sender.HttpSender
-import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
-import dev.arkbuilders.arkmemo.utils.Config
 
 @HiltAndroidApp
-class App: Application() {
+class App : Application() {
 
     override fun onCreate() {
         super.onCreate()

@@ -4,7 +4,7 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import javax.inject.Inject
 
-class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
+class ArkMediaPlayerImpl @Inject constructor() : ArkMediaPlayer {
 
     private var player: MediaPlayer? = null
 

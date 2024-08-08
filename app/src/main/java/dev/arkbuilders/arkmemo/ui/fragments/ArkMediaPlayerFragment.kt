@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,13 +26,12 @@ import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
-import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
-class ArkMediaPlayerFragment: Fragment(R.layout.fragment_edit_notes) {
+class ArkMediaPlayerFragment : Fragment(R.layout.fragment_edit_notes) {
 
     private val activity by lazy {
         requireActivity() as MainActivity
@@ -68,7 +66,7 @@ class ArkMediaPlayerFragment: Fragment(R.layout.fragment_edit_notes) {
             LocalDate.now().format(DateTimeFormatter.ISO_DATE)
         )
         var title = note.title
-        val textWatcher = object: TextWatcher {
+        val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -76,9 +74,8 @@ class ArkMediaPlayerFragment: Fragment(R.layout.fragment_edit_notes) {
             }
 
             override fun afterTextChanged(p0: Editable?) {}
-
         }
-        val seekBarChangeListener = object: OnSeekBarChangeListener {
+        val seekBarChangeListener = object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, isFromUser: Boolean) {
                 if (isFromUser) arkMediaPlayerViewModel.onSeekTo(progress)
             }

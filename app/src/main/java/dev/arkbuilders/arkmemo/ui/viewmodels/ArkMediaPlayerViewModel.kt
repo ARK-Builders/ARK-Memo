@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,13 +12,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class ArkMediaPlayerSideEffect {
-    object StartPlaying: ArkMediaPlayerSideEffect()
+    object StartPlaying : ArkMediaPlayerSideEffect()
 
-    object PausePlaying: ArkMediaPlayerSideEffect()
+    object PausePlaying : ArkMediaPlayerSideEffect()
 
-    object ResumePlaying: ArkMediaPlayerSideEffect()
+    object ResumePlaying : ArkMediaPlayerSideEffect()
 
-    object StopPlaying: ArkMediaPlayerSideEffect()
+    object StopPlaying : ArkMediaPlayerSideEffect()
 }
 
 data class ArkMediaPlayerState(
@@ -30,7 +29,7 @@ data class ArkMediaPlayerState(
 @HiltViewModel
 class ArkMediaPlayerViewModel @Inject constructor(
     private val arkMediaPlayer: ArkMediaPlayer
-): ViewModel() {
+) : ViewModel() {
 
     private var currentPlayingVoiceNotePath: String = ""
     private val arkMediaPlayerSideEffect = MutableStateFlow<ArkMediaPlayerSideEffect?>(null)
@@ -104,13 +103,15 @@ class ArkMediaPlayerViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             var progress: Float
             do {
-                progress = (arkMediaPlayer.currentPosition().toFloat() /
-                        arkMediaPlayer.duration().toFloat()) * 100
+                progress = (
+                    arkMediaPlayer.currentPosition().toFloat() /
+                        arkMediaPlayer.duration().toFloat()
+                    ) * 100
                 arkMediaPlayerState.value = ArkMediaPlayerState(
                     progress = progress,
                     duration = millisToString(arkMediaPlayer.duration().toLong())
                 )
-            } while(arkMediaPlayer.isPlaying())
+            } while (arkMediaPlayer.isPlaying())
         }
     }
 

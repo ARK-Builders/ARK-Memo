@@ -6,12 +6,11 @@ import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.ui.views.PathPreference
 import javax.inject.Inject
-
 
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -19,7 +18,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     @Inject
     lateinit var memoPreferences: MemoPreferences
 
-    private val activity: MainActivity by lazy{
+    private val activity: MainActivity by lazy {
         requireActivity() as MainActivity
     }
 
@@ -51,12 +50,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    override fun onResume(){
+    override fun onResume() {
         super.onResume()
         activity.fragment = this
     }
 
-    companion object{
+    companion object {
         const val TAG = "Settings"
     }
 }

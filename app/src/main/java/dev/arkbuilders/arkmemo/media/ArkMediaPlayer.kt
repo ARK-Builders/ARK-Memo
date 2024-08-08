@@ -2,7 +2,7 @@ package dev.arkbuilders.arkmemo.media
 
 import android.media.MediaPlayer
 
-interface ArkMediaPlayer:
+interface ArkMediaPlayer :
     MediaPlayer.OnCompletionListener,
     MediaPlayer.OnPreparedListener,
     MediaPlayer.OnSeekCompleteListener {

@@ -5,31 +5,31 @@ import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
 import dev.arkbuilders.arkmemo.utils.readLines
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.io.path.createTempFile
+import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
 import kotlin.io.path.writeLines
-import kotlin.io.path.createTempFile
-import kotlin.io.path.exists
 
 class TextNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
     @Named(IO_DISPATCHER)
     private val iODispatcher: CoroutineDispatcher,
     private val helper: NotesRepoHelper
-): NotesRepo<TextNote> {
+) : NotesRepo<TextNote> {
 
     private lateinit var root: Path
 
@@ -63,7 +63,8 @@ class TextNotesRepo @Inject constructor(
         val isPropertiesChanged = helper.persistNoteProperties(
             resourceId = id,
             noteTitle = note.title,
-            description = note.description)
+            description = note.description
+        )
 
         val resourcePath = root.resolve("$id.$NOTE_EXT")
         if (resourcePath.exists()) {
@@ -116,4 +117,3 @@ class TextNotesRepo @Inject constructor(
 
 private const val TEXT_REPO = "text-repo"
 private const val NOTE_EXT = "note"
-

@@ -1,9 +1,9 @@
 package dev.arkbuilders.arkmemo.ui.activities
 
+import android.Manifest
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -19,8 +19,8 @@ import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
-import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
@@ -50,14 +50,20 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     init {
         FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) FilePickerDialog.show()
-                else finish()
+                if (isGranted) {
+                    FilePickerDialog.show()
+                } else {
+                    finish()
+                }
             }
 
         FilePickerDialog.readPermLauncher_SDK_R =
             registerForActivityResult(PermissionContract()) { isGranted ->
-                if (isGranted) FilePickerDialog.show()
-                else finish()
+                if (isGranted) {
+                    FilePickerDialog.show()
+                } else {
+                    finish()
+                }
             }
     }
 
@@ -79,17 +85,18 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     commit()
                 }
             } else {
-                if (savedInstanceState == null)
+                if (savedInstanceState == null) {
                     supportFragmentManager.beginTransaction().apply {
                         add(fragContainer, fragment, NotesFragment.TAG)
                         commit()
                     }
-                else {
+                } else {
                     supportFragmentManager.apply {
                         val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)!!
                         fragment = findFragmentByTag(tag)!!
-                        if (!fragment.isInLayout)
+                        if (!fragment.isInLayout) {
                             resumeFragment(fragment)
+                        }
                     }
                 }
             }
@@ -102,15 +109,17 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 memoPreferences.storePath(it.toString())
                 showFragment()
             }
+        } else {
+            showFragment()
         }
-        else showFragment()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         this.menu = menu
-        if(fragment.tag != NotesFragment.TAG)
+        if (fragment.tag != NotesFragment.TAG) {
             showSettingsButton(false)
+        }
         return true
     }
 
@@ -130,7 +139,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     }
 
     fun showSettingsButton(show: Boolean = true) {
-        if(menu != null) {
+        if (menu != null) {
             val settingsItem = menu?.findItem(R.id.settings)
             settingsItem?.isVisible = show
         }
@@ -146,7 +155,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         showSettingsButton(false)
     }
 
-    companion object{
+    companion object {
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }
 }
@@ -165,14 +174,14 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     }
 }
 
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
+fun AppCompatActivity.resumeFragment(fragment: Fragment) {
+    supportFragmentManager.beginTransaction().apply {
         show(fragment)
         commit()
     }
 }
 
-fun Context.getTextFromClipBoard(): String?{
+fun Context.getTextFromClipBoard(): String? {
     val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }

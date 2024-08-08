@@ -7,7 +7,6 @@ import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.Path
 
-
 private const val NAME = "memo_prefs"
 private const val CURRENT_NOTES_PATH = "current_notes_path"
 

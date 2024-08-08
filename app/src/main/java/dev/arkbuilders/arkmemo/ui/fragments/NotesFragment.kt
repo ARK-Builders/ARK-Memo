@@ -14,17 +14,17 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.databinding.FragmentNotesBinding
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
+import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 @AndroidEntryPoint
-class NotesFragment: Fragment(R.layout.fragment_notes) {
+class NotesFragment : Fragment(R.layout.fragment_notes) {
 
     private val binding by viewBinding(FragmentNotesBinding::bind)
 
@@ -50,7 +50,7 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         showFabs = false
     }
 
-    private val newGraphicNoteClickListener = View.OnClickListener{
+    private val newGraphicNoteClickListener = View.OnClickListener {
         activity.fragment = EditGraphicNotesFragment.newInstance()
         activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
         showFabs = false
@@ -61,13 +61,14 @@ class NotesFragment: Fragment(R.layout.fragment_notes) {
         if (clipBoardText != null) {
             activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
             activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+        } else {
+            Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
         }
-        else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notesViewModel.apply {  init { readAllNotes() } }
+        notesViewModel.apply { init { readAllNotes() } }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

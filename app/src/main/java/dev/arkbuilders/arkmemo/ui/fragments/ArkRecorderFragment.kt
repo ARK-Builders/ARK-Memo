@@ -24,10 +24,10 @@ import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
-import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
 import dev.arkbuilders.arkmemo.ui.views.WaveView
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
-class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
+class ArkRecorderFragment : Fragment(R.layout.fragment_edit_notes) {
 
     private val activity by lazy { requireActivity() as MainActivity }
     private val binding by viewBinding(FragmentEditNotesBinding::bind)
@@ -60,7 +60,7 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
         super.onCreate(savedInstanceState)
         shouldRecord = context?.let {
             it.checkSelfPermission(Manifest.permission.RECORD_AUDIO) ==
-                    PackageManager.PERMISSION_GRANTED
+                PackageManager.PERMISSION_GRANTED
         } ?: false
         if (shouldRecord) {
             notesViewModel.init {}
@@ -73,7 +73,9 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
                 }
             }
             observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
-        } else audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        } else {
+            audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -88,7 +90,7 @@ class ArkRecorderFragment: Fragment(R.layout.fragment_edit_notes) {
         )
         var title = ""
         val etTitle = binding.noteTitle
-        val etTitleWatcher = object: TextWatcher {
+        val etTitleWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {

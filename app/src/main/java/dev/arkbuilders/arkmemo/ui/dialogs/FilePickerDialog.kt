@@ -19,7 +19,7 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class FilePickerDialog: ArkFilePickerFragment() {
+class FilePickerDialog : ArkFilePickerFragment() {
 
     @Inject lateinit var memoPreferences: MemoPreferences
 
@@ -33,9 +33,9 @@ class FilePickerDialog: ArkFilePickerFragment() {
         if (storageNotAvailable()) { activity?.finish() }
     }
 
-    private fun storageNotAvailable(): Boolean  = memoPreferences.getPath().isEmpty()
+    private fun storageNotAvailable(): Boolean = memoPreferences.getPath().isEmpty()
 
-    companion object{
+    companion object {
 
         private const val TAG = "file_picker"
         private lateinit var fragmentManager: FragmentManager
@@ -46,33 +46,33 @@ class FilePickerDialog: ArkFilePickerFragment() {
             newInstance(getFilePickerConfig()).show(fragmentManager, TAG)
         }
 
-        fun show(activity: AppCompatActivity, fragmentManager: FragmentManager){
+        fun show(activity: AppCompatActivity, fragmentManager: FragmentManager) {
             Companion.fragmentManager = fragmentManager
-            if(isReadPermissionGranted(activity)){
+            if (isReadPermissionGranted(activity)) {
                 show()
+            } else {
+                askForReadPermissions()
             }
-            else askForReadPermissions()
         }
 
         private fun newInstance(config: ArkFilePickerConfig) = FilePickerDialog().apply {
             setConfig(config)
         }
 
-        private fun isReadPermissionGranted(activity: AppCompatActivity): Boolean{
-            return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        private fun isReadPermissionGranted(activity: AppCompatActivity): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 Environment.isExternalStorageManager()
-            else{
+            } else {
                 ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED
+                    PackageManager.PERMISSION_GRANTED
             }
         }
 
         private fun askForReadPermissions() {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-                val packageUri ="package:" + BuildConfig.APPLICATION_ID
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                val packageUri = "package:" + BuildConfig.APPLICATION_ID
                 readPermLauncher_SDK_R?.launch(packageUri)
-            }
-            else{
+            } else {
                 readPermLauncher?.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
         }

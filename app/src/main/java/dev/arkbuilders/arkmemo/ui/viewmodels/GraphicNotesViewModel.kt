@@ -6,16 +6,15 @@ import android.graphics.Path
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.graphics.SVG
+import dev.arkbuilders.arkmemo.models.GraphicNote
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.Stack
 import javax.inject.Inject
 
 @HiltViewModel
-class GraphicNotesViewModel @Inject constructor(): ViewModel() {
+class GraphicNotesViewModel @Inject constructor() : ViewModel() {
 
     private val _notes = MutableStateFlow(listOf<GraphicNote>())
     val notes: StateFlow<List<GraphicNote>> = _notes

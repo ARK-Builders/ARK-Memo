@@ -28,7 +28,7 @@ import dev.arkbuilders.arkmemo.utils.replaceFragment
 class NotesListAdapter(
     private val notes: List<Note>,
     private val onPlayPauseClick: (String) -> Unit
-): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
+) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
 
     private lateinit var activity: MainActivity
     private lateinit var fragmentManager: FragmentManager
@@ -52,8 +52,8 @@ class NotesListAdapter(
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val note = notes[position]
         holder.title.text = note.getAutoTitle(activity)
-        holder.date.text = note.resource?.modified?.toString() ?:
-                activity.getString(R.string.ark_memo_just_now)
+        holder.date.text = note.resource?.modified?.toString()
+            ?: activity.getString(R.string.ark_memo_just_now)
         holder.btnPlayPause.isVisible = false
         if (note is VoiceNote) {
             holder.btnPlayPause.isVisible = true
@@ -104,7 +104,7 @@ class NotesListAdapter(
         holder.btnPlayPause.setImageDrawable(playIcon)
     }
 
-    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding by viewBinding {
             NoteBinding.bind(itemView)
         }

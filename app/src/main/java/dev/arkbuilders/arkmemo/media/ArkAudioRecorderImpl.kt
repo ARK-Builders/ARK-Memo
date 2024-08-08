@@ -10,16 +10,18 @@ import kotlin.io.path.createTempFile
 
 class ArkAudioRecorderImpl @Inject constructor(
     @ApplicationContext private val context: Context
-): ArkAudioRecorder {
+) : ArkAudioRecorder {
 
     private var recorder: MediaRecorder? = null
 
     private val tempFile = createTempFile().toFile()
 
     override fun init() {
-        recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MediaRecorder(context)
-        else MediaRecorder()
+        } else {
+            MediaRecorder()
+        }
         recorder?.apply {
             setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)

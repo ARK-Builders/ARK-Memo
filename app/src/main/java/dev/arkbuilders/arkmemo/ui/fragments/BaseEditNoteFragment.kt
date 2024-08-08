@@ -7,7 +7,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
 
-open class BaseEditNoteFragment: Fragment(R.layout.fragment_edit_notes) {
+open class BaseEditNoteFragment : Fragment(R.layout.fragment_edit_notes) {
 
     val binding by viewBinding(FragmentEditNotesBinding::bind)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
