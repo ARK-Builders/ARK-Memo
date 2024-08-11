@@ -95,7 +95,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
                 hostActivity.showProgressBar(show)
             }
         }
-        enableSaveText(false)
+        enableSaveText(noteStr?.isNotBlank() == true)
 
         binding.tvPaste.setOnClickListener(pasteNoteClickListener)
 

@@ -74,7 +74,7 @@ class NotesListAdapter(
 
             holder.btnPlayPause.setOnClickListener {
                 onPlayPauseClick(note.path.toString(), position) { stopPos ->
-                    showPlayIcon(holder)
+                    showPlaybackIdleState(holder)
                     (notes[position] as VoiceNote).isPlaying = false
                     notifyItemChanged(position)
                 }
@@ -83,9 +83,9 @@ class NotesListAdapter(
             }
 
             if (note.isPlaying) {
-                showPauseIcon(holder)
+                showPlayingState(holder)
             } else {
-                showPlayIcon(holder)
+                showPlaybackIdleState(holder)
             }
 
         } else if (note is GraphicNote) {
@@ -108,36 +108,38 @@ class NotesListAdapter(
     ) {
         when (effect) {
             is ArkMediaPlayerSideEffect.StartPlaying -> {
-                showPauseIcon(holder)
+                showPlayingState(holder)
             }
             is ArkMediaPlayerSideEffect.PausePlaying -> {
-                showPlayIcon(holder)
+                showPlaybackIdleState(holder)
             }
             is ArkMediaPlayerSideEffect.StopPlaying -> {
-                showPlayIcon(holder)
+                showPlaybackIdleState(holder)
             }
             is ArkMediaPlayerSideEffect.ResumePlaying -> {
-                showPauseIcon(holder)
+                showPlayingState(holder)
             }
         }
     }
 
-    private fun showPlayIcon(holder: NoteViewHolder) {
+    private fun showPlaybackIdleState(holder: NoteViewHolder) {
         val playIcon = ResourcesCompat.getDrawable(
             activity.resources,
             R.drawable.ic_play_circle,
             null
         )
         holder.btnPlayPause.setImageDrawable(playIcon)
+        holder.layoutAudioView.animAudioPlaying.pauseAnimation()
     }
 
-    private fun showPauseIcon(holder: NoteViewHolder) {
+    private fun showPlayingState(holder: NoteViewHolder) {
         val playIcon = ResourcesCompat.getDrawable(
             activity.resources,
             R.drawable.ic_pause_circle,
             null
         )
         holder.btnPlayPause.setImageDrawable(playIcon)
+        holder.layoutAudioView.animAudioPlaying.playAnimation()
     }
 
     fun updateData(newNotes: List<Note>, fromSearch: Boolean? = null, keyword: String? = null) {
