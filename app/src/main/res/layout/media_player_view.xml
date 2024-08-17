@@ -1,48 +1,46 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/media_player_view"
+    android:id="@+id/layout_audio_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:visibility="gone"
-    tools:visibility="visible"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_audio_view"
+    android:paddingHorizontal="13dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <ImageView
+        android:id="@+id/iv_play_audio"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_play_circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/anim_audio_playing"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_play_audio"
+        app:layout_constraintEnd_toStartOf="@+id/tv_duration"
+        app:layout_constraintStart_toEndOf="@+id/iv_play_audio"
+        app:layout_constraintTop_toTopOf="@+id/iv_play_audio"
+        app:lottie_rawRes="@raw/anim_audio_playing"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="false"/>
 
     <TextView
         android:id="@+id/tv_duration"
+        style="@style/TextMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:hint="@string/ark_memo_duration"
-        android:textSize="12sp"
+        tools:text="09.32"
+        android:textColor="@color/white"
+        android:textStyle="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <SeekBar
-        android:id="@+id/seek_bar"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:progress="50"
-        android:progressTint="@color/purple_700"
-        android:thumbTint="@color/purple_700"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_duration" />
-
-    <ImageView
-        android:id="@+id/iv_play_pause"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="25dp"
-        android:contentDescription="@string/ark_memo_play_pause"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seek_bar"
-        app:srcCompat="@drawable/ic_play" />
 </androidx.constraintlayout.widget.ConstraintLayout>

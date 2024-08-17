@@ -31,7 +31,6 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
-import dev.arkbuilders.arkmemo.ui.views.WaveView
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.millisToString
@@ -61,7 +60,6 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
     private lateinit var ivRecord: ImageView
     private lateinit var ivPauseResume: ImageView
     private lateinit var tvDuration: TextView
-    private lateinit var waveView: WaveView
 
     private var note: VoiceNote? = null
 
@@ -142,7 +140,6 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         ivRecord = binding.layoutAudioRecord.ivRecord
         ivPauseResume = binding.layoutAudioRecord.ivPauseResume
         tvDuration = binding.layoutAudioRecord.tvDuration
-        waveView = binding.recorderViewBinding.waveView
 
         ivPauseResume.isEnabled = false
         enableSaveText(false)
@@ -224,7 +221,6 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                     R.drawable.ic_record_ongoing,
                     null
                 )
-                waveView.resetWave()
                 ivRecord.setImageDrawable(stopIcon)
                 ivRecord.backgroundTintList = ColorStateList.valueOf(
                     ContextCompat.getColor(activity, R.color.warning_50)
@@ -303,7 +299,6 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
 
     private fun showState(state: RecorderState) {
         tvDuration.text = state.progress
-        waveView.invalidateWave(state.maxAmplitude)
     }
 
     private fun showPlayState(state: ArkMediaPlayerState) {

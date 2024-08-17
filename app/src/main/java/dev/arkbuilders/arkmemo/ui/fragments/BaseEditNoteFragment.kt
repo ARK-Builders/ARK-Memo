@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesV2Binding
+import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
@@ -21,7 +21,7 @@ import java.util.Locale
 
 abstract class BaseEditNoteFragment: Fragment() {
 
-    lateinit var binding: FragmentEditNotesV2Binding
+    lateinit var binding: FragmentEditNotesBinding
     val notesViewModel: NotesViewModel by activityViewModels()
     val hostActivity by lazy { activity as MainActivity }
 
@@ -30,7 +30,7 @@ abstract class BaseEditNoteFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentEditNotesV2Binding.inflate(layoutInflater)
+        binding = FragmentEditNotesBinding.inflate(layoutInflater)
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

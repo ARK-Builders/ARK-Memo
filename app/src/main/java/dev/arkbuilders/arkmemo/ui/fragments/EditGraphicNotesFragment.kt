@@ -96,7 +96,6 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
         hostActivity.title = getString(R.string.edit_note)
         hostActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        hostActivity.showSettingsButton(false)
 
         noteTitle.hint = getString(R.string.hint_new_graphical_note)
         noteTitle.setText(title)

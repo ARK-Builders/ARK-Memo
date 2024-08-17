@@ -9,7 +9,7 @@
     android:layout_marginBottom="@dimen/note_item_padding"
     android:foreground="?attr/selectableItemBackgroundBorderless">
 
-    <include layout="@layout/media_player_view_v2"
+    <include layout="@layout/media_player_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
