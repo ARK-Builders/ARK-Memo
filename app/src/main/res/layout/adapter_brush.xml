@@ -15,6 +15,7 @@
         android:layout_width="@dimen/brush_size_icon"
         android:layout_height="@dimen/brush_size_icon"
         tools:src="@drawable/bg_round_button"
+        android:src="@drawable/bg_brush_color_black"
         tools:tint="@color/fg_primary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
