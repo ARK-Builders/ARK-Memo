@@ -76,7 +76,6 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
 
         hostActivity.title = getString(R.string.edit_note)
         hostActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        hostActivity.showSettingsButton(false)
 
         noteTitle.setText(this.note.title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)

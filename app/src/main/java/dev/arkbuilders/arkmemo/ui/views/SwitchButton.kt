@@ -14,7 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Checkable
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.utils.dp2Px
+import dev.arkbuilders.arkmemo.utils.dpToPx
 
 /**
  * SwitchButton.
@@ -74,25 +74,25 @@ class SwitchButton : View, Checkable {
         uncheckCircleWidth = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_uncheckcircle_width,
-            dp2pxInt(1.5f)
+            dpToPxInt(1.5f)
         )
-        uncheckCircleOffsetX = 10f.dp2Px()
+        uncheckCircleOffsetX = 10f.dpToPx()
         uncheckCircleRadius = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_uncheckcircle_radius,
-            4f.dp2Px()
+            4f.dpToPx()
         )
-        checkedLineOffsetX = 4f.dp2Px()
-        checkedLineOffsetY = 4f.dp2Px()
+        checkedLineOffsetX = 4f.dpToPx()
+        checkedLineOffsetY = 4f.dpToPx()
         shadowRadius = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_shadow_radius,
-            dp2pxInt(2.5f)
+            dpToPxInt(2.5f)
         )
         shadowOffset = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_shadow_offset,
-            dp2pxInt(1.5f)
+            dpToPxInt(1.5f)
         )
         shadowColor = optColor(
             typedArray,
@@ -112,7 +112,7 @@ class SwitchButton : View, Checkable {
         borderWidth = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_border_width,
-            dp2pxInt(1f)
+            dpToPxInt(1f)
         )
         checkLineColor = optColor(
             typedArray,
@@ -122,9 +122,9 @@ class SwitchButton : View, Checkable {
         checkLineWidth = optPixelSize(
             typedArray,
             R.styleable.SwitchButton_sb_checkline_width,
-            dp2pxInt(1f)
+            dpToPxInt(1f)
         )
-        checkLineLength = 6f.dp2Px()
+        checkLineLength = 6f.dpToPx()
         val buttonColor = optColor(
             typedArray,
             R.styleable.SwitchButton_sb_button_color,
@@ -620,7 +620,6 @@ class SwitchButton : View, Checkable {
         fun onCheckedChanged(view: SwitchButton?, isChecked: Boolean)
     }
 
-    /** */
     private var shadowRadius = 0
     private var shadowOffset = 0
     private var shadowColor = 0
@@ -649,12 +648,12 @@ class SwitchButton : View, Checkable {
     private var checkedLineOffsetY = 0f
 
     /**
-     * Color for button when it's uncheck
+     * Color for button when it's unchecked
      */
     private var uncheckButtonColor = 0
 
     /**
-     * Color for button when it's check
+     * Color for button when it's checked
      */
     private var checkedButtonColor = 0
     private var buttonMinX = 0f
@@ -686,8 +685,6 @@ class SwitchButton : View, Checkable {
             val value = animation.animatedValue as Float
             when (animateState) {
                 ANIMATE_STATE_PENDING_SETTLE -> {
-                    run {}
-                    run {}
                     run {
                         viewState.checkedLineColor = argbEvaluator.evaluate(
                             value,
@@ -709,7 +706,6 @@ class SwitchButton : View, Checkable {
                 }
 
                 ANIMATE_STATE_PENDING_RESET -> {
-                    run {}
                     run {
                         viewState.checkedLineColor = argbEvaluator.evaluate(
                             value,
@@ -767,14 +763,10 @@ class SwitchButton : View, Checkable {
                 }
 
                 ANIMATE_STATE_DRAGING -> {
-                    run {}
-                    run {}
                 }
 
                 ANIMATE_STATE_NONE -> {}
                 else -> {
-                    run {}
-                    run {}
                 }
             }
             postInvalidate()
@@ -833,11 +825,11 @@ class SwitchButton : View, Checkable {
     }
 
     companion object {
-        private val DEFAULT_WIDTH = dp2pxInt(50f)
-        private val DEFAULT_HEIGHT = dp2pxInt(31f)
+        private val DEFAULT_WIDTH = dpToPxInt(50f)
+        private val DEFAULT_HEIGHT = dpToPxInt(31f)
 
-        private fun dp2pxInt(dp: Float): Int {
-            return dp.dp2Px().toInt()
+        private fun dpToPxInt(dp: Float): Int {
+            return dp.dpToPx().toInt()
         }
 
         private fun optInt(

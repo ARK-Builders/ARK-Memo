@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
@@ -24,7 +23,6 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.fragments.BaseEditNoteFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
-import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -88,10 +86,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     }
                 else {
                     supportFragmentManager.apply {
-                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)!!
-                        fragment = findFragmentByTag(tag)!!
-                        if (!fragment.isInLayout)
-                            resumeFragment(fragment)
+                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
+                        findFragmentByTag(tag)?.let {
+                            fragment = it
+                            if (!fragment.isInLayout) {
+                                resumeFragment(fragment)
+                            }
+                        }
                     }
                 }
             }
@@ -108,34 +109,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         else showFragment()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        this.menu = menu
-        if(fragment.tag != NotesFragment.TAG)
-            showSettingsButton(false)
-        return true
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(CURRENT_FRAGMENT_TAG, fragment.tag)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.settings -> {
-                fragment = SettingsFragment()
-                replaceFragment(fragment, SettingsFragment.TAG)
-            }
-        }
-        return true
-    }
-
-    fun showSettingsButton(show: Boolean = true) {
-        if(menu != null) {
-            val settingsItem = menu?.findItem(R.id.settings)
-            settingsItem?.isVisible = show
-        }
     }
 
     fun showProgressBar(show: Boolean) {
@@ -145,7 +121,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     fun initEditUI() {
         title = getString(R.string.edit_note)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        showSettingsButton(false)
     }
 
     private fun setStatusBarColor(color: Int, isLight: Boolean) {

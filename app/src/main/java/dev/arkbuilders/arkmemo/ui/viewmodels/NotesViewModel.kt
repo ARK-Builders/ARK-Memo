@@ -69,8 +69,9 @@ class NotesViewModel @Inject constructor(
             //triggered within 0.5 second window.
             delay(500)
             notes.collectLatest {
-                val filteredNotes = it.filter { note
-                    -> note.title.lowercase().contains(keyword.lowercase()) }
+                val filteredNotes = it.filter { note ->
+                    note.title.contains(keyword, true)
+                }
                 withContext(Dispatchers.Main) {
                     onSuccess(filteredNotes)
                 }
