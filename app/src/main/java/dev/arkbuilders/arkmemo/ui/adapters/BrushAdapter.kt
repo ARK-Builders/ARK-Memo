@@ -20,6 +20,7 @@ class BrushAdapter(
 
     override fun onBindViewHolder(holder: BrushTypeViewHolder, position: Int) {
         val attribute = attributes[holder.bindingAdapterPosition]
+        val context = holder.itemView.context
 
         when (attribute) {
             is BrushSizeTiny -> {
@@ -62,13 +63,20 @@ class BrushAdapter(
                 holder.ivBrush.setPadding(padding, padding, padding, padding)
             }
 
-            is BrushColorBlack -> holder.ivBrush.setImageResource(R.drawable.bg_brush_color_black)
-            is BrushColorBlue -> holder.ivBrush.setImageResource(R.drawable.bg_brush_color_blue)
-            is BrushColorGreen -> holder.ivBrush.setImageResource(R.drawable.bg_brush_color_green)
-            is BrushColorGrey -> holder.ivBrush.setImageResource(R.drawable.bg_brush_color_grey)
-            is BrushColorOrange -> holder.ivBrush.setImageResource(R.drawable.bg_brush_color_orange)
-            is BrushColorPurple -> holder.ivBrush.setImageResource(R.drawable.bg_brush_color_purple)
-            is BrushColorRed -> holder.ivBrush.setImageResource(R.drawable.bg_brush_color_red)
+            is BrushColorBlack ->
+                holder.ivBrush.imageTintList = context.getColorStateList(R.color.black)
+            is BrushColorBlue ->
+                holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_blue)
+            is BrushColorGreen ->
+                holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_green)
+            is BrushColorGrey ->
+                holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_grey)
+            is BrushColorOrange ->
+                holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_orange)
+            is BrushColorPurple ->
+                holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_purple)
+            is BrushColorRed ->
+                holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_red)
         }
 
         if (attribute.isSelected) {
