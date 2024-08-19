@@ -14,7 +14,6 @@ class GraphicControlTextView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : androidx.appcompat.widget.AppCompatTextView(context, attrs) {
 
-    var isSelectedState = false
     private var iconTintColor: Int
 
     init {
@@ -29,12 +28,13 @@ class GraphicControlTextView @JvmOverloads constructor(
         drawableResId.let {
             this.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0)
         }
-        setSelectState(isSelected)
+        setSelected(isSelected)
 
         typedArray.recycle()
     }
 
-    fun setSelectState(selected: Boolean) {
+    override fun setSelected(selected: Boolean) {
+        super.setSelected(selected)
         if (selected) {
             this.background = ContextCompat.getDrawable(
                 context, R.drawable.bg_graphic_control_text_selected
@@ -53,8 +53,6 @@ class GraphicControlTextView @JvmOverloads constructor(
             this.setTextColor(selectedColor)
             setDrawableTint(drawableColor)
         }
-
-        isSelectedState = selected
     }
 
     private fun setDrawableTint(@ColorInt color: Int) {

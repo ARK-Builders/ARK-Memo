@@ -160,13 +160,13 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
     private fun initBottomControls() {
         val tvBrushSize = binding.layoutGraphicsControl.tvBrushSize
         tvBrushSize.setOnClickListener {
-            tvBrushSize.setSelectState(!tvBrushSize.isSelectedState)
-            if (tvBrushSize.isSelectedState) {
+            tvBrushSize.isSelected = !tvBrushSize.isSelected
+            if (tvBrushSize.isSelected) {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.visible()
                 showBrushSizeList()
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
-                binding.layoutGraphicsControl.tvEraser.setSelectState(false)
-                binding.layoutGraphicsControl.tvBrushColor.setSelectState(false)
+                binding.layoutGraphicsControl.tvEraser.isSelected = false
+                binding.layoutGraphicsControl.tvBrushColor.isSelected = false
                 graphicNotesViewModel.setEraseMode(false)
             } else {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
@@ -175,29 +175,29 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
 
         val tvEraser = binding.layoutGraphicsControl.tvEraser
         tvEraser.setOnClickListener {
-            tvEraser.setSelectState(!tvEraser.isSelectedState)
-            if (tvEraser.isSelectedState) {
+            tvEraser.isSelected = !tvEraser.isSelected
+            if (tvEraser.isSelected) {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.visible()
                 showBrushSizeList(isEraseMode = true)
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
-                binding.layoutGraphicsControl.tvBrushSize.setSelectState(false)
-                binding.layoutGraphicsControl.tvBrushColor.setSelectState(false)
+                binding.layoutGraphicsControl.tvBrushSize.isSelected = false
+                binding.layoutGraphicsControl.tvBrushColor.isSelected = false
             } else {
                 binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
                 graphicNotesViewModel.setEraseMode(false)
             }
-            graphicNotesViewModel.setEraseMode(tvEraser.isSelectedState)
+            graphicNotesViewModel.setEraseMode(tvEraser.isSelected)
         }
 
         val tvColor = binding.layoutGraphicsControl.tvBrushColor
         tvColor.setOnClickListener {
-            tvColor.setSelectState(!tvColor.isSelectedState)
-            if (tvColor.isSelectedState) {
+            tvColor.isSelected = !tvColor.isSelected
+            if (tvColor.isSelected) {
                 showBrushColorList()
                 binding.layoutGraphicsControl.layoutColorChooser.root.visible()
                 binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
-                binding.layoutGraphicsControl.tvBrushSize.setSelectState(false)
-                binding.layoutGraphicsControl.tvEraser.setSelectState(false)
+                binding.layoutGraphicsControl.tvBrushSize.isSelected = false
+                binding.layoutGraphicsControl.tvEraser.isSelected = false
                 graphicNotesViewModel.setEraseMode(false)
             } else {
                 binding.layoutGraphicsControl.layoutColorChooser.root.gone()
