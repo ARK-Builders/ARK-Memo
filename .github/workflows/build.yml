@@ -112,5 +112,5 @@ jobs:
           distribution: 'adopt'
 
       - name: Kotlin linter
-        run: ./gradlew ktlint -PautoCorrect=0
+        run: ./gradlew ktlintCheck
 

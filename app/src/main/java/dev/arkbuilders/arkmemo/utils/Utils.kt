@@ -29,7 +29,10 @@ fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
     }
 }
 
-fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
+fun AppCompatActivity.replaceFragment(
+    fragment: Fragment,
+    tag: String,
+) {
     supportFragmentManager.beginTransaction().apply {
         val backStackName = fragment.javaClass.name
         val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
@@ -55,7 +58,10 @@ fun Context.getTextFromClipBoard(): String? {
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }
 
-fun <R> Path.listFiles(extension: String, process: (Path) -> R): List<R> =
+fun <R> Path.listFiles(
+    extension: String,
+    process: (Path) -> R,
+): List<R> =
     Files.list(this).toList().filter { it.extension == extension }.map {
         process(it)
     }
@@ -74,9 +80,9 @@ fun tenthSecondsToString(duration: Long): String {
     val minutes = seconds / 60
     val remainingSeconds = seconds % 60
     return "${
-    if (minutes <= 9) "0$minutes" else minutes
+        if (minutes <= 9) "0$minutes" else minutes
     }:${
-    if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
+        if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
     }:0$remainingMilliSeconds"
 }
 
@@ -85,8 +91,8 @@ fun millisToString(duration: Long): String {
     val minutes = seconds / 60
     val remainingSeconds = seconds % 60
     return "${
-    if (minutes <= 9) "0$minutes" else minutes
+        if (minutes <= 9) "0$minutes" else minutes
     }:${
-    if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
+        if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
     }"
 }

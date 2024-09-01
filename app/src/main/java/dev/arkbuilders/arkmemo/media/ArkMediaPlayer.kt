@@ -6,8 +6,11 @@ interface ArkMediaPlayer :
     MediaPlayer.OnCompletionListener,
     MediaPlayer.OnPreparedListener,
     MediaPlayer.OnSeekCompleteListener {
-
-    fun init(path: String, onCompletion: () -> Unit, onPrepared: () -> Unit)
+    fun init(
+        path: String,
+        onCompletion: () -> Unit,
+        onPrepared: () -> Unit,
+    )
 
     fun play()
 

@@ -32,7 +32,7 @@ abstract class RepositoryModule {
         @Provides
         fun provideNotesRepoHelper(
             memoPreferences: MemoPreferences,
-            propertiesStorageRepo: PropertiesStorageRepo
+            propertiesStorageRepo: PropertiesStorageRepo,
         ) = NotesRepoHelper(memoPreferences, propertiesStorageRepo)
     }
 }

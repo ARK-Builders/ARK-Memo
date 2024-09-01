@@ -12,7 +12,6 @@ import dev.arkbuilders.arkmemo.media.ArkMediaPlayerImpl
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class MediaModule {
-
     @Binds
     abstract fun bindArkAudioRecorder(impl: ArkAudioRecorderImpl): ArkAudioRecorder
 

@@ -19,14 +19,15 @@ class SVG {
     private val paths = ArrayDeque<DrawPath>()
 
     private val paint
-        get() = Paint().also {
-            it.color = Color.parseColor(strokeColor)
-            it.style = Paint.Style.STROKE
-            it.strokeWidth = 10f
-            it.strokeCap = Paint.Cap.ROUND
-            it.strokeJoin = Paint.Join.ROUND
-            it.isAntiAlias = true
-        }
+        get() =
+            Paint().also {
+                it.color = Color.parseColor(strokeColor)
+                it.style = Paint.Style.STROKE
+                it.strokeWidth = 10f
+                it.strokeCap = Paint.Cap.ROUND
+                it.strokeJoin = Paint.Join.ROUND
+                it.isAntiAlias = true
+            }
 
     fun addCommand(command: SVGCommand) {
         commands.addLast(command)
@@ -36,7 +37,10 @@ class SVG {
         paths.addLast(path)
     }
 
-    fun setViewBox(width: Float, height: Float) {
+    fun setViewBox(
+        width: Float,
+        height: Float,
+    ) {
         viewBox = ViewBox(width = width, height = height)
     }
 
@@ -63,13 +67,14 @@ class SVG {
 
     fun getPaths(): Collection<DrawPath> = paths
 
-    fun copy(): SVG = SVG().apply {
-        strokeColor = this@SVG.strokeColor
-        fill = this@SVG.fill
-        viewBox = this@SVG.viewBox
-        commands.addAll(this@SVG.commands)
-        paths.addAll(this@SVG.paths)
-    }
+    fun copy(): SVG =
+        SVG().apply {
+            strokeColor = this@SVG.strokeColor
+            fill = this@SVG.fill
+            viewBox = this@SVG.viewBox
+            commands.addAll(this@SVG.commands)
+            paths.addAll(this@SVG.paths)
+        }
 
     private fun createCanvasPaths() {
         if (commands.isNotEmpty()) {
@@ -96,61 +101,63 @@ class SVG {
     }
 
     companion object {
-        fun parse(path: Path): SVG = SVG().apply {
-            val xmlParser = Xml.newPullParser()
-            var pathData = ""
+        fun parse(path: Path): SVG =
+            SVG().apply {
+                val xmlParser = Xml.newPullParser()
+                var pathData = ""
 
-            xmlParser.apply {
-                setInput(path.reader())
+                xmlParser.apply {
+                    setInput(path.reader())
 
-                var event = xmlParser.eventType
-                var pathCount = 0
-                while (event != XmlPullParser.END_DOCUMENT) {
-                    val tag = xmlParser.name
-                    when (event) {
-                        XmlPullParser.START_TAG -> {
-                            when (tag) {
-                                SVG_TAG -> {
-                                    viewBox = ViewBox.fromString(
-                                        getAttributeValue("", Attributes.VIEW_BOX)
-                                    )
+                    var event = xmlParser.eventType
+                    var pathCount = 0
+                    while (event != XmlPullParser.END_DOCUMENT) {
+                        val tag = xmlParser.name
+                        when (event) {
+                            XmlPullParser.START_TAG -> {
+                                when (tag) {
+                                    SVG_TAG -> {
+                                        viewBox =
+                                            ViewBox.fromString(
+                                                getAttributeValue("", Attributes.VIEW_BOX),
+                                            )
+                                    }
+                                    PATH_TAG -> {
+                                        pathCount += 1
+                                        strokeColor = getAttributeValue("", Attributes.Path.STROKE)
+                                        fill = getAttributeValue("", Attributes.Path.FILL)
+                                        pathData = getAttributeValue("", Attributes.Path.DATA)
+                                    }
                                 }
-                                PATH_TAG -> {
-                                    pathCount += 1
-                                    strokeColor = getAttributeValue("", Attributes.Path.STROKE)
-                                    fill = getAttributeValue("", Attributes.Path.FILL)
-                                    pathData = getAttributeValue("", Attributes.Path.DATA)
+                                if (pathCount > 1) {
+                                    Log.d("svg", "found more than 1 path in file")
+                                    break
                                 }
                             }
-                            if (pathCount > 1) {
-                                Log.d("svg", "found more than 1 path in file")
-                                break
+                        }
+
+                        event = next()
+                    }
+
+                    pathData.split(COMMA).forEach {
+                        val command = it.trim()
+                        when (command.first()) {
+                            SVGCommand.MoveTo.CODE -> {
+                                commands.addLast(SVGCommand.MoveTo.fromString(command))
                             }
+                            SVGCommand.AbsLineTo.CODE -> {
+                                commands.addLast(SVGCommand.MoveTo.fromString(command))
+                            }
+                            SVGCommand.AbsQuadTo.CODE -> {
+                                commands.addLast(SVGCommand.AbsQuadTo.fromString(command))
+                            }
+                            else -> {}
                         }
                     }
 
-                    event = next()
+                    createCanvasPaths()
                 }
-
-                pathData.split(COMMA).forEach {
-                    val command = it.trim()
-                    when (command.first()) {
-                        SVGCommand.MoveTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(command))
-                        }
-                        SVGCommand.AbsLineTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(command))
-                        }
-                        SVGCommand.AbsQuadTo.CODE -> {
-                            commands.addLast(SVGCommand.AbsQuadTo.fromString(command))
-                        }
-                        else -> {}
-                    }
-                }
-
-                createCanvasPaths()
             }
-        }
 
         private object Attributes {
             const val VIEW_BOX = "viewBox"
@@ -169,7 +176,7 @@ data class ViewBox(
     val x: Float = 0f,
     val y: Float = 0f,
     val width: Float = 100f,
-    val height: Float = 100f
+    val height: Float = 100f,
 ) {
     override fun toString(): String = "$x $y $width $height"
 
@@ -180,17 +187,16 @@ data class ViewBox(
                 viewBox[0].toFloat(),
                 viewBox[1].toFloat(),
                 viewBox[2].toFloat(),
-                viewBox[3].toFloat()
+                viewBox[3].toFloat(),
             )
         }
     }
 }
 
 sealed class SVGCommand {
-
     class MoveTo(
         val x: Float,
-        val y: Float
+        val y: Float,
     ) : SVGCommand() {
         override fun toString(): String = "$CODE $x $y"
 
@@ -208,7 +214,7 @@ sealed class SVGCommand {
 
     class AbsLineTo(
         val x: Float,
-        val y: Float
+        val y: Float,
     ) : SVGCommand() {
         override fun toString(): String = "$CODE $x $y"
 
@@ -228,7 +234,7 @@ sealed class SVGCommand {
         val x1: Float,
         val y1: Float,
         val x2: Float,
-        val y2: Float
+        val y2: Float,
     ) : SVGCommand() {
         override fun toString(): String = "$CODE $x1 $y1 $x2 $y2"
 

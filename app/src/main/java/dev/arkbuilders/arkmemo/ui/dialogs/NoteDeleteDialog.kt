@@ -10,7 +10,6 @@ import dev.arkbuilders.arkmemo.ui.fragments.deleteNote
 import dev.arkbuilders.arkmemo.ui.views.toast
 
 class NoteDeleteDialog : DialogFragment() {
-
     private var note: Note? = null
 
     fun setNoteToBeDeleted(note: Note): NoteDeleteDialog {
@@ -19,18 +18,19 @@ class NoteDeleteDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(requireContext())
-            .setMessage(R.string.ark_memo_delete_warn)
-            .setNegativeButton(R.string.ark_memo_cancel) { dialog, _ ->
-                dialog.cancel()
-            }
-            .setPositiveButton(R.string.ark_memo_ok) { dialog, _ ->
-                if (note != null) {
-                    parentFragment?.deleteNote(note!!)
-                    toast(requireContext(), getString(R.string.note_deleted))
+        val builder =
+            AlertDialog.Builder(requireContext())
+                .setMessage(R.string.ark_memo_delete_warn)
+                .setNegativeButton(R.string.ark_memo_cancel) { dialog, _ ->
                     dialog.cancel()
                 }
-            }
+                .setPositiveButton(R.string.ark_memo_ok) { dialog, _ ->
+                    if (note != null) {
+                        parentFragment?.deleteNote(note!!)
+                        toast(requireContext(), getString(R.string.note_deleted))
+                        dialog.cancel()
+                    }
+                }
         return builder.create()
     }
 

@@ -25,123 +25,126 @@ sealed class RecorderSideEffect {
 
 data class RecorderState(
     val maxAmplitude: Int,
-    val progress: String
+    val progress: String,
 )
 
 @HiltViewModel
-class ArkRecorderViewModel @Inject constructor(
-    private val arkAudioRecorder: ArkAudioRecorder
-) : ViewModel() {
+class ArkRecorderViewModel
+    @Inject
+    constructor(
+        private val arkAudioRecorder: ArkAudioRecorder,
+    ) : ViewModel() {
+        private val recorderSideEffect = MutableStateFlow<RecorderSideEffect?>(null)
+        private val recorderState = MutableStateFlow<RecorderState?>(null)
+        private val isRecording = MutableStateFlow(false)
+        private val isPaused = MutableStateFlow(false)
 
-    private val recorderSideEffect = MutableStateFlow<RecorderSideEffect?>(null)
-    private val recorderState = MutableStateFlow<RecorderState?>(null)
-    private val isRecording = MutableStateFlow(false)
-    private val isPaused = MutableStateFlow(false)
+        // Duration is in milliseconds
+        private var duration = 0L
 
-    // Duration is in milliseconds
-    private var duration = 0L
+        private var timer: Timer? = null
 
-    private var timer: Timer? = null
-
-    fun onStartStopClick() {
-        if (isRecording.value) {
-            onStopRecordingClick()
-        } else {
-            onStartRecordingClick()
+        fun onStartStopClick() {
+            if (isRecording.value) {
+                onStopRecordingClick()
+            } else {
+                onStartRecordingClick()
+            }
         }
-    }
 
-    fun onPauseResumeClick() {
-        if (isPaused.value) {
-            onResumeRecordingClick()
-        } else {
-            onPauseRecordingClick()
+        fun onPauseResumeClick() {
+            if (isPaused.value) {
+                onResumeRecordingClick()
+            } else {
+                onPauseRecordingClick()
+            }
         }
-    }
 
-    fun collect(
-        stateToUI: (RecorderState) -> Unit,
-        handleSideEffect: (RecorderSideEffect) -> Unit
-    ) {
-        viewModelScope.launch {
-            recorderState.collect {
-                it?.let {
-                    stateToUI(it)
+        fun collect(
+            stateToUI: (RecorderState) -> Unit,
+            handleSideEffect: (RecorderSideEffect) -> Unit,
+        ) {
+            viewModelScope.launch {
+                recorderState.collect {
+                    it?.let {
+                        stateToUI(it)
+                    }
+                }
+            }
+            viewModelScope.launch {
+                recorderSideEffect.collectLatest {
+                    it?.let {
+                        handleSideEffect(it)
+                    }
                 }
             }
         }
-        viewModelScope.launch {
-            recorderSideEffect.collectLatest {
-                it?.let {
-                    handleSideEffect(it)
-                }
-            }
+
+        fun getRecordingPath(): Path {
+            return arkAudioRecorder.getRecording()
         }
-    }
 
-    fun getRecordingPath(): Path {
-        return arkAudioRecorder.getRecording()
-    }
-
-    private fun onStartRecordingClick() {
-        viewModelScope.launch {
-            arkAudioRecorder.init()
-            arkAudioRecorder.start()
-            isRecording.value = true
-            startTimer()
-            recorderSideEffect.value = RecorderSideEffect.StartRecording
-        }
-    }
-
-    private fun onStopRecordingClick() {
-        viewModelScope.launch {
-            arkAudioRecorder.stop()
-            isRecording.value = false
-            if (isPaused.value) isPaused.value = false
-            duration = 0
-            stopTimer()
-            recorderSideEffect.value = RecorderSideEffect.StopRecording
-        }
-    }
-
-    private fun onPauseRecordingClick() {
-        viewModelScope.launch {
-            if (isRecording.value) {
-                isPaused.value = true
-                arkAudioRecorder.pause()
-                stopTimer()
-                recorderSideEffect.value = RecorderSideEffect.PauseRecording
-            }
-        }
-    }
-
-    private fun onResumeRecordingClick() {
-        viewModelScope.launch {
-            if (isRecording.value) {
-                arkAudioRecorder.resume()
-                isPaused.value = false
+        private fun onStartRecordingClick() {
+            viewModelScope.launch {
+                arkAudioRecorder.init()
+                arkAudioRecorder.start()
+                isRecording.value = true
                 startTimer()
-                recorderSideEffect.value = RecorderSideEffect.ResumeRecording
+                recorderSideEffect.value = RecorderSideEffect.StartRecording
             }
         }
-    }
 
-    private fun startTimer() {
-        viewModelScope.launch {
-            timer = timer(initialDelay = 0L, period = 100L) {
-                if (isRecording.value && !isPaused.value) {
-                    duration += 1
-                    recorderState.value = RecorderState(
-                        arkAudioRecorder.maxAmplitude(),
-                        tenthSecondsToString(duration)
-                    )
+        private fun onStopRecordingClick() {
+            viewModelScope.launch {
+                arkAudioRecorder.stop()
+                isRecording.value = false
+                if (isPaused.value) isPaused.value = false
+                duration = 0
+                stopTimer()
+                recorderSideEffect.value = RecorderSideEffect.StopRecording
+            }
+        }
+
+        private fun onPauseRecordingClick() {
+            viewModelScope.launch {
+                if (isRecording.value) {
+                    isPaused.value = true
+                    arkAudioRecorder.pause()
+                    stopTimer()
+                    recorderSideEffect.value = RecorderSideEffect.PauseRecording
                 }
             }
         }
-    }
 
-    private fun stopTimer() {
-        timer?.cancel()
-        timer = null
+        private fun onResumeRecordingClick() {
+            viewModelScope.launch {
+                if (isRecording.value) {
+                    arkAudioRecorder.resume()
+                    isPaused.value = false
+                    startTimer()
+                    recorderSideEffect.value = RecorderSideEffect.ResumeRecording
+                }
+            }
+        }
+
+        private fun startTimer() {
+            viewModelScope.launch {
+                timer =
+                    timer(initialDelay = 0L, period = 100L) {
+                        if (isRecording.value && !isPaused.value) {
+                            duration += 1
+                            recorderState.value =
+                                RecorderState(
+                                    arkAudioRecorder.maxAmplitude(),
+                                    tenthSecondsToString(duration),
+                                )
+                        }
+                    }
+            }
+        }
+
+        private fun stopTimer() {
+            timer?.cancel()
+            timer = null
+        }
     }
-}

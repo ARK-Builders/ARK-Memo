@@ -11,7 +11,6 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 
 class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) {
-
     private var currentX = 0f
     private var currentY = 0f
     private lateinit var viewModel: GraphicNotesViewModel

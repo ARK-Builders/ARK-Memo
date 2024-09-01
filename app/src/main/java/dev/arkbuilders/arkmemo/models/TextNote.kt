@@ -11,5 +11,5 @@ data class TextNote(
     override val description: String = "",
     val text: String = "",
     @IgnoredOnParcel
-    override var resource: Resource? = null
+    override var resource: Resource? = null,
 ) : Note, Parcelable

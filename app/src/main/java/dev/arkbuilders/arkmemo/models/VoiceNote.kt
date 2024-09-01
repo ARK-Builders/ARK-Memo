@@ -15,5 +15,5 @@ class VoiceNote(
     @IgnoredOnParcel
     var path: Path = createTempFile(),
     @IgnoredOnParcel
-    override var resource: Resource? = null
+    override var resource: Resource? = null,
 ) : Note, Parcelable

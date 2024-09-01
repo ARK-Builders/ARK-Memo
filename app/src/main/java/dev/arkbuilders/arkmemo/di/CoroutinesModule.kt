@@ -12,7 +12,6 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object CoroutinesModule {
-
     @Named(IO_DISPATCHER)
     @Singleton
     @Provides

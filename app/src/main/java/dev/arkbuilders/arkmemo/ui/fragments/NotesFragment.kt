@@ -25,7 +25,6 @@ import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 @AndroidEntryPoint
 class NotesFragment : Fragment(R.layout.fragment_notes) {
-
     private val binding by viewBinding(FragmentNotesBinding::bind)
 
     private val activity: MainActivity by lazy {
@@ -44,34 +43,40 @@ class NotesFragment : Fragment(R.layout.fragment_notes) {
 
     private var showFabs = false
 
-    private val newTextNoteClickListener = View.OnClickListener {
-        activity.fragment = EditTextNotesFragment()
-        activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
-        showFabs = false
-    }
-
-    private val newGraphicNoteClickListener = View.OnClickListener {
-        activity.fragment = EditGraphicNotesFragment.newInstance()
-        activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
-        showFabs = false
-    }
-
-    private val pasteNoteClickListener = View.OnClickListener {
-        val clipBoardText = requireContext().getTextFromClipBoard()
-        if (clipBoardText != null) {
-            activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
+    private val newTextNoteClickListener =
+        View.OnClickListener {
+            activity.fragment = EditTextNotesFragment()
             activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
-        } else {
-            Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
+            showFabs = false
         }
-    }
+
+    private val newGraphicNoteClickListener =
+        View.OnClickListener {
+            activity.fragment = EditGraphicNotesFragment.newInstance()
+            activity.replaceFragment(activity.fragment, EditGraphicNotesFragment.TAG)
+            showFabs = false
+        }
+
+    private val pasteNoteClickListener =
+        View.OnClickListener {
+            val clipBoardText = requireContext().getTextFromClipBoard()
+            if (clipBoardText != null) {
+                activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
+                activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+            } else {
+                Toast.makeText(requireContext(), getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.apply { init { readAllNotes() } }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         val fabNewVoiceNote = binding.fabNewVoiceNote
         recyclerView = binding.include.recyclerView
@@ -84,19 +89,20 @@ class NotesFragment : Fragment(R.layout.fragment_notes) {
         newNoteButton.shrink()
         showFabs = false
         newNoteButton.setOnClickListener {
-            showFabs = if (!showFabs) {
-                newNoteButton.extend()
-                newTextNoteButton.show()
-                newGraphicNoteButton.show()
-                fabNewVoiceNote.show()
-                true
-            } else {
-                newNoteButton.shrink()
-                newTextNoteButton.hide()
-                newGraphicNoteButton.hide()
-                fabNewVoiceNote.hide()
-                false
-            }
+            showFabs =
+                if (!showFabs) {
+                    newNoteButton.extend()
+                    newTextNoteButton.show()
+                    newGraphicNoteButton.show()
+                    fabNewVoiceNote.show()
+                    true
+                } else {
+                    newNoteButton.shrink()
+                    newTextNoteButton.hide()
+                    newGraphicNoteButton.hide()
+                    fabNewVoiceNote.hide()
+                    false
+                }
         }
         newTextNoteButton.setOnClickListener(newTextNoteClickListener)
         newGraphicNoteButton.setOnClickListener(newGraphicNoteClickListener)
@@ -107,16 +113,17 @@ class NotesFragment : Fragment(R.layout.fragment_notes) {
         }
         lifecycleScope.launchWhenStarted {
             notesViewModel.getNotes {
-                val adapter = NotesListAdapter(
-                    it,
-                    onPlayPauseClick = { path ->
-                        arkMediaPlayerViewModel.onPlayOrPauseClick(path)
-                    }
-                )
+                val adapter =
+                    NotesListAdapter(
+                        it,
+                        onPlayPauseClick = { path ->
+                            arkMediaPlayerViewModel.onPlayOrPauseClick(path)
+                        },
+                    )
                 val layoutManager = LinearLayoutManager(requireContext())
                 arkMediaPlayerViewModel.collect(
                     stateToUI = { state -> adapter.observeItemState = { state } },
-                    handleSideEffect = { effect -> adapter.observeItemSideEffect = { effect } }
+                    handleSideEffect = { effect -> adapter.observeItemSideEffect = { effect } },
                 )
                 adapter.setActivity(activity)
                 adapter.setFragmentManager(childFragmentManager)

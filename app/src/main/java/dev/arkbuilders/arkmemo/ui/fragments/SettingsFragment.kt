@@ -14,7 +14,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
-
     @Inject
     lateinit var memoPreferences: MemoPreferences
 
@@ -22,18 +21,25 @@ class SettingsFragment : PreferenceFragmentCompat() {
         requireActivity() as MainActivity
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         val pathKey = getString(R.string.path_pref_key)
-        val pathPref: PathPreference? = findPreference<PathPreference?>(pathKey)?.apply {
-            onBindView = {
-                setPath(memoPreferences.getPath())
+        val pathPref: PathPreference? =
+            findPreference<PathPreference?>(pathKey)?.apply {
+                onBindView = {
+                    setPath(memoPreferences.getPath())
+                }
             }
-        }
         activity.title = getString(R.string.settings)
         activity.showSettingsButton(false)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)

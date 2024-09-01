@@ -23,106 +23,112 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @HiltViewModel
-class NotesViewModel @Inject constructor(
-    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
-    private val textNotesRepo: NotesRepo<TextNote>,
-    private val graphicNotesRepo: NotesRepo<GraphicNote>,
-    private val voiceNotesRepo: NotesRepo<VoiceNote>,
-    private val arkMediaPlayer: ArkMediaPlayer
-) : ViewModel() {
+class NotesViewModel
+    @Inject
+    constructor(
+        @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
+        private val textNotesRepo: NotesRepo<TextNote>,
+        private val graphicNotesRepo: NotesRepo<GraphicNote>,
+        private val voiceNotesRepo: NotesRepo<VoiceNote>,
+        private val arkMediaPlayer: ArkMediaPlayer,
+    ) : ViewModel() {
+        private val notes = MutableStateFlow(listOf<Note>())
+        private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
 
-    private val notes = MutableStateFlow(listOf<Note>())
-    private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
-
-    fun init(extraBlock: () -> Unit) {
-        val initJob = viewModelScope.launch(iODispatcher) {
-            textNotesRepo.init()
-            graphicNotesRepo.init()
-            voiceNotesRepo.init()
-        }
-        viewModelScope.launch {
-            initJob.join()
-            extraBlock()
-        }
-    }
-
-    fun readAllNotes() {
-        viewModelScope.launch(iODispatcher) {
-            notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
-        }
-    }
-
-    fun onSaveClick(note: Note, showProgress: (Boolean) -> Unit) {
-        viewModelScope.launch(iODispatcher) {
-            withContext(Dispatchers.Main) {
-                showProgress(true)
-            }
-            fun handleResult(result: SaveNoteResult) {
-                if (result == SaveNoteResult.SUCCESS) {
-                    add(note)
+        fun init(extraBlock: () -> Unit) {
+            val initJob =
+                viewModelScope.launch(iODispatcher) {
+                    textNotesRepo.init()
+                    graphicNotesRepo.init()
+                    voiceNotesRepo.init()
                 }
-                mSaveNoteResultLiveData.postValue(result)
-            }
-            when (note) {
-                is TextNote -> {
-                    textNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
-                }
-                is GraphicNote -> {
-                    graphicNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
-                }
-                is VoiceNote -> {
-                    voiceNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
-                }
-            }
-            withContext(Dispatchers.Main) {
-                showProgress(false)
+            viewModelScope.launch {
+                initJob.join()
+                extraBlock()
             }
         }
-    }
 
-    fun onDeleteConfirmed(note: Note) {
-        viewModelScope.launch(iODispatcher) {
-            remove(note)
-            when (note) {
-                is TextNote -> textNotesRepo.delete(note)
-                is GraphicNote -> graphicNotesRepo.delete(note)
-                is VoiceNote -> voiceNotesRepo.delete(note)
+        fun readAllNotes() {
+            viewModelScope.launch(iODispatcher) {
+                notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
             }
         }
-    }
 
-    fun getNotes(emit: (List<Note>) -> Unit) {
-        viewModelScope.launch(iODispatcher) {
-            notes.collectLatest {
+        fun onSaveClick(
+            note: Note,
+            showProgress: (Boolean) -> Unit,
+        ) {
+            viewModelScope.launch(iODispatcher) {
                 withContext(Dispatchers.Main) {
-                    emit(it)
+                    showProgress(true)
+                }
+
+                fun handleResult(result: SaveNoteResult) {
+                    if (result == SaveNoteResult.SUCCESS) {
+                        add(note)
+                    }
+                    mSaveNoteResultLiveData.postValue(result)
+                }
+                when (note) {
+                    is TextNote -> {
+                        textNotesRepo.save(note) { result ->
+                            handleResult(result)
+                        }
+                    }
+                    is GraphicNote -> {
+                        graphicNotesRepo.save(note) { result ->
+                            handleResult(result)
+                        }
+                    }
+                    is VoiceNote -> {
+                        voiceNotesRepo.save(note) { result ->
+                            handleResult(result)
+                        }
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    showProgress(false)
                 }
             }
         }
-    }
 
-    private fun add(note: Note) {
-        val notes = this.notes.value.toMutableList()
-        note.resource?.let {
-            notes.removeIf { it.resource?.id == note.resource?.id }
+        fun onDeleteConfirmed(note: Note) {
+            viewModelScope.launch(iODispatcher) {
+                remove(note)
+                when (note) {
+                    is TextNote -> textNotesRepo.delete(note)
+                    is GraphicNote -> graphicNotesRepo.delete(note)
+                    is VoiceNote -> voiceNotesRepo.delete(note)
+                }
+            }
         }
-        notes.add(note)
-        this.notes.value = notes
-    }
 
-    private fun remove(note: Note) {
-        val notes = this.notes.value.toMutableList()
-        notes.remove(note)
-        this.notes.value = notes
-    }
+        fun getNotes(emit: (List<Note>) -> Unit) {
+            viewModelScope.launch(iODispatcher) {
+                notes.collectLatest {
+                    withContext(Dispatchers.Main) {
+                        emit(it)
+                    }
+                }
+            }
+        }
 
-    fun getSaveNoteResultLiveData(): LiveData<SaveNoteResult> {
-        return mSaveNoteResultLiveData
+        private fun add(note: Note) {
+            val notes = this.notes.value.toMutableList()
+            note.resource?.let {
+                notes.removeIf { it.resource?.id == note.resource?.id }
+            }
+            notes.add(note)
+            this.notes.value = notes
+        }
+
+        private fun remove(note: Note) {
+            val notes = this.notes.value.toMutableList()
+            notes.remove(note)
+            this.notes.value = notes
+        }
+
+        fun getSaveNoteResultLiveData(): LiveData<SaveNoteResult> {
+            return mSaveNoteResultLiveData
+        }
     }
-}

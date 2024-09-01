@@ -28,7 +28,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
-
     private val binding by viewBinding(ActivityMainBinding::bind)
 
     @Inject
@@ -57,7 +56,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 }
             }
 
-        FilePickerDialog.readPermLauncher_SDK_R =
+        FilePickerDialog.readPermLauncherSdkR =
             registerForActivityResult(PermissionContract()) { isGranted ->
                 if (isGranted) {
                     FilePickerDialog.show()
@@ -160,7 +159,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     }
 }
 
-fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
+fun AppCompatActivity.replaceFragment(
+    fragment: Fragment,
+    tag: String,
+) {
     supportFragmentManager.beginTransaction().apply {
         val backStackName = fragment.javaClass.name
         val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
