@@ -29,7 +29,10 @@ fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
     }
 }
 
-fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
+fun AppCompatActivity.replaceFragment(
+    fragment: Fragment,
+    tag: String,
+) {
     supportFragmentManager.beginTransaction().apply {
         val backStackName = fragment.javaClass.name
         val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
@@ -43,19 +46,22 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     }
 }
 
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
+fun AppCompatActivity.resumeFragment(fragment: Fragment) {
+    supportFragmentManager.beginTransaction().apply {
         show(fragment)
         commit()
     }
 }
 
-fun Context.getTextFromClipBoard(): String?{
+fun Context.getTextFromClipBoard(): String? {
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }
 
-fun <R> Path.listFiles(extension: String, process: (Path) -> R): List<R> =
+fun <R> Path.listFiles(
+    extension: String,
+    process: (Path) -> R,
+): List<R> =
     Files.list(this).toList().filter { it.extension == extension }.map {
         process(it)
     }

@@ -8,7 +8,6 @@ import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
 
 fun Note.getAutoTitle(context: Context? = null): String {
-
     return if (this is TextNote) {
         this.title.ifEmpty { this.text.take(20) }
     } else if (this is GraphicNote && context != null) {

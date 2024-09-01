@@ -2,12 +2,15 @@ package dev.arkbuilders.arkmemo.media
 
 import android.media.MediaPlayer
 
-interface ArkMediaPlayer:
+interface ArkMediaPlayer :
     MediaPlayer.OnCompletionListener,
     MediaPlayer.OnPreparedListener,
     MediaPlayer.OnSeekCompleteListener {
-
-    fun init(path: String, onCompletion: () -> Unit, onPrepared: () -> Unit)
+    fun init(
+        path: String,
+        onCompletion: () -> Unit,
+        onPrepared: () -> Unit,
+    )
 
     fun play()
 

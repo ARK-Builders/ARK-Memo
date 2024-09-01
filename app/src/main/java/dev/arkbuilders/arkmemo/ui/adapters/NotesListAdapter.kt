@@ -27,9 +27,8 @@ import dev.arkbuilders.arkmemo.utils.replaceFragment
 
 class NotesListAdapter(
     private val notes: List<Note>,
-    private val onPlayPauseClick: (String) -> Unit
-): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
-
+    private val onPlayPauseClick: (String) -> Unit,
+) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
     private lateinit var activity: MainActivity
     private lateinit var fragmentManager: FragmentManager
 
@@ -44,16 +43,22 @@ class NotesListAdapter(
         fragmentManager = manager
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): NoteViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.note, parent, false)
         return NoteViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: NoteViewHolder,
+        position: Int,
+    ) {
         val note = notes[position]
         holder.title.text = note.getAutoTitle(activity)
-        holder.date.text = note.resource?.modified?.toString() ?:
-                activity.getString(R.string.ark_memo_just_now)
+        holder.date.text = note.resource?.modified?.toString()
+            ?: activity.getString(R.string.ark_memo_just_now)
         holder.btnPlayPause.isVisible = false
         if (note is VoiceNote) {
             holder.btnPlayPause.isVisible = true
@@ -68,7 +73,7 @@ class NotesListAdapter(
 
     private fun handleMediaPlayerSideEffect(
         effect: ArkMediaPlayerSideEffect,
-        holder: NoteViewHolder
+        holder: NoteViewHolder,
     ) {
         when (effect) {
             is ArkMediaPlayerSideEffect.StartPlaying -> {
@@ -87,24 +92,26 @@ class NotesListAdapter(
     }
 
     private fun showPlayIcon(holder: NoteViewHolder) {
-        val playIcon = ResourcesCompat.getDrawable(
-            activity.resources,
-            R.drawable.ic_play,
-            null
-        )
+        val playIcon =
+            ResourcesCompat.getDrawable(
+                activity.resources,
+                R.drawable.ic_play,
+                null,
+            )
         holder.btnPlayPause.setImageDrawable(playIcon)
     }
 
     private fun showPauseIcon(holder: NoteViewHolder) {
-        val playIcon = ResourcesCompat.getDrawable(
-            activity.resources,
-            R.drawable.ic_pause,
-            null
-        )
+        val playIcon =
+            ResourcesCompat.getDrawable(
+                activity.resources,
+                R.drawable.ic_pause,
+                null,
+            )
         holder.btnPlayPause.setImageDrawable(playIcon)
     }
 
-    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding by viewBinding {
             NoteBinding.bind(itemView)
         }
@@ -113,27 +120,29 @@ class NotesListAdapter(
         val date = binding.noteDate
         val btnPlayPause = binding.btnPlayPause
 
-        private val clickNoteToEditListener = View.OnClickListener {
-            var tag = EditTextNotesFragment.TAG
-            when (val selectedNote = notes[bindingAdapterPosition]) {
-                is TextNote -> activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
-                is GraphicNote -> {
-                    activity.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
-                    tag = EditGraphicNotesFragment.TAG
+        private val clickNoteToEditListener =
+            View.OnClickListener {
+                var tag = EditTextNotesFragment.TAG
+                when (val selectedNote = notes[bindingAdapterPosition]) {
+                    is TextNote -> activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
+                    is GraphicNote -> {
+                        activity.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
+                        tag = EditGraphicNotesFragment.TAG
+                    }
+                    is VoiceNote -> {
+                        activity.fragment = ArkMediaPlayerFragment.newInstance(selectedNote)
+                        tag = ArkMediaPlayerFragment.TAG
+                    }
                 }
-                is VoiceNote -> {
-                    activity.fragment = ArkMediaPlayerFragment.newInstance(selectedNote)
-                    tag = ArkMediaPlayerFragment.TAG
-                }
+                activity.replaceFragment(activity.fragment, tag)
             }
-            activity.replaceFragment(activity.fragment, tag)
-        }
 
-        private val deleteNoteClickListener = View.OnClickListener {
-            NoteDeleteDialog()
-                .setNoteToBeDeleted(notes[bindingAdapterPosition])
-                .show(fragmentManager, NoteDeleteDialog.TAG)
-        }
+        private val deleteNoteClickListener =
+            View.OnClickListener {
+                NoteDeleteDialog()
+                    .setNoteToBeDeleted(notes[bindingAdapterPosition])
+                    .show(fragmentManager, NoteDeleteDialog.TAG)
+            }
 
         init {
             binding.theNote.setOnClickListener(clickNoteToEditListener)

@@ -3,7 +3,6 @@ package dev.arkbuilders.arkmemo.media
 import java.nio.file.Path
 
 interface ArkAudioRecorder {
-
     fun init()
 
     fun start()

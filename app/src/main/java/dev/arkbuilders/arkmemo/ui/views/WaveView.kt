@@ -8,12 +8,12 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 
-class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
-
-    private val paint = Paint().also {
-        it.color = Color.LTGRAY
-        it.style = Paint.Style.FILL
-    }
+class WaveView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+    private val paint =
+        Paint().also {
+            it.color = Color.LTGRAY
+            it.style = Paint.Style.FILL
+        }
 
     private val bars = ArrayDeque<Rect>()
 
