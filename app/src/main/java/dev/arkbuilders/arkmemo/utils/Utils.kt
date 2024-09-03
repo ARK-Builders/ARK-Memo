@@ -3,7 +3,9 @@ package dev.arkbuilders.arkmemo.utils
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.os.Build
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -107,4 +109,21 @@ fun millisToString(duration: Long): String {
     }:${
         if (remainingSeconds <= 9) "0$remainingSeconds" else remainingSeconds
     }"
+}
+
+/**
+ * Extract duration of a media file and return it in human-readable format
+ */
+fun extractDuration(path: String): String {
+    return try {
+        val metadataRetriever = MediaMetadataRetriever()
+        metadataRetriever.setDataSource(path)
+        val duration = metadataRetriever.extractMetadata(
+            MediaMetadataRetriever.METADATA_KEY_DURATION
+        )?.toLong() ?: 0L
+        millisToString(duration)
+    } catch (e: Exception) {
+        Log.e("ExtractDuration", "extractDuration exception: " + e.message)
+        ""
+    }
 }

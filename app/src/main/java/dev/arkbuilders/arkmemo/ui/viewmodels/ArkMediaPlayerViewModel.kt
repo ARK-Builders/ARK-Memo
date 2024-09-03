@@ -1,10 +1,10 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.media.MediaMetadataRetriever
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.media.ArkMediaPlayer
+import dev.arkbuilders.arkmemo.utils.extractDuration
 import dev.arkbuilders.arkmemo.utils.millisToString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,13 +15,13 @@ import java.io.File
 import javax.inject.Inject
 
 sealed class ArkMediaPlayerSideEffect {
-    object StartPlaying: ArkMediaPlayerSideEffect()
+    data object StartPlaying: ArkMediaPlayerSideEffect()
 
-    object PausePlaying: ArkMediaPlayerSideEffect()
+    data object PausePlaying: ArkMediaPlayerSideEffect()
 
-    object ResumePlaying: ArkMediaPlayerSideEffect()
+    data object ResumePlaying: ArkMediaPlayerSideEffect()
 
-    object StopPlaying: ArkMediaPlayerSideEffect()
+    data object StopPlaying: ArkMediaPlayerSideEffect()
 }
 
 data class ArkMediaPlayerState(
@@ -133,18 +133,14 @@ class ArkMediaPlayerViewModel @Inject constructor(
         arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.PausePlaying
     }
 
-    fun getDurationMillis(onSuccess: (duration: Long) -> Unit) {
+    fun getDurationString(onSuccess: (duration: String) -> Unit) {
         if (currentPlayingVoiceNotePath.isEmpty()
             || File(currentPlayingVoiceNotePath).length() == 0L) return
 
         viewModelScope.launch(Dispatchers.IO) {
-            val metadataRetriever = MediaMetadataRetriever()
-            metadataRetriever.setDataSource(currentPlayingVoiceNotePath)
-            val duration = metadataRetriever.extractMetadata(
-                MediaMetadataRetriever.METADATA_KEY_DURATION
-            )?.toLong() ?: 0L
+            val durationString = extractDuration(currentPlayingVoiceNotePath)
             withContext(Dispatchers.Main) {
-                onSuccess.invoke(duration)
+                onSuccess.invoke(durationString)
             }
         }
     }

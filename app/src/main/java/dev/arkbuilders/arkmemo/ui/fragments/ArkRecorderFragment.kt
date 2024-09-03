@@ -33,7 +33,6 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.gone
-import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.launch
@@ -391,8 +390,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
             binding.layoutAudioView.root.visible()
             binding.layoutAudioRecord.tvRecordGuide.text =
                 getString(R.string.audio_record_guide_text_replace)
-            mediaPlayViewModel.getDurationMillis { duration ->
-                binding.layoutAudioView.tvDuration.text = millisToString(duration)
+            mediaPlayViewModel.getDurationString { duration ->
+                binding.layoutAudioView.tvDuration.text = duration
             }
 
         } else {

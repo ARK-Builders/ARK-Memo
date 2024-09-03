@@ -16,7 +16,6 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.utils.gone
-import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.launch
 import java.io.File
@@ -76,8 +75,8 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
             binding.layoutAudioRecord.root.visible()
             binding.layoutAudioRecord.tvRecordGuide.text =
                 getString(R.string.audio_record_guide_text_replace)
-            arkMediaPlayerViewModel.getDurationMillis { duration ->
-                binding.layoutAudioView.tvDuration.text = millisToString(duration)
+            arkMediaPlayerViewModel.getDurationString { duration ->
+                binding.layoutAudioView.tvDuration.text = duration
             }
 
         } else {

@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -32,6 +31,7 @@ import dev.arkbuilders.arkmemo.ui.adapters.EqualSpacingItemDecoration
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.utils.getBrushSize
 import dev.arkbuilders.arkmemo.utils.getColorCode
+import dev.arkbuilders.arkmemo.utils.getParcelableCompat
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.setDrawableColor
@@ -59,17 +59,9 @@ class EditGraphicNotesFragment: BaseEditNoteFragment() {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
         observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
-        if (arguments != null) {
-            @Suppress("DEPRECATION")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                requireArguments().getParcelable(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
-                    note = it
-                    graphicNotesViewModel.onNoteOpened(note)
-                }
-            else requireArguments().getParcelable<GraphicNote>(GRAPHICAL_NOTE_KEY)?.let {
-                note = it
-                graphicNotesViewModel.onNoteOpened(note)
-            }
+        arguments?.getParcelableCompat(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
+            note = it
+            graphicNotesViewModel.onNoteOpened(note)
         }
     }
 

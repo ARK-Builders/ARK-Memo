@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.repo.voices
 
-import android.media.MediaMetadataRetriever
 import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
@@ -10,8 +9,8 @@ import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
+import dev.arkbuilders.arkmemo.utils.extractDuration
 import dev.arkbuilders.arkmemo.utils.listFiles
-import dev.arkbuilders.arkmemo.utils.millisToString
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
@@ -109,20 +108,6 @@ class VoiceNotesRepo @Inject constructor(
                 duration = extractDuration(path.pathString),
                 resource = resource
             )
-        }
-    }
-
-    fun extractDuration(path: String): String {
-        return try {
-            val metadataRetriever = MediaMetadataRetriever()
-            metadataRetriever.setDataSource(path)
-            val duration = metadataRetriever.extractMetadata(
-                MediaMetadataRetriever.METADATA_KEY_DURATION
-            )?.toLong() ?: 0L
-            millisToString(duration)
-        } catch (e: Exception) {
-            Log.e(VOICES_REPO, "extractDuration exception: " + e.message)
-            ""
         }
     }
 }
