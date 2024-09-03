@@ -53,7 +53,7 @@ class NotesViewModel @Inject constructor(
     fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
-            notes.collectLatest {
+            notes.value.let {
                 withContext(Dispatchers.Main) {
                     onSuccess(it.sortedByDescending { note -> note.resource?.modified })
                 }

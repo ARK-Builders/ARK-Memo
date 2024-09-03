@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dev.arkbuilders.arkmemo.R
@@ -24,6 +24,7 @@ import dev.arkbuilders.arkmemo.ui.views.NotesCanvas
 import dev.arkbuilders.arkmemo.utils.getAutoTitle
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.highlightWord
+import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 import dev.arkbuilders.arkmemo.utils.visible
 
@@ -62,11 +63,11 @@ class NotesListAdapter(
         if (note is TextNote) {
             holder.contentPreview.text = note.text
         }
-        holder.layoutAudioView.root.isVisible = false
+        holder.layoutAudioView.root.gone()
         if (note is VoiceNote) {
             val isRecordingExist = note.path.toFile().length() > 0L
             if (isRecordingExist) {
-                holder.layoutAudioView.root.isVisible = true
+                holder.layoutAudioView.root.visible()
                 holder.layoutAudioView.tvDuration.text = note.duration
             } else {
                 holder.layoutAudioView.root.gone()
@@ -76,17 +77,26 @@ class NotesListAdapter(
                 onPlayPauseClick(note.path.toString(), position) { stopPos ->
                     showPlaybackIdleState(holder)
                     (notes[position] as VoiceNote).isPlaying = false
+                    holder.layoutAudioView.animAudioPlaying.resetWave()
+                    holder.layoutAudioView.animAudioPlaying.invalidateWave(0)
+                    holder.tvPlayingPosition.gone()
                     notifyItemChanged(position)
                 }
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
                 note.isPlaying = !note.isPlaying
+                holder.tvPlayingPosition.visible()
             }
 
             if (note.isPlaying) {
                 showPlayingState(holder)
+                holder.tvPlayingPosition.text = millisToString(note.currentPlayingPos * 1000L)
+                holder.tvPlayingPosition.visible()
             } else {
                 showPlaybackIdleState(holder)
+                holder.tvPlayingPosition.gone()
             }
+
+            holder.layoutAudioView.animAudioPlaying.invalidateWave(note.currentMaxAmplitude)
 
         } else if (note is GraphicNote) {
             holder.canvasGraphicThumb.visible()
@@ -111,10 +121,11 @@ class NotesListAdapter(
                 showPlayingState(holder)
             }
             is ArkMediaPlayerSideEffect.PausePlaying -> {
-                showPlaybackIdleState(holder)
+                showPlaybackIdleState(holder, isPaused = true)
             }
             is ArkMediaPlayerSideEffect.StopPlaying -> {
                 showPlaybackIdleState(holder)
+                holder.tvPlayingPosition.gone()
             }
             is ArkMediaPlayerSideEffect.ResumePlaying -> {
                 showPlayingState(holder)
@@ -122,14 +133,19 @@ class NotesListAdapter(
         }
     }
 
-    private fun showPlaybackIdleState(holder: NoteViewHolder) {
+    private fun showPlaybackIdleState(holder: NoteViewHolder, isPaused: Boolean = false) {
         val playIcon = ResourcesCompat.getDrawable(
             activity.resources,
             R.drawable.ic_play_circle,
             null
         )
         holder.btnPlayPause.setImageDrawable(playIcon)
-        holder.layoutAudioView.animAudioPlaying.pauseAnimation()
+        if (!isPaused) {
+            holder.layoutAudioView.animAudioPlaying.resetWave()
+            holder.layoutAudioView.animAudioPlaying.invalidateWave(0)
+            holder.layoutAudioView.animAudioPlaying.background =
+                ContextCompat.getDrawable(activity, R.drawable.audio_wave_thumb)
+        }
     }
 
     private fun showPlayingState(holder: NoteViewHolder) {
@@ -139,7 +155,7 @@ class NotesListAdapter(
             null
         )
         holder.btnPlayPause.setImageDrawable(playIcon)
-        holder.layoutAudioView.animAudioPlaying.playAnimation()
+        holder.layoutAudioView.animAudioPlaying.background = null
     }
 
     fun updateData(newNotes: List<Note>, fromSearch: Boolean? = null, keyword: String? = null) {
@@ -166,6 +182,7 @@ class NotesListAdapter(
         val contentPreview = binding.tvContentPreview
         val btnPlayPause = binding.layoutAudioView.ivPlayAudio
         val layoutAudioView = binding.layoutAudioView
+        val tvPlayingPosition = binding.layoutAudioView.tvPlayingPosition
         val canvasGraphicThumb = binding.canvasGraphicThumb
         val tvDelete = binding.tvDelete
 
