@@ -18,7 +18,7 @@ import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
-import dev.arkbuilders.arkmemo.repo.voices.VoiceNotesRepo
+import dev.arkbuilders.arkmemo.utils.extractDuration
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -137,7 +137,7 @@ class NotesViewModel @Inject constructor(
             notes.removeIf { it.resource?.id == parentResId ?: note.resource?.id }
         }
         if (note is VoiceNote) {
-            note.duration = (voiceNotesRepo as VoiceNotesRepo).extractDuration(note.path.pathString)
+            note.duration = extractDuration(note.path.pathString)
         }
         notes.add(note)
         this.notes.value = notes

@@ -61,10 +61,10 @@ class ArkAudioRecorderImpl @Inject constructor(
     }
 
     override fun maxAmplitude(): Int {
-        try {
-            return recorder?.maxAmplitude ?: 0
+        return try {
+            recorder?.maxAmplitude ?: 0
         } catch (e: Exception) {
-            return 0
+            0
         }
     }
 

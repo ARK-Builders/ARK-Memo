@@ -227,7 +227,7 @@ class SwitchButton : View, Checkable {
         } else {
             setUncheckViewState(viewState)
         }
-        isUiInited = true
+        isUIInitialized = true
         postInvalidate()
     }
 
@@ -410,7 +410,7 @@ class SwitchButton : View, Checkable {
         if (isEventBroadcast) {
             throw RuntimeException("should NOT switch the state in method: [onCheckedChanged]!")
         }
-        if (!isUiInited) {
+        if (!isUIInitialized) {
             isChecked = !isChecked
             if (broadcast) {
                 broadcastEvent()
@@ -671,7 +671,7 @@ class SwitchButton : View, Checkable {
     private var shadowEffect = false
     private var showIndicator = false
     private var isTouchingDown = false
-    private var isUiInited = false
+    private var isUIInitialized = false
     private var isEventBroadcast = false
     private var onCheckedChangeListener: OnCheckedChangeListener? = null
     private var touchDownTime: Long = 0
