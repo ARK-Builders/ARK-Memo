@@ -33,8 +33,10 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.visible
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDate
@@ -67,15 +69,20 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         LocalDate.now().format(DateTimeFormatter.ISO_DATE)
     ) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initUI()
+        initExistingNoteUI()
+        observeViewModel()
+        observeKeyboardVisibility()
+
         shouldRecord = context?.let {
             it.checkSelfPermission(Manifest.permission.RECORD_AUDIO) ==
                     PackageManager.PERMISSION_GRANTED
         } ?: false
         if (shouldRecord) {
             notesViewModel.init {}
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.CREATED) {
                     arkRecorderViewModel.collect(
                         stateToUI = {
@@ -87,14 +94,6 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
             }
             observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         } else audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initUI()
-        initExistingNoteUI()
-        observeViewModel()
-        observeKeyboardVisibility()
     }
 
     private fun observeKeyboardVisibility() {
@@ -184,6 +183,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                 }
 
                 mediaPlayViewModel.onPlayOrPauseClick(recordingPath)
+                binding.layoutAudioView.tvPlayingPosition.visible()
             }
         }
 
@@ -220,6 +220,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                     R.drawable.ic_record_ongoing,
                     null
                 )
+                binding.layoutAudioView.animAudioPlaying.resetWave()
                 ivRecord.setImageDrawable(stopIcon)
                 ivRecord.backgroundTintList = ColorStateList.valueOf(
                     ContextCompat.getColor(activity, R.color.warning_50)
@@ -279,29 +280,35 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         when (effect) {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
-                binding.layoutAudioView.animAudioPlaying.playAnimation()
+                binding.layoutAudioView.animAudioPlaying.background = null
             }
             ArkMediaPlayerSideEffect.StopPlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
-                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
+                mediaPlayViewModel.getDurationString { duration ->
+                    binding.layoutAudioView.tvDuration.text = duration
+                }
+                binding.layoutAudioView.tvPlayingPosition.gone()
+                binding.layoutAudioView.animAudioPlaying.resetWave()
+                binding.layoutAudioView.animAudioPlaying.invalidateWave(0)
+                binding.layoutAudioView.animAudioPlaying.background = ContextCompat.getDrawable(activity, R.drawable.audio_wave_thumb)
             }
             ArkMediaPlayerSideEffect.PausePlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
-                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
             }
             ArkMediaPlayerSideEffect.ResumePlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
-                binding.layoutAudioView.animAudioPlaying.playAnimation()
             }
         }
     }
 
     private fun showState(state: RecorderState) {
         tvDuration.text = state.progress
+        binding.layoutAudioView.animAudioPlaying.invalidateWave(state.maxAmplitude)
     }
 
-    private fun showPlayState(state: ArkMediaPlayerState) {
-        binding.layoutAudioView.tvDuration.text = state.duration
+    private fun updatePlaybackTimeInfo(state: ArkMediaPlayerState) {
+        binding.layoutAudioView.tvPlayingPosition.text = millisToString(state.currentPos * 1000L)
+        binding.layoutAudioView.animAudioPlaying.invalidateWave(state.maxAmplitude)
     }
 
     private fun showPauseIcon() {
@@ -350,12 +357,28 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                mediaPlayViewModel.collect(
-                    stateToUI = { showPlayState(it) },
-                    handleSideEffect = { handlePlaySideEffect(it) }
-                )
+        observePlayerState()
+        observePlayerSideEffect()
+    }
+
+    private fun observePlayerState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mediaPlayViewModel.playerState.collectLatest { state ->
+                    state ?: return@collectLatest
+                    updatePlaybackTimeInfo(state)
+                }
+            }
+        }
+    }
+
+    private fun observePlayerSideEffect() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                mediaPlayViewModel.playerSideEffect.collectLatest { sideEffect ->
+                    sideEffect ?: return@collectLatest
+                    handlePlaySideEffect(sideEffect)
+                }
             }
         }
     }

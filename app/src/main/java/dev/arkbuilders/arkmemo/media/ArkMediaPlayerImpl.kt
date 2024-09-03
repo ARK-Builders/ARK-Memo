@@ -11,6 +11,8 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
     private var onCompletionHandler: () -> Unit = {}
     private var onPreparedHandler: () -> Unit = {}
 
+    private var maxAmplitude = 0
+
     override fun init(path: String, onCompletion: () -> Unit, onPrepared: () -> Unit) {
         if (player?.isPlaying == true) {
             player?.stop()
@@ -72,5 +74,17 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
 
     override fun isInitialized(): Boolean {
         return player != null
+    }
+
+    override fun getAudioSessionId(): Int {
+        return player?.audioSessionId ?: -1
+    }
+
+    override fun getMaxAmplitude(): Int {
+        return maxAmplitude
+    }
+
+    override fun setMaxAmplitude(maxAmplitude: Int) {
+        this.maxAmplitude = maxAmplitude
     }
 }

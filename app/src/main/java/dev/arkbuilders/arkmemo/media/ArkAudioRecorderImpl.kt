@@ -23,7 +23,7 @@ class ArkAudioRecorderImpl @Inject constructor(
             MediaRecorder(context)
         else MediaRecorder()
         recorder?.apply {
-            setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
+            setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
             setOutputFile(tempFile)
             setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)

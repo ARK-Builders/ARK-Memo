@@ -11,6 +11,10 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,6 +34,8 @@ import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.replaceFragment
 import dev.arkbuilders.arkmemo.utils.visible
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -177,14 +183,17 @@ class NotesFragment: Fragment() {
         }
 
         val layoutManager = LinearLayoutManager(requireContext())
-        arkMediaPlayerViewModel.collect(
-            stateToUI = { state -> notesAdapter?.observeItemState = { state } },
-            handleSideEffect = { effect -> notesAdapter?.observeItemSideEffect = { effect } }
-        )
+        observePlayerState()
+        observePlayerSideEffect()
         notesAdapter?.setActivity(activity)
         binding.rvPinnedNotes.apply {
             this.layoutManager = layoutManager
             this.adapter = notesAdapter
+            this.itemAnimator = object : DefaultItemAnimator() {
+                override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
+                    return true
+                }
+            }
         }
         ItemTouchHelper(mItemTouchCallback).attachToRecyclerView(binding.rvPinnedNotes)
 
@@ -200,6 +209,33 @@ class NotesFragment: Fragment() {
             binding.rvPinnedNotes.gone()
             binding.edtSearch.gone()
             binding.scrollViewNotes.gone()
+        }
+    }
+
+    private fun observePlayerState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                arkMediaPlayerViewModel.playerState.collectLatest { state ->
+                    state ?: return@collectLatest
+                    notesAdapter?.observeItemState = { state }
+                    notesAdapter?.getNotes()?.getOrNull(playingAudioPosition)?.let {
+                        (it as? VoiceNote)?.currentPlayingPos = state.currentPos
+                        (it as? VoiceNote)?.currentMaxAmplitude = state.maxAmplitude
+                        notesAdapter?.notifyItemChanged(playingAudioPosition)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observePlayerSideEffect() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                arkMediaPlayerViewModel.playerSideEffect.collectLatest { sideEffect ->
+                    sideEffect ?: return@collectLatest
+                    notesAdapter?.observeItemSideEffect = { sideEffect }
+                }
+            }
         }
     }
 
