@@ -17,6 +17,7 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDate
@@ -88,42 +89,56 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
             val recordingPath = note.path.toString()
             arkMediaPlayerViewModel.initPlayer(recordingPath)
             arkMediaPlayerViewModel.onPlayOrPauseClick(recordingPath)
+            binding.layoutAudioView.tvPlayingPosition.visible()
         }
 
     }
 
     private fun showState(state: ArkMediaPlayerState) {
-        binding.layoutAudioView.tvDuration.text = state.duration
+        binding.layoutAudioView.tvPlayingPosition.text = state.currentPos.toString()
     }
 
     private fun handleSideEffect(effect: ArkMediaPlayerSideEffect) {
         when (effect) {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 showPauseIcon()
-                binding.layoutAudioView.animAudioPlaying.playAnimation()
             }
             ArkMediaPlayerSideEffect.StopPlaying -> {
                 showPlayIcon()
-                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
+                binding.layoutAudioView.animAudioPlaying.resetWave()
             }
             ArkMediaPlayerSideEffect.PausePlaying -> {
                 showPlayIcon()
-                binding.layoutAudioView.animAudioPlaying.cancelAnimation()
             }
             ArkMediaPlayerSideEffect.ResumePlaying -> {
                 showPauseIcon()
-                binding.layoutAudioView.animAudioPlaying.playAnimation()
             }
         }
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                arkMediaPlayerViewModel.collect(
-                    stateToUI = { showState(it) },
-                    handleSideEffect = { handleSideEffect(it) }
-                )
+        observePlayerState()
+        observePlayerSideEffect()
+    }
+
+    private fun observePlayerState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                arkMediaPlayerViewModel.playerState.collectLatest { state ->
+                    state ?: return@collectLatest
+                    showState(state)
+                }
+            }
+        }
+    }
+
+    private fun observePlayerSideEffect() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                arkMediaPlayerViewModel.playerSideEffect.collectLatest { sideEffect ->
+                    sideEffect ?: return@collectLatest
+                    handleSideEffect(sideEffect)
+                }
             }
         }
     }

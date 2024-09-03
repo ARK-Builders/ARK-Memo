@@ -11,17 +11,19 @@ import android.view.View
 class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
 
     private val paint = Paint().also {
-        it.color = Color.LTGRAY
+        it.color = Color.WHITE
         it.style = Paint.Style.FILL
     }
 
     private val bars = ArrayDeque<Rect>()
+    private val radius = 10f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (bars.isNotEmpty()) {
             bars.forEach {
-                canvas.drawRect(it, paint)
+                canvas.drawRoundRect(it.left.toFloat(), it.top.toFloat(), it.right.toFloat(),
+                    it.bottom.toFloat(), radius, radius, paint)
             }
         }
     }
@@ -36,6 +38,7 @@ class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
     }
 
     private fun computeWave(amplitude: Int) {
+        if (height <= 0) return
         if (bars.isNotEmpty()) {
             bars.forEachIndexed { index, rect ->
                 val right = width - ((index + 1) * (BAR_WIDTH + BAR_INTERVAL))
@@ -51,8 +54,8 @@ class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
 
     companion object {
         private const val MIN_BAR_HEIGHT = 4
-        private const val BAR_WIDTH = 4
-        private const val BAR_INTERVAL = 2
-        private const val MAX_AMPLITUDE = 32762f / 10f
+        private const val BAR_WIDTH = 6
+        private const val BAR_INTERVAL = 12
+        const val MAX_AMPLITUDE = 32762f / 10f
     }
 }
