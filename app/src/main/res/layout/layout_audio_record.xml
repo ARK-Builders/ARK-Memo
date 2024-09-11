@@ -45,19 +45,15 @@
         tools:visibility="visible"
         app:lottie_autoPlay="true"/>
 
-    <com.airbnb.lottie.LottieAnimationView
+    <dev.arkbuilders.arkmemo.ui.views.WaveView
         android:id="@+id/anim_sound_wave"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="64dp"
-        android:scaleType="center"
         app:layout_constraintBottom_toTopOf="@+id/anim_recording"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:lottie_rawRes="@raw/anim_sound_wave"
-        app:lottie_loop="true"
         android:visibility="gone"
-        tools:visibility="visible"
-        app:lottie_autoPlay="true"/>
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tv_duration"

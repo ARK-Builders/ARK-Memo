@@ -2,6 +2,7 @@ package dev.arkbuilders.arkmemo.media
 
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.util.Log
 import javax.inject.Inject
 
 class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
@@ -25,14 +26,20 @@ class ArkMediaPlayerImpl @Inject constructor(): ArkMediaPlayer {
         player = MediaPlayer().apply {
             setOnCompletionListener(this@ArkMediaPlayerImpl)
             setOnPreparedListener(this@ArkMediaPlayerImpl)
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-            setDataSource(path)
-            prepare()
+
+            try {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                setDataSource(path)
+                prepare()
+            } catch (e: Exception) {
+                Log.e("ArkMediaPlayerImpl", "init exception: ${e.message}" )
+            }
+
         }
     }
 

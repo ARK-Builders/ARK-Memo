@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.graphics.ColorCode
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
@@ -171,6 +172,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
 
         binding.layoutAudioRecord.ivStartOver.setOnClickListener {
             arkRecorderViewModel.onStartOverClick()
+            binding.layoutAudioRecord.animSoundWave.resetWave()
         }
 
         binding.layoutAudioView.ivPlayAudio.setOnClickListener {
@@ -190,6 +192,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         binding.layoutAudioRecord.tvSaveRecording.setOnClickListener {
             saveNote()
         }
+
+        binding.layoutAudioRecord.animSoundWave.waveColor = ColorCode.brown
 
         binding.toolbar.ivRightActionIcon.setOnClickListener {
             val note = VoiceNote(
@@ -229,8 +233,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                 enableSaveText(false)
                 binding.layoutAudioRecord.animRecording.playAnimation()
                 binding.layoutAudioRecord.animRecording.visible()
+                binding.layoutAudioRecord.animSoundWave.resetWave()
                 binding.layoutAudioRecord.animSoundWave.visible()
-                binding.layoutAudioRecord.animSoundWave.playAnimation()
                 binding.layoutAudioRecord.ivPauseResume.visible()
                 binding.layoutAudioRecord.ivStartOver.visible()
                 binding.layoutAudioView.root.gone()
@@ -303,7 +307,11 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
 
     private fun showState(state: RecorderState) {
         tvDuration.text = state.progress
-        binding.layoutAudioView.animAudioPlaying.invalidateWave(state.maxAmplitude)
+        if (arkRecorderViewModel.isRecording()) {
+            binding.layoutAudioRecord.animSoundWave.invalidateWave(state.maxAmplitude / 10)
+        } else {
+            binding.layoutAudioView.animAudioPlaying.invalidateWave(state.maxAmplitude)
+        }
     }
 
     private fun updatePlaybackTimeInfo(state: ArkMediaPlayerState) {
@@ -385,10 +393,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
 
     private fun pauseOrResumeRecordingAnimation(resume: Boolean) {
         if (resume) {
-            binding.layoutAudioRecord.animSoundWave.resumeAnimation()
             binding.layoutAudioRecord.animRecording.resumeAnimation()
         } else {
-            binding.layoutAudioRecord.animSoundWave.pauseAnimation()
             binding.layoutAudioRecord.animRecording.pauseAnimation()
         }
     }

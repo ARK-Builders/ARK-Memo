@@ -10,9 +10,12 @@ import android.view.View
 
 class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
 
-    private val paint = Paint().also {
-        it.color = Color.WHITE
-        it.style = Paint.Style.FILL
+    var waveColor = Color.WHITE
+    private val paint by lazy {
+        Paint().also {
+            it.color = waveColor
+            it.style = Paint.Style.FILL
+        }
     }
 
     private val bars = ArrayDeque<Rect>()
