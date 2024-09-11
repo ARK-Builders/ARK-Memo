@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.media.ArkAudioRecorder
+import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.tenthSecondsToString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -11,17 +12,18 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.nio.file.Path
 import java.util.Timer
+import java.util.TimerTask
 import javax.inject.Inject
 import kotlin.concurrent.timer
 
 sealed class RecorderSideEffect {
-    object StartRecording: RecorderSideEffect()
+    data object StartRecording: RecorderSideEffect()
 
     data class StopRecording(val duration: String) : RecorderSideEffect()
 
-    object PauseRecording: RecorderSideEffect()
+    data object PauseRecording: RecorderSideEffect()
 
-    object ResumeRecording: RecorderSideEffect()
+    data object ResumeRecording: RecorderSideEffect()
 }
 
 data class RecorderState(
@@ -41,8 +43,10 @@ class ArkRecorderViewModel @Inject constructor(
 
     // Duration is in milliseconds
     private var duration = 0L
+    private val RECORD_SAMPLING_INTERVAL = 100L //millisecond
 
     private var timer: Timer? = null
+    private var recordTimerTask: TimerTask? = null
 
     fun onStartStopClick() {
         if (isRecording.value) {
@@ -111,7 +115,9 @@ class ArkRecorderViewModel @Inject constructor(
             val lastDuration = duration
             duration = 0
             stopTimer()
-            recorderSideEffect.value = RecorderSideEffect.StopRecording(duration = tenthSecondsToString(lastDuration))
+            recorderSideEffect.value = RecorderSideEffect.StopRecording(
+                duration = millisToString(lastDuration * RECORD_SAMPLING_INTERVAL)
+            )
         }
     }
 
@@ -143,15 +149,19 @@ class ArkRecorderViewModel @Inject constructor(
             if (isRecording.value) {
                 arkAudioRecorder.resume()
                 isPaused.value = false
-                startTimer()
+                startTimer(isResumed = true)
                 recorderSideEffect.value = RecorderSideEffect.ResumeRecording
             }
         }
     }
 
-    private fun startTimer() {
+    private fun startTimer(isResumed: Boolean = false) {
         viewModelScope.launch {
-            timer = timer(initialDelay = 0L, period = 100L) {
+            if (isResumed) {
+                recordTimerTask?.cancel()
+            }
+            timer = timer(initialDelay = 0L, period = RECORD_SAMPLING_INTERVAL) {
+                recordTimerTask = this
                 if (isRecording.value && !isPaused.value) {
                     duration += 1
                     recorderState.value = RecorderState(
@@ -165,6 +175,7 @@ class ArkRecorderViewModel @Inject constructor(
 
     private fun stopTimer() {
         timer?.cancel()
+        recordTimerTask?.cancel()
         timer = null
     }
 
