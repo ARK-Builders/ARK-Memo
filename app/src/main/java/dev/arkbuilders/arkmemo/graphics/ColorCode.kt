@@ -9,4 +9,5 @@ internal object ColorCode {
     val blue by lazy { android.graphics.Color.parseColor("#0BA5EC") }
     val purple by lazy { android.graphics.Color.parseColor("#7A5AF8") }
     val white by lazy { android.graphics.Color.parseColor("#FFFFFF") }
+    val brown by lazy { android.graphics.Color.parseColor("#B54708") }
 }
