@@ -6,6 +6,8 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.ViewTreeObserver.OnWindowFocusChangeListener
 import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -82,6 +84,15 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         editNote.addTextChangedListener {
             enableSaveText(isContentChanged() && !isContentEmpty())
         }
+
+        activity?.window?.decorView?.rootView?.let { rootView ->
+            ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
+                val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+                editNote.isCursorVisible = isKeyboardVisible
+                insets
+            }
+        }
+
         editNote.isVisible = true
         editNote.requestFocus()
         editNote.setText(this.note.text)
