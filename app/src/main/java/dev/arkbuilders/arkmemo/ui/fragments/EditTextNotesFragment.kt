@@ -3,6 +3,7 @@ package dev.arkbuilders.arkmemo.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver.OnWindowFocusChangeListener
 import android.widget.Toast
@@ -17,6 +18,7 @@ import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.utils.getParcelableCompat
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.insertStringAtPosition
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import java.lang.StringBuilder
 
@@ -30,9 +32,23 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         requireContext().getTextFromClipBoard(view) { clipBoardText ->
             if (clipBoardText != null) {
                 val newTextBuilder = StringBuilder()
-                newTextBuilder.append(binding.editNote.text.toString()).append(clipBoardText)
+                val cursorPos = binding.editNote.selectionStart
+                val noteContent = binding.editNote.text.toString()
+
+                val newCursorPos = if (cursorPos < 0) {
+                    (clipBoardText.length + noteContent.length - 1).coerceAtLeast(0)
+                } else {
+                    clipBoardText.length + cursorPos
+                }
+                try {
+                    newTextBuilder.append(noteContent.insertStringAtPosition(clipBoardText, cursorPos))
+                } catch (e: IndexOutOfBoundsException) {
+                    Log.e(TAG, "pasteNoteClickListener exception: ${e.message}")
+                    newTextBuilder.append(noteContent).append(clipBoardText)
+                }
+
                 binding.editNote.setText(newTextBuilder.toString())
-                binding.editNote.setSelection(binding.editNote.text.length)
+                binding.editNote.setSelection(newCursorPos)
             }
             else Toast.makeText(requireContext(),
                 getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
