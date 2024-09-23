@@ -54,6 +54,7 @@ class NotesFragment: Fragment() {
     private var showingFloatingButtons = false
     private var playingAudioPath: String? = null
     private var playingAudioPosition = -1
+    private var lastNoteItemPosition = 0
 
     private val newTextNoteClickListener = View.OnClickListener {
         onFloatingActionButtonClicked()
@@ -202,13 +203,11 @@ class NotesFragment: Fragment() {
             binding.groupEmptyState.gone()
             binding.rvPinnedNotes.visible()
             binding.edtSearch.visible()
-            binding.scrollViewNotes.visible()
         } else {
             binding.layoutBottomControl.gone()
             binding.groupEmptyState.visible()
             binding.rvPinnedNotes.gone()
             binding.edtSearch.gone()
-            binding.scrollViewNotes.gone()
         }
     }
 
@@ -250,10 +249,17 @@ class NotesFragment: Fragment() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        val layoutMgr = (binding.rvPinnedNotes.layoutManager as? LinearLayoutManager)
+        lastNoteItemPosition = layoutMgr?.findFirstCompletelyVisibleItemPosition() ?: 0
+    }
+
     override fun onResume() {
         super.onResume()
         activity.fragment = this
         observeClipboardContent()
+        binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
     }
 
     private fun createTextNote() {

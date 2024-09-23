@@ -182,7 +182,7 @@
         android:layout_marginBottom="16dp"
         app:icon="@drawable/add"/>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -190,56 +190,8 @@
         android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/view_bottom_panel"
         android:paddingHorizontal="@dimen/home_horizontal_margin"
-        android:id="@+id/scroll_view_notes"
-        app:layout_constraintTop_toBottomOf="@+id/edt_search">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TextSmall"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:id="@+id/tv_header_pinned"
-                android:text="@string/ark_memo_notes_title_pinned"
-                android:visibility="gone"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:id="@+id/rv_pinned_notes"
-                android:layout_marginTop="12dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TextSmall"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rv_pinned_notes"
-                android:id="@+id/tv_header_recent"
-                android:layout_marginTop="24dp"
-                android:visibility="gone"
-                android:text="@string/ark_memo_notes_title_recent"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:id="@+id/rv_recent_notes"
-                app:layout_constraintTop_toBottomOf="@+id/tv_header_recent"
-                android:layout_marginTop="12dp"
-                android:visibility="gone"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.core.widget.NestedScrollView>
+        android:id="@+id/rv_pinned_notes"
+        app:layout_constraintTop_toBottomOf="@+id/edt_search"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_draw"
