@@ -69,9 +69,13 @@ class NotesViewModel @Inject constructor(
             //triggered within 0.5 second window.
             delay(500)
             notes.collectLatest {
-                val filteredNotes = it.filter { note ->
-                    note.title.contains(keyword, true)
-                }
+                val filteredNotes = it
+                    .filter { note ->
+                        note.title.contains(keyword, true)
+                    }
+
+                    //Keep the search result ordered chronologically
+                    .sortedByDescending { note -> note.resource?.modified }
                 withContext(Dispatchers.Main) {
                     onSuccess(filteredNotes)
                 }

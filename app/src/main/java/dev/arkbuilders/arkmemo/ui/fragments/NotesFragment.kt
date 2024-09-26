@@ -158,8 +158,19 @@ class NotesFragment: Fragment() {
                         binding.groupSearchResultEmpty.gone()
                     }
                     notesAdapter?.updateData(notes, fromSearch = true, keyword = text.toString())
+
+                    //When search text is cleared, restore previous note item position in the list
+                    if (text.toString().isEmpty() && binding.edtSearch.hasFocus()) {
+                        binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
+                    }
                 }
         })
+
+        binding.edtSearch.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                lastNoteItemPosition = getCurrentScrollPosition()
+            }
+        }
     }
 
     private fun onNotesLoaded(notes: List<Note>) {
@@ -251,8 +262,12 @@ class NotesFragment: Fragment() {
 
     override fun onPause() {
         super.onPause()
+        lastNoteItemPosition = getCurrentScrollPosition()
+    }
+
+    private fun getCurrentScrollPosition(): Int {
         val layoutMgr = (binding.rvPinnedNotes.layoutManager as? LinearLayoutManager)
-        lastNoteItemPosition = layoutMgr?.findFirstCompletelyVisibleItemPosition() ?: 0
+        return layoutMgr?.findFirstCompletelyVisibleItemPosition() ?: 0
     }
 
     override fun onResume() {
