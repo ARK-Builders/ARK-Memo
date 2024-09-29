@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.media.ArkAudioRecorder
 import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.tenthSecondsToString
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -181,5 +182,11 @@ class ArkRecorderViewModel @Inject constructor(
 
     fun isRecording(): Boolean {
         return isRecording.value
+    }
+
+    fun deleteTempFile() {
+        viewModelScope.launch(Dispatchers.IO) {
+            arkAudioRecorder.deleteTempFile()
+        }
     }
 }

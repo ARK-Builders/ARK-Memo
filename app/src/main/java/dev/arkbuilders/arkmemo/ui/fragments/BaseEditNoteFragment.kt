@@ -5,7 +5,6 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
@@ -19,7 +18,7 @@ import dev.arkbuilders.arkmemo.utils.visible
 import java.util.Calendar
 import java.util.Locale
 
-abstract class BaseEditNoteFragment: Fragment() {
+abstract class BaseEditNoteFragment: BaseFragment() {
 
     lateinit var binding: FragmentEditNotesBinding
     val notesViewModel: NotesViewModel by activityViewModels()
@@ -99,7 +98,7 @@ abstract class BaseEditNoteFragment: Fragment() {
         }
     }
 
-    private fun showSaveNoteDialog() {
+    private fun showSaveNoteDialog(onDiscard: (needClearResource: Boolean) -> Unit) {
         val saveNoteDialog = CommonActionDialog(
             title = R.string.dialog_save_note_title,
             message = R.string.dialog_save_note_message,
@@ -112,6 +111,7 @@ abstract class BaseEditNoteFragment: Fragment() {
                 }
             },
             onNegativeClicked = {
+                onDiscard.invoke(getCurrentNote().resource?.id == null)
                 hostActivity.onBackPressedDispatcher.onBackPressed()
             })
         saveNoteDialog.show(parentFragmentManager, CommonActionDialog.TAG)
@@ -133,14 +133,21 @@ abstract class BaseEditNoteFragment: Fragment() {
     }
 
     private fun handleBackPressed() {
+        val recordFragment = this as? ArkRecorderFragment
+        recordFragment?.stopIfRecording()
+
         if (isContentChanged() && !isContentEmpty()) {
-            showSaveNoteDialog()
+            showSaveNoteDialog { needClearResource ->
+                if (needClearResource) {
+                    recordFragment?.deleteTempFile()
+                }
+            }
         } else {
             hostActivity.onBackPressedDispatcher.onBackPressed()
         }
     }
 
-    fun onBackPressed() {
+    override fun onBackPressed() {
         handleBackPressed()
     }
 
