@@ -457,6 +457,18 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         ViewCompat.setOnApplyWindowInsetsListener(view, null)
     }
 
+    fun stopIfRecording(): Boolean {
+        if (arkRecorderViewModel.isRecording()) {
+            arkRecorderViewModel.onStartStopClick()
+            return true
+        }
+        return false
+    }
+
+    fun deleteTempFile() {
+        arkRecorderViewModel.deleteTempFile()
+    }
+
     companion object {
 
         const val TAG = "voice-notes-fragment"

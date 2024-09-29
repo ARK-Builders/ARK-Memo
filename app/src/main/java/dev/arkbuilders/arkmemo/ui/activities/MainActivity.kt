@@ -3,7 +3,6 @@ package dev.arkbuilders.arkmemo.ui.activities
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
@@ -20,7 +19,7 @@ import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
 import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
-import dev.arkbuilders.arkmemo.ui.fragments.BaseEditNoteFragment
+import dev.arkbuilders.arkmemo.ui.fragments.BaseFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import javax.inject.Inject
@@ -35,8 +34,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     @IdRes
     private val fragContainer = R.id.container
-
-    private var menu: Menu? = null
 
     var fragment: Fragment = NotesFragment()
 
@@ -130,8 +127,8 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     }
 
     override fun onBackPressed() {
-        if (fragment is BaseEditNoteFragment) {
-            (fragment as? BaseEditNoteFragment)?.onBackPressed()
+        if (fragment is BaseFragment) {
+            (fragment as BaseFragment).onBackPressed()
         } else {
             super.onBackPressed()
         }
@@ -139,20 +136,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
-    }
-}
-
-fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
-    supportFragmentManager.beginTransaction().apply {
-        val backStackName = fragment.javaClass.name
-        val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
-        if (!popBackStack) {
-            replace(R.id.container, fragment, tag)
-            addToBackStack(backStackName)
-        } else {
-            show(fragment)
-        }
-        commit()
     }
 }
 

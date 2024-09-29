@@ -19,4 +19,6 @@ interface ArkAudioRecorder {
     fun maxAmplitude(): Int
 
     fun getRecording(): Path
+
+    suspend fun deleteTempFile(): Boolean
 }

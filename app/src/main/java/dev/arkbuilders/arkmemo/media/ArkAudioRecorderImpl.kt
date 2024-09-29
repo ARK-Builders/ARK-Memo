@@ -69,4 +69,13 @@ class ArkAudioRecorderImpl @Inject constructor(
     }
 
     override fun getRecording(): Path = tempFile.toPath()
+
+    override suspend fun deleteTempFile(): Boolean {
+        return try {
+            tempFile.delete()
+        } catch (e: Exception) {
+            Log.e(TAG, "deleteTempFile exception: " + e.message)
+            false
+        }
+    }
 }
