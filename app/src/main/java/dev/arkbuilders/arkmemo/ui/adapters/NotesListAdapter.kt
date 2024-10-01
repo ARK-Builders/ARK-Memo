@@ -91,12 +91,10 @@ class NotesListAdapter(
                 showPlayingState(holder)
                 holder.tvPlayingPosition.text = millisToString(note.currentPlayingPos * 1000L)
                 holder.tvPlayingPosition.visible()
+                holder.layoutAudioView.animAudioPlaying.invalidateWave(note.currentMaxAmplitude)
             } else {
-                showPlaybackIdleState(holder)
                 holder.tvPlayingPosition.gone()
             }
-
-            holder.layoutAudioView.animAudioPlaying.invalidateWave(note.currentMaxAmplitude)
 
         } else if (note is GraphicNote) {
             holder.canvasGraphicThumb.visible()

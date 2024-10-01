@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.log10
 
 sealed class ArkMediaPlayerSideEffect {
     data object StartPlaying: ArkMediaPlayerSideEffect()
@@ -82,9 +83,6 @@ class ArkMediaPlayerViewModel @Inject constructor(
                     waveform: ByteArray?,
                     samplingRate: Int
                 ) {
-                    // Process waveform data here
-                    val intensity = ((waveform?.getOrNull(0) ?: 0) + 128f) / 256
-                    arkMediaPlayer.setMaxAmplitude((intensity * WaveView.MAX_AMPLITUDE).toInt())
                 }
 
                 override fun onFftDataCapture(
@@ -93,11 +91,40 @@ class ArkMediaPlayerViewModel @Inject constructor(
                     samplingRate: Int
                 ) {
                     // Optionally, process FFT data here
+                    viewModelScope.launch(Dispatchers.IO) {
+                        val intensity = computeFftMagnitude(fft)
+                        withContext(Dispatchers.Main) {
+                            arkMediaPlayer.setMaxAmplitude((intensity * WaveView.MAX_AMPLITUDE).toInt())
+                        }
+                    }
                 }
-            }, Visualizer.getMaxCaptureRate() / 2, true, false)
+            }, Visualizer.getMaxCaptureRate(), false, true)
 
+            scalingMode = Visualizer.MEASUREMENT_MODE_PEAK_RMS
             enabled = true
         }
+    }
+
+    /**
+     * Calculate the FFT-based sound magnitude from the provided FFT ByteArray
+     * Inspiration is from: https://developer.android.com/reference/android/media/audiofx/Visualizer#getFft(byte[])
+     */
+    private fun computeFftMagnitude(fft: ByteArray?): Float {
+        if (fft == null) return 0f
+
+        // Compute magnitude from FFT data
+        var sum = 0.0
+        for (i in 2 until fft.size step 2) { // Skip the first 2 bytes (DC component)
+            val real = fft[i].toInt()
+            val imaginary = fft[i + 1].toInt()
+            val magnitude = real * real + imaginary * imaginary
+            sum += magnitude
+        }
+
+        val averageMagnitude = sum / (fft.size / 2)
+
+        // Convert to a logarithmic scale to make visualizer more responsive
+        return log10(averageMagnitude + 1).toFloat() // Add 1 to avoid log(0)
     }
 
     fun setPath(path: String) {
@@ -148,8 +175,8 @@ class ArkMediaPlayerViewModel @Inject constructor(
 
     private fun onPlayClick() {
         arkMediaPlayer.play()
-        startProgressMonitor()
         setupVisualizer()
+        startProgressMonitor()
         arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.StartPlaying
     }
 
