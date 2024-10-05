@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.BrushAdapter
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColor
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlack
@@ -35,6 +37,7 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 import dev.arkbuilders.arkmemo.ui.adapters.EqualSpacingItemDecoration
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.data.Resolution
 import dev.arkbuilders.arkmemo.ui.views.presentation.edit.EditScreen
 import dev.arkbuilders.arkmemo.utils.getBrushSize
@@ -46,9 +49,22 @@ import dev.arkbuilders.arkmemo.utils.setDrawableColor
 import dev.arkbuilders.arkmemo.utils.visible
 
 @AndroidEntryPoint
-class EditGraphicNotesFragment: BaseFragment() {
+class EditGraphicNotesFragment : BaseFragment() {
+    val notesViewModel: NotesViewModel by activityViewModels()
+    private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
+    private var note = GraphicNote()
+    val hostActivity by lazy { activity as MainActivity }
+
     override fun onBackPressed() {
-        TODO("Not yet implemented")
+        parentFragmentManager.popBackStack()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+//        arguments?.getParcelableCompat(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
+//            note = it
+//            graphicNotesViewModel.onNoteOpened(note)
+//        }
     }
 
     override fun onCreateView(
@@ -59,12 +75,12 @@ class EditGraphicNotesFragment: BaseFragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 EditScreen(
-                    null,
-                    null,
-                    childFragmentManager,
-                    {onBackPressed()},
-                    true,
-                    Resolution(120, 120)
+                    imagePath = null,
+                    imageUri = null,
+                    fragmentManager = parentFragmentManager,
+                    navigateBack = { onBackPressed() },
+                    launchedFromIntent = true,
+                    maxResolution = Resolution(120, 120)
                 )
             }
         }

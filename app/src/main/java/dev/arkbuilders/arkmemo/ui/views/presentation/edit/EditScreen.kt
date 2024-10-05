@@ -78,6 +78,7 @@ import dev.arkbuilders.arkmemo.ui.views.presentation.theme.Gray
 import dev.arkbuilders.arkmemo.ui.views.presentation.utils.askWritePermissions
 import dev.arkbuilders.arkmemo.ui.views.presentation.utils.getActivity
 import dev.arkbuilders.arkmemo.ui.views.presentation.utils.isWritePermGranted
+import dev.arkbuilders.arkmemo.utils.ControlFlag.isChangedForMemoIntegration
 import java.nio.file.Path
 
 @Composable
@@ -209,6 +210,7 @@ fun EditScreen(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 private fun Menus(
     imagePath: Path?,
@@ -335,7 +337,9 @@ private fun DrawContainer(
                                 return@onSizeChanged
                             }
 
-                            isZoomMode.value -> { return@onSizeChanged }
+                            isZoomMode.value -> {
+                                return@onSizeChanged
+                            }
 
                             else -> {
                                 scaleToFit()
@@ -443,12 +447,16 @@ private fun BoxScope.TopMenu(
                     if (
                         !viewModel.editManager.canUndo.value
                     ) {
-                        if (launchedFromIntent) {
-                            context
-                                .getActivity()
-                                ?.finish()
-                        } else {
+                        if (isChangedForMemoIntegration) {
                             navigateBack()
+                        } else {
+                            if (launchedFromIntent) {
+                                context
+                                    .getActivity()
+                                    ?.finish()
+                            } else {
+                                navigateBack()
+                            }
                         }
                     } else {
                         viewModel.showExitDialog = true
@@ -1049,10 +1057,14 @@ private fun ExitDialog(
             TextButton(
                 onClick = {
                     viewModel.showExitDialog = false
-                    if (launchedFromIntent) {
-                        context.getActivity()?.finish()
-                    } else {
+                    if (isChangedForMemoIntegration) {
                         navigateBack()
+                    } else {
+                        if (launchedFromIntent) {
+                            context.getActivity()?.finish()
+                        } else {
+                            navigateBack()
+                        }
                     }
                 }
             ) {
