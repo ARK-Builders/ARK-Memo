@@ -206,7 +206,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                 negativeText = R.string.ark_memo_cancel,
                 isAlert = true,
                 onPositiveClick = {
-                notesViewModel.onDeleteConfirmed(note)
+                notesViewModel.onDeleteConfirmed(note){}
                 toast(requireContext(), getString(R.string.note_deleted))
                 activity.onBackPressedDispatcher.onBackPressed()
             }, onNegativeClicked = {
@@ -463,6 +463,10 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
             return true
         }
         return false
+    }
+
+    fun isRecordingVoiceNote(): Boolean {
+        return arkRecorderViewModel.isRecording()
     }
 
     fun deleteTempFile() {

@@ -25,6 +25,7 @@ import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
+import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
@@ -70,6 +71,7 @@ class NotesFragment: BaseFragment() {
         }
     }
 
+    private var mItemTouchHelper: ItemTouchHelper? = null
     private val mItemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
         override fun onMove(
             recyclerView: RecyclerView,
@@ -84,6 +86,10 @@ class NotesFragment: BaseFragment() {
             val noteToDelete = notesAdapter?.getNotes()?.getOrNull(deletePosition)?.apply {
                 pendingForDelete = true
             } ?: return
+
+            val noteViewHolder = viewHolder as? NotesListAdapter.NoteViewHolder
+            noteViewHolder?.isSwiping = true
+
             binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
 
             CommonActionDialog(title = R.string.delete_note,
@@ -92,13 +98,19 @@ class NotesFragment: BaseFragment() {
                 negativeText = R.string.ark_memo_cancel,
                 isAlert = true,
                 onPositiveClick = {
-                    notesViewModel.onDeleteConfirmed(noteToDelete)
-                    toast(requireContext(), getString(R.string.note_deleted))
-                    binding.rvPinnedNotes.adapter?.notifyItemRemoved(deletePosition)
+                    noteViewHolder?.isSwiping = false
+                    notesViewModel.onDeleteConfirmed(noteToDelete) {
+                        notesAdapter?.removeNote(noteToDelete)
+                        toast(requireContext(), getString(R.string.note_deleted))
+                        binding.rvPinnedNotes.adapter?.notifyItemRemoved(deletePosition)
+                    }
+
             }, onNegativeClicked = {
+                    noteViewHolder?.isSwiping = false
                     noteToDelete.pendingForDelete = false
                     binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
             }, onCloseClicked = {
+                    noteViewHolder?.isSwiping = false
                     noteToDelete.pendingForDelete = false
                     binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
             }).show(childFragmentManager, CommonActionDialog.TAG)
@@ -159,7 +171,7 @@ class NotesFragment: BaseFragment() {
                     notesAdapter?.updateData(notes, fromSearch = true, keyword = text.toString())
 
                     //When search text is cleared, restore previous note item position in the list
-                    if (text.toString().isEmpty() && binding.edtSearch.hasFocus()) {
+                    if (text.toString().isEmpty()) {
                         binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
                     }
                 }
@@ -176,10 +188,26 @@ class NotesFragment: BaseFragment() {
         binding.pbLoading.gone()
         if (notesAdapter == null) {
             notesAdapter = NotesListAdapter(
-                notes,
+                notes.toMutableList(),
                 onPlayPauseClick = { path, pos, onStop ->
                     playingAudioPath = path
+                    if (playingAudioPosition >= 0) {
+                        refreshVoiceNoteItem(playingAudioPosition)
+                    }
+
+                    if (playingAudioPosition >= 0 && playingAudioPosition != pos) {
+                        //Another Voice note is being played compared to the previously played one
+                        markResetVoiceNotePlayback(playingAudioPosition)
+                    }
+
                     playingAudioPosition = pos ?: -1
+
+                    if (arkMediaPlayerViewModel.isPlaying()) {
+                        mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
+                    } else {
+                        mItemTouchHelper?.attachToRecyclerView(null)
+                    }
+
                     arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
                 },
                 onThumbPrepare = { graphicNote, noteCanvas ->
@@ -202,11 +230,14 @@ class NotesFragment: BaseFragment() {
             this.adapter = notesAdapter
             this.itemAnimator = object : DefaultItemAnimator() {
                 override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
-                    return true
+                    val isSwiping = (viewHolder as? NotesListAdapter.NoteViewHolder)?.isSwiping ?: false
+                    return !isSwiping
                 }
             }
         }
-        ItemTouchHelper(mItemTouchCallback).attachToRecyclerView(binding.rvPinnedNotes)
+
+        mItemTouchHelper = ItemTouchHelper(mItemTouchCallback)
+        mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
 
         if (notes.isNotEmpty()) {
             binding.layoutBottomControl.visible()
@@ -219,6 +250,14 @@ class NotesFragment: BaseFragment() {
             binding.rvPinnedNotes.gone()
             binding.edtSearch.gone()
         }
+    }
+
+    private fun markResetVoiceNotePlayback(pos: Int) {
+        (notesAdapter?.getNotes()?.getOrNull(pos) as? VoiceNote)?.pendingForPlaybackReset = true
+    }
+
+    private fun refreshVoiceNoteItem(position: Int) {
+        notesAdapter?.notifyItemChanged(position)
     }
 
     private fun observePlayerState() {
@@ -243,6 +282,10 @@ class NotesFragment: BaseFragment() {
                 arkMediaPlayerViewModel.playerSideEffect.collectLatest { sideEffect ->
                     sideEffect ?: return@collectLatest
                     notesAdapter?.observeItemSideEffect = { sideEffect }
+
+                    if (sideEffect == ArkMediaPlayerSideEffect.StopPlaying) {
+                        mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
+                    }
                 }
             }
         }
@@ -358,6 +401,7 @@ class NotesFragment: BaseFragment() {
         if (binding.edtSearch.isFocused) {
             binding.edtSearch.text.clear()
             binding.edtSearch.clearFocus()
+            binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
         } else {
             activity.onBackPressedDispatcher.onBackPressed()
         }

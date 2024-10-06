@@ -98,7 +98,8 @@ abstract class BaseEditNoteFragment: BaseFragment() {
         }
     }
 
-    private fun showSaveNoteDialog(onDiscard: (needClearResource: Boolean) -> Unit) {
+    private fun showSaveNoteDialog(needStopRecording: Boolean = false,
+                                   onDiscard: (needClearResource: Boolean) -> Unit) {
         val saveNoteDialog = CommonActionDialog(
             title = R.string.dialog_save_note_title,
             message = R.string.dialog_save_note_message,
@@ -106,6 +107,9 @@ abstract class BaseEditNoteFragment: BaseFragment() {
             negativeText = R.string.discard,
             isAlert = false,
             onPositiveClick = {
+                if (needStopRecording) {
+                    (this as? ArkRecorderFragment)?.stopIfRecording()
+                }
                 notesViewModel.onSaveClick(createNewNote()) { show ->
                     hostActivity.showProgressBar(show)
                 }
@@ -125,7 +129,7 @@ abstract class BaseEditNoteFragment: BaseFragment() {
             negativeText = R.string.ark_memo_cancel,
             isAlert = true,
             onPositiveClick = {
-                notesViewModel.onDeleteConfirmed(note)
+                notesViewModel.onDeleteConfirmed(note){}
                 hostActivity.onBackPressedDispatcher.onBackPressed()
                 toast(requireContext(), getString(R.string.note_deleted))
             }, onNegativeClicked = {
@@ -134,11 +138,12 @@ abstract class BaseEditNoteFragment: BaseFragment() {
 
     private fun handleBackPressed() {
         val recordFragment = this as? ArkRecorderFragment
-        recordFragment?.stopIfRecording()
+        val isRecording = recordFragment?.isRecordingVoiceNote() ?: false
 
-        if (isContentChanged() && !isContentEmpty()) {
-            showSaveNoteDialog { needClearResource ->
+        if (isContentChanged() && !isContentEmpty() || isRecording) {
+            showSaveNoteDialog (needStopRecording = isRecording) { needClearResource ->
                 if (needClearResource) {
+                    recordFragment?.stopIfRecording()
                     recordFragment?.deleteTempFile()
                 }
             }

@@ -29,7 +29,7 @@ import dev.arkbuilders.arkmemo.utils.replaceFragment
 import dev.arkbuilders.arkmemo.utils.visible
 
 class NotesListAdapter(
-    private var notes: List<Note>,
+    private var notes: MutableList<Note>,
     private val onPlayPauseClick: (path: String, pos: Int?, stopCallback: ((pos: Int) -> Unit)?) -> Unit,
     private val onThumbPrepare : (note: GraphicNote, holder: NotesCanvas) -> Unit
 ): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
@@ -53,7 +53,7 @@ class NotesListAdapter(
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        val note = notes[position]
+        val note = notes[holder.bindingAdapterPosition]
         holder.title.text = note.getAutoTitle(activity)
 
         if (isFromSearch) {
@@ -84,7 +84,6 @@ class NotesListAdapter(
                 }
                 handleMediaPlayerSideEffect(observeItemSideEffect(), holder)
                 note.isPlaying = !note.isPlaying
-                holder.tvPlayingPosition.visible()
             }
 
             if (note.isPlaying) {
@@ -93,7 +92,13 @@ class NotesListAdapter(
                 holder.tvPlayingPosition.visible()
                 holder.layoutAudioView.animAudioPlaying.invalidateWave(note.currentMaxAmplitude)
             } else {
-                holder.tvPlayingPosition.gone()
+                if (note.pendingForPlaybackReset) {
+                    showPlaybackIdleState(holder, false)
+                    holder.tvPlayingPosition.gone()
+                    note.pendingForPlaybackReset = false
+                } else {
+                    showPlaybackIdleState(holder)
+                }
             }
 
         } else if (note is GraphicNote) {
@@ -137,6 +142,7 @@ class NotesListAdapter(
             R.drawable.ic_play_circle,
             null
         )
+
         holder.btnPlayPause.setImageDrawable(playIcon)
         if (!isPaused) {
             holder.layoutAudioView.animAudioPlaying.resetWave()
@@ -157,7 +163,7 @@ class NotesListAdapter(
     }
 
     fun updateData(newNotes: List<Note>, fromSearch: Boolean? = null, keyword: String? = null) {
-        notes = newNotes
+        notes = newNotes.toMutableList()
         isFromSearch = fromSearch ?: false
         searchKeyWord = keyword ?: ""
         notifyDataSetChanged()
@@ -168,7 +174,11 @@ class NotesListAdapter(
     }
 
     fun setNotes(notes: List<Note>) {
-        this.notes = notes
+        this.notes = notes.toMutableList()
+    }
+
+    fun removeNote(noteToRemove: Note) {
+        notes.remove(noteToRemove)
     }
 
     inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
@@ -183,6 +193,7 @@ class NotesListAdapter(
         val tvPlayingPosition = binding.layoutAudioView.tvPlayingPosition
         val canvasGraphicThumb = binding.canvasGraphicThumb
         val tvDelete = binding.tvDelete
+        var isSwiping: Boolean = false
 
         private val clickNoteToEditListener = View.OnClickListener {
             var tag = EditTextNotesFragment.TAG

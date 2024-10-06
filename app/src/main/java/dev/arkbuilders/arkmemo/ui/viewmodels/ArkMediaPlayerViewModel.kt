@@ -69,10 +69,6 @@ class ArkMediaPlayerViewModel @Inject constructor(
     }
 
     private fun setupVisualizer() {
-        if (visualizer != null) {
-            visualizer?.setEnabled(true)
-            return
-        }
         // Attach a Visualizer to the MediaPlayer
         //Inspired from this thread: https://stackoverflow.com/a/30384717
         visualizer = Visualizer(arkMediaPlayer.getAudioSessionId()).apply {
@@ -183,7 +179,7 @@ class ArkMediaPlayerViewModel @Inject constructor(
     private fun onPauseClick() {
         arkMediaPlayer.pause()
         arkMediaPlayerSideEffect.value = ArkMediaPlayerSideEffect.PausePlaying
-        visualizer?.setEnabled(false)
+        releaseVisualizer()
         progressJob?.cancel()
     }
 
@@ -208,9 +204,12 @@ class ArkMediaPlayerViewModel @Inject constructor(
     }
 
     private fun finishPlaybackProgressUpdate() {
+        releaseVisualizer()
+        progressJob?.cancel()
+    }
+
+    private fun releaseVisualizer() {
         visualizer?.setEnabled(false)
         visualizer?.release()
-        visualizer = null
-        progressJob?.cancel()
     }
 }
