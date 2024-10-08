@@ -50,12 +50,13 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
+    fun readAllNotes(onSuccess: (notes: MutableList<Note>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
             notes.value.let {
                 withContext(Dispatchers.Main) {
-                    onSuccess(it.sortedByDescending { note -> note.resource?.modified })
+                    notes.value = it.sortedByDescending { note -> note.resource?.modified }
+                    onSuccess(notes.value.toMutableList())
                 }
             }
         }
@@ -124,7 +125,7 @@ class NotesViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteConfirmed(notes: List<Note>, onSuccess: () -> Unit) {
+    fun onDeleteConfirmed(notes: List<Note>, onSuccess: (newList: MutableList<Note>) -> Unit) {
         viewModelScope.launch(iODispatcher) {
             notes.forEach { note ->
                 when (note) {
@@ -136,7 +137,7 @@ class NotesViewModel @Inject constructor(
             this@NotesViewModel.notes.value = this@NotesViewModel.notes.value.toMutableList()
                 .apply { removeAll(notes) }
             withContext(Dispatchers.Main) {
-                onSuccess.invoke()
+                onSuccess.invoke(this@NotesViewModel.notes.value.toMutableList())
             }
         }
     }
