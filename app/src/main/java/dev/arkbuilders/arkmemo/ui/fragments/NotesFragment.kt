@@ -200,7 +200,7 @@ class NotesFragment : BaseFragment() {
         }
     }
 
-    private fun onNotesLoaded(notes: List<Note>) {
+    private fun onNotesLoaded(notes: MutableList<Note>) {
         binding.pbLoading.gone()
         if (notesAdapter == null) {
             notesAdapter =
@@ -469,7 +469,9 @@ class NotesFragment : BaseFragment() {
             isAlert = true,
             onPositiveClick = {
                 binding.pbLoading.visible()
-                notesViewModel.onDeleteConfirmed(notesAdapter?.selectedNotedForDelete ?: emptyList()) {
+                val selectedNotes = notesAdapter?.selectedNotedForDelete ?: emptyList()
+                notesViewModel.onDeleteConfirmed(selectedNotes) {
+                    notesAdapter?.getNotes()?.removeAll(selectedNotes)
                     binding.pbLoading.gone()
                     toast(requireContext(), getString(R.string.note_deleted))
                     binding.rvPinnedNotes.adapter?.notifyDataSetChanged()

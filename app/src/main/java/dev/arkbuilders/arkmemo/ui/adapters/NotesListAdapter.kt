@@ -231,7 +231,7 @@ class NotesListAdapter(
         notifyDataSetChanged()
     }
 
-    fun getNotes(): List<Note> {
+    fun getNotes(): MutableList<Note> {
         return notes
     }
 
