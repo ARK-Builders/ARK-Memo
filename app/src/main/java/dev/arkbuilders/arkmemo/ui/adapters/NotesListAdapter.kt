@@ -93,9 +93,12 @@ class NotesListAdapter(
                 holder.layoutAudioView.animAudioPlaying.invalidateWave(note.currentMaxAmplitude)
             } else {
                 if (note.pendingForPlaybackReset) {
-                    showPlaybackIdleState(holder, false)
+                    showPlaybackIdleState(holder)
                     holder.tvPlayingPosition.gone()
                     note.pendingForPlaybackReset = false
+                } else if (note.waitToBeResumed) {
+                    showPlaybackIdleState(holder, isPaused = true)
+                    note.waitToBeResumed = false
                 } else {
                     showPlaybackIdleState(holder)
                 }

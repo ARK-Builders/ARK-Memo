@@ -209,7 +209,6 @@ class ArkMediaPlayerViewModel @Inject constructor(
     }
 
     private fun releaseVisualizer() {
-        visualizer?.setEnabled(false)
         visualizer?.release()
     }
 }
