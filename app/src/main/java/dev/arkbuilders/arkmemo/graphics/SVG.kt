@@ -1,18 +1,20 @@
 package dev.arkbuilders.arkmemo.graphics
 
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.Log
 import android.graphics.Path as AndroidDrawPath
 import android.util.Xml
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
+import dev.arkbuilders.arkmemo.utils.getColorCode
+import dev.arkbuilders.arkmemo.utils.getStrokeSize
 import org.xmlpull.v1.XmlPullParser
 import java.nio.file.Path
 import kotlin.io.path.reader
 import kotlin.io.path.writer
 
 class SVG {
-    private var strokeColor = "black"
+    private var strokeColor = Color.BLACK.value
+    private var strokeSize: Int = Size.TINY.id
     private var fill = "none"
     private var viewBox = ViewBox()
     private val commands = ArrayDeque<SVGCommand>()
@@ -20,9 +22,9 @@ class SVG {
 
     private val paint
         get() = Paint().also {
-            it.color = Color.parseColor(strokeColor)
+            it.color = strokeColor.getColorCode()
             it.style = Paint.Style.STROKE
-            it.strokeWidth = 10f
+            it.strokeWidth = strokeSize.getStrokeSize()
             it.strokeCap = Paint.Cap.ROUND
             it.strokeJoin = Paint.Join.ROUND
             it.isAntiAlias = true
@@ -34,10 +36,6 @@ class SVG {
 
     fun addPath(path: DrawPath) {
         paths.addLast(path)
-    }
-
-    fun setViewBox(width: Float, height: Float) {
-        viewBox = ViewBox(width = width, height = height)
     }
 
     fun generate(path: Path) {
@@ -76,6 +74,8 @@ class SVG {
             if (paths.isNotEmpty()) paths.clear()
             var path = AndroidDrawPath()
             commands.forEach { command ->
+                strokeColor = command.paintColor
+                strokeSize = command.brushSizeId
                 when (command) {
                     is SVGCommand.MoveTo -> {
                         path = AndroidDrawPath()
@@ -90,7 +90,10 @@ class SVG {
                         path.lineTo(command.x, command.y)
                     }
                 }
-                paths.addLast(DrawPath(path, paint))
+                paths.addLast(DrawPath(path, paint.apply {
+                    color = strokeColor.getColorCode()
+                    strokeWidth = strokeSize.getStrokeSize()
+                }))
             }
         }
     }
@@ -134,15 +137,44 @@ class SVG {
 
                 pathData.split(COMMA).forEach {
                     val command = it.trim()
+                    if (command.isEmpty()) return@forEach
+                    val commandElements = command.split(" ")
                     when (command.first()) {
                         SVGCommand.MoveTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(command))
+                            if (commandElements.size > 3) {
+                                strokeColor = commandElements[3]
+                            }
+                            if (commandElements.size > 4) {
+                                strokeSize = commandElements[4].toInt()
+                            }
+                            commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
+                                paintColor = strokeColor
+                                brushSizeId = strokeSize
+                            })
                         }
                         SVGCommand.AbsLineTo.CODE -> {
-                            commands.addLast(SVGCommand.MoveTo.fromString(command))
+                            if (commandElements.size > 3) {
+                                strokeColor = commandElements[3]
+                            }
+                            if (commandElements.size > 4) {
+                                strokeSize = commandElements[4].toInt()
+                            }
+                            commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
+                                paintColor = strokeColor
+                                brushSizeId = strokeSize
+                            })
                         }
                         SVGCommand.AbsQuadTo.CODE -> {
-                            commands.addLast(SVGCommand.AbsQuadTo.fromString(command))
+                            if (commandElements.size > 5) {
+                                strokeColor = commandElements[5]
+                            }
+                            if (commandElements.size > 6) {
+                                strokeSize = commandElements[6].toInt()
+                            }
+                            commands.addLast(SVGCommand.AbsQuadTo.fromString(command).apply {
+                                paintColor = strokeColor
+                                brushSizeId = strokeSize
+                            })
                         }
                         else -> {}
                     }
@@ -188,20 +220,28 @@ data class ViewBox(
 
 sealed class SVGCommand {
 
+    var paintColor = Color.BLACK.value
+    var brushSizeId = Size.TINY.id
+
     class MoveTo(
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE $x $y"
+        override fun toString(): String = "$CODE $x $y $paintColor $brushSizeId"
 
         companion object {
             const val CODE = 'M'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").trim().split(" ")
-                val x = coords[0].toFloat()
-                val y = coords[1].toFloat()
-                return MoveTo(x, y)
+                val params = string.removePrefix("$CODE").trim().split(" ")
+                val x = params[0].toFloat()
+                val y = params[1].toFloat()
+                val colorCode = if (params.size > 2) params[2] else Color.BLACK.value
+                val strokeSizeId = if (params.size > 3) params[3].toInt() else Size.TINY.id
+                return MoveTo(x, y).apply {
+                    paintColor = colorCode
+                    brushSizeId = strokeSizeId
+                }
             }
         }
     }
@@ -210,16 +250,21 @@ sealed class SVGCommand {
         val x: Float,
         val y: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE $x $y"
+        override fun toString(): String = "$CODE $x $y $paintColor $brushSizeId"
 
         companion object {
             const val CODE = 'L'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").trim().split(" ")
-                val x = coords[0].toFloat()
-                val y = coords[1].toFloat()
-                return AbsLineTo(x, y)
+                val params = string.removePrefix("$CODE").trim().split(" ")
+                val x = params[0].toFloat()
+                val y = params[1].toFloat()
+                val colorCode = if (params.size > 2) params[2] else Color.BLACK.value
+                val strokeSizeId = if (params.size > 3) params[3].toInt() else Size.TINY.id
+                return AbsLineTo(x, y).apply {
+                    paintColor = colorCode
+                    brushSizeId = strokeSizeId
+                }
             }
         }
     }
@@ -230,18 +275,23 @@ sealed class SVGCommand {
         val x2: Float,
         val y2: Float
     ) : SVGCommand() {
-        override fun toString(): String = "$CODE $x1 $y1 $x2 $y2"
+        override fun toString(): String = "$CODE $x1 $y1 $x2 $y2 $paintColor $brushSizeId"
 
         companion object {
             const val CODE = 'Q'
 
             fun fromString(string: String): SVGCommand {
-                val coords = string.removePrefix("$CODE").trim().split(" ")
-                val x1 = coords[0].toFloat()
-                val y1 = coords[1].toFloat()
-                val x2 = coords[2].toFloat()
-                val y2 = coords[3].toFloat()
-                return AbsQuadTo(x1, y1, x2, y2)
+                val params = string.removePrefix("$CODE").trim().split(" ")
+                val x1 = params[0].toFloat()
+                val y1 = params[1].toFloat()
+                val x2 = params[2].toFloat()
+                val y2 = params[3].toFloat()
+                val colorCode = if (params.size > 4) params[4] else Color.BLACK.value
+                val strokeSizeId = if (params.size > 5) params[5].toInt() else Size.TINY.id
+                return AbsQuadTo(x1, y1, x2, y2).apply {
+                    paintColor = colorCode
+                    brushSizeId = strokeSizeId
+                }
             }
         }
     }

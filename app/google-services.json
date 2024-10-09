@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "427728790868",
+    "project_id": "ark-builders-dev",
+    "storage_bucket": "ark-builders-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427728790868:android:4451fa5dfb4b4b8c3cd4c1",
+        "android_client_info": {
+          "package_name": "dev.arkbuilders.arkmemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb6Dgf2yzFgbGIRqYlsrcor8g2hetF_jk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427728790868:android:fdf7d8f94023954e3cd4c1",
+        "android_client_info": {
+          "package_name": "dev.arkbuilders.rate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb6Dgf2yzFgbGIRqYlsrcor8g2hetF_jk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

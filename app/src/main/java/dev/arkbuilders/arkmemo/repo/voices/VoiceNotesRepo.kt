@@ -9,6 +9,7 @@ import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
+import dev.arkbuilders.arkmemo.utils.extractDuration
 import dev.arkbuilders.arkmemo.utils.listFiles
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -20,6 +21,7 @@ import kotlin.io.path.fileSize
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
+import kotlin.io.path.pathString
 
 class VoiceNotesRepo @Inject constructor(
     private val memoPreferences: MemoPreferences,
@@ -54,6 +56,11 @@ class VoiceNotesRepo @Inject constructor(
         val size = tempPath.fileSize()
         val id = computeId(size, tempPath)
 
+        val isPropertiesChanged = helper.persistNoteProperties(
+            resourceId = id,
+            noteTitle = note.title,
+            description = note.description)
+
         Log.d(VOICES_REPO, "initial resource name is ${tempPath.name}")
 
         helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
@@ -64,7 +71,11 @@ class VoiceNotesRepo @Inject constructor(
                 VOICES_REPO,
                 "resource with similar content already exists"
             )
-            callback(SaveNoteResult.ERROR_EXISTING)
+            if (isPropertiesChanged) {
+                callback(SaveNoteResult.SUCCESS_UPDATED)
+            } else {
+                callback(SaveNoteResult.ERROR_EXISTING)
+            }
             return@withContext
         }
 
@@ -76,7 +87,7 @@ class VoiceNotesRepo @Inject constructor(
         )
         note.path = resourcePath
         Log.d(VOICES_REPO, "resource renamed to $resourcePath successfully")
-        callback(SaveNoteResult.SUCCESS)
+        callback(SaveNoteResult.SUCCESS_NEW)
     }
 
     private suspend fun readStorage(): List<VoiceNote> = withContext(iODispatcher) {
@@ -94,11 +105,12 @@ class VoiceNotesRepo @Inject constructor(
                 title = userNoteProperties.title,
                 description = userNoteProperties.description,
                 path = path,
+                duration = extractDuration(path.pathString),
                 resource = resource
             )
         }
     }
 }
 
-private const val VOICES_REPO = "voices-repo"
+private const val VOICES_REPO = "VoiceNotesRepo"
 private const val VOICE_EXT = "3gp"

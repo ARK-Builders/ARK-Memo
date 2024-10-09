@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="@dimen/toolbar_action_icon_size"
+        android:layout_height="@dimen/toolbar_action_icon_size"
+        android:layout_marginStart="@dimen/common_padding"
+        android:layout_marginTop="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:padding="@dimen/note_action_menu_padding"
+        android:src="@drawable/ic_chevron_left"
+        app:layout_constraintBottom_toTopOf="@+id/toolbar_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/content_desc_back_button"/>
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/fg_secondary"
+        android:textSize="@dimen/text_huge"
+        android:visibility="gone"
+        android:textStyle="bold"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_back"
+        app:layout_constraintStart_toEndOf="@+id/iv_back"
+        app:layout_constraintTop_toTopOf="@+id/iv_back"
+        tools:text="Settings"
+        tools:visibility="visible" />
+
+    <View
+        android:id="@+id/toolbar_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/border_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_back" />
+
+    <ImageView
+        android:id="@+id/iv_right_action_icon"
+        android:layout_width="@dimen/toolbar_action_icon_size"
+        android:layout_height="@dimen/toolbar_action_icon_size"
+        android:layout_marginEnd="@dimen/common_padding"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:padding="@dimen/note_action_menu_padding"
+        android:src="@drawable/ic_delete_note"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_back"
+        android:contentDescription="@string/delete_note"/>
+
+    <TextView
+        android:id="@+id/tv_right_action_text"
+        style="@style/ActionTextView"
+        android:layout_marginEnd="@dimen/common_padding"
+        android:clickable="true"
+        android:text="@string/save"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_back"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

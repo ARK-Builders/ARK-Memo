@@ -68,7 +68,7 @@ class GraphicNotesRepo @Inject constructor(
         val resourcePath = root.resolve("${id}.$SVG_EXT")
         if (resourcePath.exists()) {
             if (isPropertiesChanged) {
-                callback(SaveNoteResult.SUCCESS)
+                callback(SaveNoteResult.SUCCESS_UPDATED)
             } else {
                 Log.d(GRAPHICS_REPO, "resource with similar content already exists")
                 callback(SaveNoteResult.ERROR_EXISTING)
@@ -83,7 +83,7 @@ class GraphicNotesRepo @Inject constructor(
             id
         )
         Log.d(GRAPHICS_REPO, "resource renamed to $resourcePath successfully")
-        callback(SaveNoteResult.SUCCESS)
+        callback(SaveNoteResult.SUCCESS_NEW)
     }
 
     private suspend fun readStorage() = withContext(iODispatcher) {
@@ -110,5 +110,5 @@ class GraphicNotesRepo @Inject constructor(
     }
 }
 
-private const val GRAPHICS_REPO = "graphics-repo"
+private const val GRAPHICS_REPO = "GraphicNotesRepo"
 private const val SVG_EXT = "svg"
