@@ -81,4 +81,8 @@
         <item name="dialogCornerRadius">@dimen/radius_medium</item>
     </style>
 
+    <style name="MemoSnackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="android:layout_marginBottom">26dp</item>
+    </style>
+
 </resources>

@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.ui.activities
 
-import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
@@ -37,12 +36,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     var fragment: Fragment = NotesFragment()
 
-    private var shouldRecord = false
-    private val audioRecordingPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            shouldRecord = isGranted
-        }
-
     init {
         FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -65,7 +58,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-        audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
 
         fun showFragment() {
             val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
