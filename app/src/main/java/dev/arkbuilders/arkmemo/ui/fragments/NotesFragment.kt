@@ -204,6 +204,7 @@ class NotesFragment: BaseFragment() {
 
                     if (arkMediaPlayerViewModel.isPlaying()) {
                         mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
+                        markWaitToBeResumed(playingAudioPosition)
                     } else {
                         mItemTouchHelper?.attachToRecyclerView(null)
                     }
@@ -254,6 +255,10 @@ class NotesFragment: BaseFragment() {
 
     private fun markResetVoiceNotePlayback(pos: Int) {
         (notesAdapter?.getNotes()?.getOrNull(pos) as? VoiceNote)?.pendingForPlaybackReset = true
+    }
+
+    private fun markWaitToBeResumed(pos: Int) {
+        (notesAdapter?.getNotes()?.getOrNull(pos) as? VoiceNote)?.waitToBeResumed = true
     }
 
     private fun refreshVoiceNoteItem(position: Int) {

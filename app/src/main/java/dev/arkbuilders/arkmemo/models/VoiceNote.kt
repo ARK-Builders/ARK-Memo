@@ -19,6 +19,7 @@ class VoiceNote(
     override var pendingForDelete: Boolean = false,
     var isPlaying: Boolean = false,
     var pendingForPlaybackReset: Boolean = false,
+    var waitToBeResumed: Boolean = false,
     var currentPlayingPos: Int = 0,
     var currentMaxAmplitude: Int = 0
 ): Note, Parcelable
