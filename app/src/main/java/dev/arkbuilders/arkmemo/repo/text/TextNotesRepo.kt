@@ -97,20 +97,27 @@ class TextNotesRepo @Inject constructor(
                 modified = path.getLastModifiedTime()
             )
 
-            path.readLines { data ->
-                val userNoteProperties = helper.readProperties(
-                    id,
-                    data.substringBefore("\n")
-                )
+            try {
+                path.readLines { data ->
+                    val userNoteProperties = helper.readProperties(
+                        id,
+                        data.substringBefore("\n")
+                    )
 
+                    TextNote(
+                        title = userNoteProperties.title,
+                        description = userNoteProperties.description,
+                        text = data,
+                        resource = resource
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
                 TextNote(
-                    title = userNoteProperties.title,
-                    description = userNoteProperties.description,
-                    text = data,
-                    resource = resource
+                    text = "",
                 )
             }
-        }
+        }.filter { textNote -> textNote.text.isNotEmpty() }
     }
 }
 
