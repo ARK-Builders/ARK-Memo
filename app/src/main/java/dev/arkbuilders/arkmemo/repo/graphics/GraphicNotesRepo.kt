@@ -89,6 +89,9 @@ class GraphicNotesRepo @Inject constructor(
     private suspend fun readStorage() = withContext(iODispatcher) {
         root.listFiles(SVG_EXT) { path ->
             val svg = SVG.parse(path)
+            if (svg == null) {
+                Log.w(GRAPHICS_REPO, "Skipping invalid SVG: " + path)
+            }
             val size = path.fileSize()
             val id = computeId(size, path)
             val resource = Resource(
@@ -106,7 +109,7 @@ class GraphicNotesRepo @Inject constructor(
                 svg = svg,
                 resource = resource
             )
-        }
+        }.filter { graphicNote -> graphicNote.svg != null }
     }
 }
 

@@ -108,7 +108,7 @@ class VoiceNotesRepo @Inject constructor(
                 duration = extractDuration(path.pathString),
                 resource = resource
             )
-        }
+        }.filter { voiceNote -> voiceNote.duration.isNotEmpty() }
     }
 }
 
