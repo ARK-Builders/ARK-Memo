@@ -99,88 +99,95 @@ class SVG {
     }
 
     companion object {
-        fun parse(path: Path): SVG = SVG().apply {
-            val xmlParser = Xml.newPullParser()
-            var pathData = ""
+        fun parse(path: Path): SVG? {
+            return try {
+                SVG().apply {
+                    val xmlParser = Xml.newPullParser()
+                    var pathData = ""
 
-            xmlParser.apply {
-                setInput(path.reader())
+                    xmlParser.apply {
+                        setInput(path.reader())
 
-                var event = xmlParser.eventType
-                var pathCount = 0
-                while (event != XmlPullParser.END_DOCUMENT) {
-                    val tag = xmlParser.name
-                    when (event) {
-                        XmlPullParser.START_TAG -> {
-                            when (tag) {
-                                SVG_TAG -> {
-                                    viewBox = ViewBox.fromString(
-                                        getAttributeValue("", Attributes.VIEW_BOX)
-                                    )
+                        var event = xmlParser.eventType
+                        var pathCount = 0
+                        while (event != XmlPullParser.END_DOCUMENT) {
+                            val tag = xmlParser.name
+                            when (event) {
+                                XmlPullParser.START_TAG -> {
+                                    when (tag) {
+                                        SVG_TAG -> {
+                                            viewBox = ViewBox.fromString(
+                                                getAttributeValue("", Attributes.VIEW_BOX)
+                                            )
+                                        }
+                                        PATH_TAG -> {
+                                            pathCount += 1
+                                            strokeColor = getAttributeValue("", Attributes.Path.STROKE)
+                                            fill = getAttributeValue("", Attributes.Path.FILL)
+                                            pathData = getAttributeValue("", Attributes.Path.DATA)
+                                        }
+                                    }
+                                    if (pathCount > 1) {
+                                        Log.d("svg", "found more than 1 path in file")
+                                        break
+                                    }
                                 }
-                                PATH_TAG -> {
-                                    pathCount += 1
-                                    strokeColor = getAttributeValue("", Attributes.Path.STROKE)
-                                    fill = getAttributeValue("", Attributes.Path.FILL)
-                                    pathData = getAttributeValue("", Attributes.Path.DATA)
+                            }
+
+                            event = next()
+                        }
+
+                        pathData.split(COMMA).forEach {
+                            val command = it.trim()
+                            if (command.isEmpty()) return@forEach
+                            val commandElements = command.split(" ")
+                            when (command.first()) {
+                                SVGCommand.MoveTo.CODE -> {
+                                    if (commandElements.size > 3) {
+                                        strokeColor = commandElements[3]
+                                    }
+                                    if (commandElements.size > 4) {
+                                        strokeSize = commandElements[4].toInt()
+                                    }
+                                    commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
+                                        paintColor = strokeColor
+                                        brushSizeId = strokeSize
+                                    })
                                 }
-                            }
-                            if (pathCount > 1) {
-                                Log.d("svg", "found more than 1 path in file")
-                                break
+                                SVGCommand.AbsLineTo.CODE -> {
+                                    if (commandElements.size > 3) {
+                                        strokeColor = commandElements[3]
+                                    }
+                                    if (commandElements.size > 4) {
+                                        strokeSize = commandElements[4].toInt()
+                                    }
+                                    commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
+                                        paintColor = strokeColor
+                                        brushSizeId = strokeSize
+                                    })
+                                }
+                                SVGCommand.AbsQuadTo.CODE -> {
+                                    if (commandElements.size > 5) {
+                                        strokeColor = commandElements[5]
+                                    }
+                                    if (commandElements.size > 6) {
+                                        strokeSize = commandElements[6].toInt()
+                                    }
+                                    commands.addLast(SVGCommand.AbsQuadTo.fromString(command).apply {
+                                        paintColor = strokeColor
+                                        brushSizeId = strokeSize
+                                    })
+                                }
+                                else -> {}
                             }
                         }
-                    }
 
-                    event = next()
-                }
-
-                pathData.split(COMMA).forEach {
-                    val command = it.trim()
-                    if (command.isEmpty()) return@forEach
-                    val commandElements = command.split(" ")
-                    when (command.first()) {
-                        SVGCommand.MoveTo.CODE -> {
-                            if (commandElements.size > 3) {
-                                strokeColor = commandElements[3]
-                            }
-                            if (commandElements.size > 4) {
-                                strokeSize = commandElements[4].toInt()
-                            }
-                            commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
-                                paintColor = strokeColor
-                                brushSizeId = strokeSize
-                            })
-                        }
-                        SVGCommand.AbsLineTo.CODE -> {
-                            if (commandElements.size > 3) {
-                                strokeColor = commandElements[3]
-                            }
-                            if (commandElements.size > 4) {
-                                strokeSize = commandElements[4].toInt()
-                            }
-                            commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
-                                paintColor = strokeColor
-                                brushSizeId = strokeSize
-                            })
-                        }
-                        SVGCommand.AbsQuadTo.CODE -> {
-                            if (commandElements.size > 5) {
-                                strokeColor = commandElements[5]
-                            }
-                            if (commandElements.size > 6) {
-                                strokeSize = commandElements[6].toInt()
-                            }
-                            commands.addLast(SVGCommand.AbsQuadTo.fromString(command).apply {
-                                paintColor = strokeColor
-                                brushSizeId = strokeSize
-                            })
-                        }
-                        else -> {}
+                        createCanvasPaths()
                     }
                 }
-
-                createCanvasPaths()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
         }
 
