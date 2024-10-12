@@ -17,6 +17,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
@@ -47,6 +48,11 @@ import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.setDrawableColor
 import dev.arkbuilders.arkmemo.utils.visible
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.nio.file.Paths
+import kotlin.io.path.Path
 
 @AndroidEntryPoint
 class EditGraphicNotesFragment : BaseFragment() {
@@ -61,26 +67,34 @@ class EditGraphicNotesFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        arguments?.getParcelableCompat(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
-//            note = it
-//            graphicNotesViewModel.onNoteOpened(note)
-//        }
+        arguments?.getParcelableCompat(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
+            note = it
+            graphicNotesViewModel.onNoteOpened(note)
+        }
     }
 
+    val coroutineScope = CoroutineScope(Dispatchers.IO)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        coroutineScope.launch {
+
+            val svgpaths = SVG.parse(Path("/storage/emulated/0/Documents/.ark/user/properties/3841-9650949"))
+            svgpaths.getPaths()
+        }
         return ComposeView(requireContext()).apply {
+
             setContent {
                 EditScreen(
-                    imagePath = null,
+                    imagePath = Path(note.drawPath),
                     imageUri = null,
                     fragmentManager = parentFragmentManager,
                     navigateBack = { onBackPressed() },
                     launchedFromIntent = true,
-                    maxResolution = Resolution(120, 120)
+                    maxResolution = Resolution(120, 120),
+                    onSaveSvg = { graphicNotesViewModel.onSave(note) }
                 )
             }
         }
@@ -89,6 +103,7 @@ class EditGraphicNotesFragment : BaseFragment() {
     companion object {
         const val TAG = "EditGraphicNotesFragment"
         private const val GRAPHICAL_NOTE_KEY = "graphical note"
+        const val PATH = "image_path"
 
         fun newInstance() = EditGraphicNotesFragment()
 

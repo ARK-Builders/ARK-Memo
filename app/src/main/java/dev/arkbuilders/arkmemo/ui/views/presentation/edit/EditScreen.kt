@@ -88,7 +88,8 @@ fun EditScreen(
     fragmentManager: FragmentManager,
     navigateBack: () -> Unit,
     launchedFromIntent: Boolean,
-    maxResolution: Resolution
+    maxResolution: Resolution,
+    onSaveSvg: () -> Unit
 ) {
     val primaryColor = MaterialTheme.colors.primary.value.toLong()
     val viewModel: EditViewModel =
@@ -137,6 +138,7 @@ fun EditScreen(
             viewModel.isLoaded = false
         },
         launchedFromIntent = launchedFromIntent,
+        onSaveSvg = onSaveSvg
     )
 
     BackHandler {
@@ -1026,7 +1028,8 @@ private fun HandleImageSavedEffect(
 private fun ExitDialog(
     viewModel: EditViewModel,
     navigateBack: () -> Unit,
-    launchedFromIntent: Boolean
+    launchedFromIntent: Boolean,
+    onSaveSvg: () -> Unit = {}
 ) {
     if (!viewModel.showExitDialog) return
 
@@ -1046,6 +1049,9 @@ private fun ExitDialog(
         confirmButton = {
             Button(
                 onClick = {
+                    if (isChangedForMemoIntegration) {
+                        onSaveSvg()
+                    }
                     viewModel.showExitDialog = false
                     viewModel.showSavePathDialog = true
                 }

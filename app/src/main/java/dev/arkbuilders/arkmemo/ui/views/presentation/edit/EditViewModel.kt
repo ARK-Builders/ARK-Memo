@@ -131,7 +131,6 @@ class EditViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             isSavingImage = true
             val combinedBitmap = getEditedImage()
-
             path.outputStream().use { out ->
                 combinedBitmap.asAndroidBitmap()
                     .compress(Bitmap.CompressFormat.PNG, 100, out)

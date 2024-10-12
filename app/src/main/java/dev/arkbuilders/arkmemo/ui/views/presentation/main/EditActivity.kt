@@ -120,7 +120,8 @@ fun MainScreen(
                 fragmentManager,
                 navigateBack = { navController.popBackStack() },
                 entry.arguments?.getBoolean("launchedFromIntent")!!,
-                maxResolution
+                maxResolution,
+                {}
             )
         }
     }
