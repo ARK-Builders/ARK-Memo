@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -27,7 +26,6 @@ import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
-import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
@@ -192,7 +190,7 @@ class NotesFragment: BaseFragment() {
                 onPlayPauseClick = { path, pos, onStop ->
                     playingAudioPath = path
                     if (playingAudioPosition >= 0) {
-                        refreshVoiceNoteItem(playingAudioPosition)
+                        refreshNoteItem(playingAudioPosition)
                     }
 
                     if (playingAudioPosition >= 0 && playingAudioPosition != pos) {
@@ -210,11 +208,6 @@ class NotesFragment: BaseFragment() {
                     }
 
                     arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
-                },
-                onThumbPrepare = { graphicNote, noteCanvas ->
-                    val tempNoteViewModel: GraphicNotesViewModel by viewModels()
-                    noteCanvas.setViewModel(viewModel = tempNoteViewModel)
-
                 }
             )
 
@@ -261,7 +254,7 @@ class NotesFragment: BaseFragment() {
         (notesAdapter?.getNotes()?.getOrNull(pos) as? VoiceNote)?.waitToBeResumed = true
     }
 
-    private fun refreshVoiceNoteItem(position: Int) {
+    private fun refreshNoteItem(position: Int) {
         notesAdapter?.notifyItemChanged(position)
     }
 

@@ -19,6 +19,7 @@
     <dimen name="fab_text_margin">12dp</dimen>
     <dimen name="radius_medium">12dp</dimen>
     <dimen name="radius_full">36dp</dimen>
+    <dimen name="border_width_thin">1dp</dimen>
 
     <!-- Recording -->
     <dimen name="record_small_button_size">30dp</dimen>
@@ -38,6 +39,7 @@
     <dimen name="brush_size_huge_padding">2dp</dimen>
     <dimen name="brush_size_item_margin">23dp</dimen>
     <dimen name="brush_color_item_margin">14dp</dimen>
+    <dimen name="graphic_thumb_width">90dp</dimen>
 
     <!-- Settings -->
     <dimen name="setting_support_icon_size">20dp</dimen>
