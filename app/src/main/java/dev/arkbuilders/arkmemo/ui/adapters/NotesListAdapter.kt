@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.adapters
 
+import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.ShapeAppearanceModel
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.AdapterTextNoteBinding
 import dev.arkbuilders.arkmemo.models.GraphicNote
@@ -20,7 +23,6 @@ import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
-import dev.arkbuilders.arkmemo.ui.views.NotesCanvas
 import dev.arkbuilders.arkmemo.utils.getAutoTitle
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.highlightWord
@@ -31,8 +33,8 @@ import dev.arkbuilders.arkmemo.utils.visible
 class NotesListAdapter(
     private var notes: MutableList<Note>,
     private val onPlayPauseClick: (path: String, pos: Int?, stopCallback: ((pos: Int) -> Unit)?) -> Unit,
-    private val onThumbPrepare: (note: GraphicNote, holder: NotesCanvas) -> Unit,
-) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
+): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
+
     private lateinit var activity: MainActivity
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
@@ -40,6 +42,10 @@ class NotesListAdapter(
 
     private var isFromSearch: Boolean = false
     private var searchKeyWord: String = ""
+
+    private val cornerRadius by lazy {
+        activity.resources.getDimension(R.dimen.corner_radius_big)
+    }
 
     fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
@@ -69,6 +75,7 @@ class NotesListAdapter(
             holder.contentPreview.text = note.text
         }
         holder.layoutAudioView.root.gone()
+        holder.ivGraphicThumb.gone()
         if (note is VoiceNote) {
             val isRecordingExist = note.path.toFile().length() > 0L
             if (isRecordingExist) {
@@ -109,12 +116,24 @@ class NotesListAdapter(
                 }
             }
         } else if (note is GraphicNote) {
-            holder.canvasGraphicThumb.visible()
-            onThumbPrepare(note, holder.canvasGraphicThumb)
+            holder.ivGraphicThumb.background = BitmapDrawable(
+                holder.itemView.context.resources, note.thumb
+            )
+            holder.ivGraphicThumb.visible()
+            holder.ivGraphicThumb.shapeAppearanceModel = ShapeAppearanceModel.builder()
+                .setBottomLeftCornerSize(0f)
+                .setTopLeftCornerSize(0f)
+                .setTopRightCorner(CornerFamily.ROUNDED, cornerRadius)
+                .setBottomRightCorner(CornerFamily.ROUNDED, cornerRadius)
+                .build()
         }
 
         if (note.pendingForDelete) {
             holder.tvDelete.visible()
+            if (note is GraphicNote) {
+                holder.ivGraphicThumb.shapeAppearanceModel = ShapeAppearanceModel.builder()
+                    .setAllCorners(CornerFamily.ROUNDED, 0f).build()
+            }
         } else {
             holder.tvDelete.gone()
         }
@@ -207,7 +226,7 @@ class NotesListAdapter(
         val btnPlayPause = binding.layoutAudioView.ivPlayAudio
         val layoutAudioView = binding.layoutAudioView
         val tvPlayingPosition = binding.layoutAudioView.tvPlayingPosition
-        val canvasGraphicThumb = binding.canvasGraphicThumb
+        val ivGraphicThumb = binding.ivGraphicsThumb
         val tvDelete = binding.tvDelete
         var isSwiping: Boolean = false
 

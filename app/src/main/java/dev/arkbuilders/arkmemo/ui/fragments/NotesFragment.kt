@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -27,7 +26,6 @@ import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
-import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
@@ -204,14 +202,13 @@ class NotesFragment : BaseFragment() {
     private fun onNotesLoaded(notes: List<Note>) {
         binding.pbLoading.gone()
         if (notesAdapter == null) {
-            notesAdapter =
-                NotesListAdapter(
-                    notes.toMutableList(),
-                    onPlayPauseClick = { path, pos, onStop ->
-                        playingAudioPath = path
-                        if (playingAudioPosition >= 0) {
-                            refreshVoiceNoteItem(playingAudioPosition)
-                        }
+            notesAdapter = NotesListAdapter(
+                notes.toMutableList(),
+                onPlayPauseClick = { path, pos, onStop ->
+                    playingAudioPath = path
+                    if (playingAudioPosition >= 0) {
+                        refreshNoteItem(playingAudioPosition)
+                    }
 
                         if (playingAudioPosition >= 0 && playingAudioPosition != pos) {
                             // Another Voice note is being played compared to the previously played one
@@ -227,13 +224,10 @@ class NotesFragment : BaseFragment() {
                             mItemTouchHelper?.attachToRecyclerView(null)
                         }
 
-                        arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
-                    },
-                    onThumbPrepare = { graphicNote, noteCanvas ->
-                        val tempNoteViewModel: GraphicNotesViewModel by viewModels()
-                        noteCanvas.setViewModel(viewModel = tempNoteViewModel)
-                    },
-                )
+                    arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
+                }
+            )
+
         } else {
             notesAdapter?.setNotes(notes)
         }
@@ -278,7 +272,7 @@ class NotesFragment : BaseFragment() {
         (notesAdapter?.getNotes()?.getOrNull(pos) as? VoiceNote)?.waitToBeResumed = true
     }
 
-    private fun refreshVoiceNoteItem(position: Int) {
+    private fun refreshNoteItem(position: Int) {
         notesAdapter?.notifyItemChanged(position)
     }
 
