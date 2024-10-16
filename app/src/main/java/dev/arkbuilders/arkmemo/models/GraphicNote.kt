@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.models
 
+import android.graphics.Bitmap
 import android.os.Parcelable
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.graphics.SVG
@@ -15,4 +16,6 @@ data class GraphicNote(
     @IgnoredOnParcel
     override var resource: Resource? = null,
     override var pendingForDelete: Boolean = false,
+    var thumb: Bitmap? = null
+
 ) : Note, Parcelable

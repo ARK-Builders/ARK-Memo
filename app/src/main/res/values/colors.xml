@@ -37,6 +37,7 @@
     <color name="brush_color_green">#17B26A</color>
     <color name="brush_color_blue">#0BA5EC</color>
     <color name="brush_color_purple">#7A5AF8</color>
+    <color name="graphic_thumb_background">#FBF8F0</color>
 
     <!-- Custom SwitchButton -->
     <color name="sb_unchecked_circle_color">#FFAAAAAA</color>

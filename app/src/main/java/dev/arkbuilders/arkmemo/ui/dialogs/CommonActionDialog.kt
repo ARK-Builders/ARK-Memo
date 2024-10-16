@@ -41,6 +41,7 @@ class CommonActionDialog(
 
     private fun initViews() {
         dialog?.setCanceledOnTouchOutside(false)
+        dialog?.setCancelable(false)
 
         if (isAlert) {
             mBinding.tvPositive.setTextAppearance(R.style.AlertButton)
