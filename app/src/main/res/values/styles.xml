@@ -81,4 +81,12 @@
         <item name="dialogCornerRadius">@dimen/radius_medium</item>
     </style>
 
+    <style name="GraphicThumbBackground">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">@dimen/corner_radius_big</item>
+        <item name="cornerSizeBottomRight">@dimen/corner_radius_big</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
 </resources>
