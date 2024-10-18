@@ -1,6 +1,7 @@
 package dev.arkbuilders.arkmemo.ui.views
 
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Path
 import android.util.AttributeSet
@@ -18,6 +19,8 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
     private lateinit var viewModel: GraphicNotesViewModel
     private var path = Path()
 
+    private val screenWidth by lazy { Resources.getSystem().displayMetrics.widthPixels }
+
     override fun onDraw(canvas: Canvas) {
         val paths = viewModel.paths()
         if (paths.isNotEmpty()) {
@@ -30,6 +33,14 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
+
+        val edgeThreshold = 50
+
+        // When touch point starts from either of the left or right side of the screen,
+        // that's probably a back gesture. Do not draw in this case
+        if (x < edgeThreshold || x > screenWidth - edgeThreshold) {
+            return false
+        }
 
         var finishDrawing = false
         when (event.action) {
