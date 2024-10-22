@@ -27,7 +27,7 @@
         android:textColor="@color/text_primary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/canvas_graphic_thumb"
+        app:layout_constraintEnd_toStartOf="@+id/iv_graphics_thumb"
         android:gravity="start"
         app:layout_constraintTop_toBottomOf="@+id/layout_audio_view"
         android:maxLines="1"
@@ -46,7 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/canvas_graphic_thumb"
+        app:layout_constraintEnd_toStartOf="@+id/iv_graphics_thumb"
         android:maxLines="2"
         android:ellipsize="end"
         android:layout_marginTop="4dp"
@@ -55,17 +55,18 @@
         android:id="@+id/tv_content_preview"
         tools:text="How do you create compelling presentations that wow your colleagues and impress your managers?"/>
 
-    <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
-        android:id="@+id/canvas_graphic_thumb"
-        android:layout_width="90dp"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/iv_graphics_thumb"
+        android:layout_width="@dimen/graphic_thumb_width"
         android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:paddingStart="10dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="80dp"
+        app:layout_constraintEnd_toStartOf="@+id/barrier_graphic_thumb_end"
+        android:layout_marginEnd="@dimen/border_width_thin"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginVertical="@dimen/border_width_thin"
+        app:shapeAppearanceOverlay="@style/GraphicThumbBackground"
         android:visibility="gone"
-        tools:visibility="gone"/>
+        tools:visibility="visible"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
@@ -95,5 +96,13 @@
         android:id="@+id/tv_delete"
         android:visibility="gone"
         android:gravity="center"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/barrier_graphic_thumb_end"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="tv_delete"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
