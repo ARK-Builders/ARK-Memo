@@ -13,8 +13,8 @@ import dev.arkbuilders.arkmemo.databinding.DialogCommonActionBinding
  * This is a common action dialog that can be used inside app.
  * It's a basic dialog with customizable title, message, one positive button and one negative button
  */
-class CommonActionDialog(@StringRes private val title: Int,
-                         @StringRes private val message: Int,
+class CommonActionDialog(private val title: String,
+                         private val message: String,
                          @StringRes private val positiveText: Int,
                          @StringRes private val negativeText: Int,
                          private val isAlert: Boolean = false,
@@ -46,8 +46,8 @@ class CommonActionDialog(@StringRes private val title: Int,
             mBinding.tvPositive.setBackgroundResource(R.drawable.bg_red_button)
         }
 
-        mBinding.tvTitle.setText(title)
-        mBinding.tvMessage.setText(message)
+        mBinding.tvTitle.text = title
+        mBinding.tvMessage.text = message
         mBinding.tvPositive.setText(positiveText)
         mBinding.tvNegative.setText(negativeText)
         mBinding.ivClose.setOnClickListener {

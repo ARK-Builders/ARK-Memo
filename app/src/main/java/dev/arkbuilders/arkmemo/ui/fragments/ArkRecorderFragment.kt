@@ -151,8 +151,8 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                 && (arkRecorderViewModel.isRecordExisting() ||
                         File(getCurrentRecordingPath()).length() > 0L)) {
 
-                CommonActionDialog(title = R.string.dialog_replace_recording_title,
-                    message = R.string.dialog_replace_recording_message,
+                CommonActionDialog(title = getString(R.string.dialog_replace_recording_title),
+                    message = getString(R.string.dialog_replace_recording_message),
                     positiveText = R.string.dialog_replace_recording_positive_text,
                     negativeText = R.string.discard,
                     onPositiveClick = {
@@ -200,15 +200,16 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
                 title = title.ifEmpty { defaultNoteTitle },
                 path = arkRecorderViewModel.getRecordingPath()
             )
-            CommonActionDialog(title = R.string.delete_note,
-                message = R.string.ark_memo_delete_warn,
+            CommonActionDialog(title = getString(R.string.delete_note),
+                message = resources.getQuantityString(R.plurals.delete_batch_note_message, 1),
                 positiveText = R.string.action_delete,
                 negativeText = R.string.ark_memo_cancel,
                 isAlert = true,
                 onPositiveClick = {
-                notesViewModel.onDeleteConfirmed(note){}
-                toast(requireContext(), getString(R.string.note_deleted))
-                activity.onBackPressedDispatcher.onBackPressed()
+                notesViewModel.onDeleteConfirmed(listOf(note)) {
+                    toast(requireContext(), getString(R.string.note_deleted))
+                    activity.onBackPressedDispatcher.onBackPressed()
+                }
             }, onNegativeClicked = {
             }).show(parentFragmentManager, CommonActionDialog.TAG)
         }
