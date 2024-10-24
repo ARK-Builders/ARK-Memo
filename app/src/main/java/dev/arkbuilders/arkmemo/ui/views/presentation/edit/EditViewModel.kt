@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntSize
@@ -43,11 +44,14 @@ import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.ui.views.data.Preferences
 import dev.arkbuilders.arkmemo.ui.views.data.Resolution
 import dev.arkbuilders.arkmemo.di.DIManager
+import dev.arkbuilders.arkmemo.graphics.SVG
+import dev.arkbuilders.arkmemo.ui.views.presentation.drawing.DrawPath
 import dev.arkbuilders.arkmemo.ui.views.presentation.drawing.EditManager
 import dev.arkbuilders.arkmemo.ui.views.presentation.edit.resize.ResizeOperation
 import timber.log.Timber
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.Path
 import kotlin.io.path.outputStream
 import kotlin.system.measureTimeMillis
 
@@ -81,6 +85,22 @@ class EditViewModel(
     private val _usedColors = mutableListOf<Color>()
     val usedColors: List<Color> = _usedColors
 
+    fun setPaths() {
+        viewModelScope.launch {
+            editManager.setPaintColor(Color.Blue)
+            val svgpaths = SVG.parse(Path("/storage/emulated/0/Documents/32254-1096105931.svg"))
+           svgpaths.getPaths().forEach {
+                val draw = DrawPath(
+                    path = it.path.asComposePath(),
+                    paint = Paint().apply {
+                        color = Color(it.paint.color)
+                    }
+                )
+                editManager.addDrawPath(draw.path)
+                editManager.setPaintColor(draw.paint.color)
+            }
+        }
+    }
     init {
         if (imageUri == null && imagePath == null) {
             viewModelScope.launch {
@@ -104,6 +124,7 @@ class EditViewModel(
 
             editManager.setPaintColor(color)
         }
+        setPaths()
     }
 
     fun loadImage() {

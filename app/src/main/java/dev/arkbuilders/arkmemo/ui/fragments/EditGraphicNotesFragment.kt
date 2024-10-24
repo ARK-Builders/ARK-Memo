@@ -9,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -37,6 +40,7 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeMedium
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 import dev.arkbuilders.arkmemo.ui.adapters.EqualSpacingItemDecoration
+import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.data.Resolution
@@ -53,7 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.nio.file.Paths
 import kotlin.io.path.Path
-
+import dev.arkbuilders.arkmemo.ui.views.presentation.drawing.DrawPath as DrawPathCompose
 @AndroidEntryPoint
 class EditGraphicNotesFragment : BaseFragment() {
     val notesViewModel: NotesViewModel by activityViewModels()
@@ -80,9 +84,15 @@ class EditGraphicNotesFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         coroutineScope.launch {
-
-            val svgpaths = SVG.parse(Path("/storage/emulated/0/Documents/.ark/user/properties/3841-9650949"))
-            svgpaths.getPaths()
+            val svgpaths = SVG.parse(Path("/storage/emulated/0/Documents/32254-1096105931.svg"))
+            svgpaths.getPaths().map {
+                DrawPathCompose(
+                    path = it.path.asComposePath(),
+                    paint = Paint().apply {
+                        color = Color(it.paint.color)
+                    }
+                )
+            }
         }
         return ComposeView(requireContext()).apply {
 

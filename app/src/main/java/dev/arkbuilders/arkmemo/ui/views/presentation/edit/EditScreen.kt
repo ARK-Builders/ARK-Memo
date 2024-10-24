@@ -73,6 +73,7 @@ import dev.arkbuilders.arkmemo.ui.views.presentation.edit.resize.Hint
 import dev.arkbuilders.arkmemo.ui.views.presentation.edit.resize.ResizeInput
 import dev.arkbuilders.arkmemo.ui.views.presentation.edit.resize.delayHidingHint
 import dev.arkbuilders.arkmemo.di.DIManager
+import dev.arkbuilders.arkmemo.ui.views.presentation.drawing.DrawPath
 import dev.arkbuilders.arkmemo.ui.views.presentation.picker.toPx
 import dev.arkbuilders.arkmemo.ui.views.presentation.theme.Gray
 import dev.arkbuilders.arkmemo.ui.views.presentation.utils.askWritePermissions
@@ -89,11 +90,11 @@ fun EditScreen(
     navigateBack: () -> Unit,
     launchedFromIntent: Boolean,
     maxResolution: Resolution,
-    onSaveSvg: () -> Unit
+    onSaveSvg: () -> Unit,
 ) {
     val primaryColor = MaterialTheme.colors.primary.value.toLong()
     val viewModel: EditViewModel =
-        viewModel(
+        viewModel<EditViewModel>(
             factory = DIManager
                 .component
                 .editVMFactory()
@@ -105,6 +106,7 @@ fun EditScreen(
                     maxResolution
                 )
         )
+
     val context = LocalContext.current
     val showDefaultsDialog = remember {
         mutableStateOf(
