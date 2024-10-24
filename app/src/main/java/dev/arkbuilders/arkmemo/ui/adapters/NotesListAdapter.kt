@@ -72,6 +72,8 @@ class NotesListAdapter(
 
         if (note is TextNote) {
             holder.contentPreview.text = note.text
+        } else {
+            holder.contentPreview.text = ""
         }
         holder.layoutAudioView.root.gone()
         holder.ivGraphicThumb.gone()
