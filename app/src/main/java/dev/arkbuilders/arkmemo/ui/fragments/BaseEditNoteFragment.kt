@@ -77,13 +77,13 @@ abstract class BaseEditNoteFragment: BaseFragment() {
             }
         }
 
-        if (this is EditGraphicNotesFragment) {
-            binding.toolbar.tvRightActionText.visible()
-            binding.toolbar.ivRightActionIcon.gone()
-        } else {
-            binding.toolbar.tvRightActionText.gone()
-            binding.toolbar.ivRightActionIcon.visible()
-        }
+//        if (this is EditGraphicNotesFragment) {
+//            binding.toolbar.tvRightActionText.visible()
+//            binding.toolbar.ivRightActionIcon.gone()
+//        } else {
+//            binding.toolbar.tvRightActionText.gone()
+//            binding.toolbar.ivRightActionIcon.visible()
+//        }
 
         if (getCurrentNote().resource == null) {
             binding.tvLastModified.gone()

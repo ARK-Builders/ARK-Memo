@@ -107,7 +107,7 @@ class GraphicNotesRepo @Inject constructor(
                 title = userNoteProperties.title,
                 description = userNoteProperties.description,
                 svg = svg,
-                resource = resource
+                resource = resource,
             )
         }.filter { graphicNote -> graphicNote.svg != null }
     }

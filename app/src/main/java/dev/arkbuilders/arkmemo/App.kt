@@ -4,6 +4,7 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import dev.arkbuilders.arklib.initArkLib
 import dev.arkbuilders.arkfilepicker.folders.FoldersRepo
+import dev.arkbuilders.arkmemo.di.DIManager
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class App: Application() {
         super.onCreate()
         System.loadLibrary("arklib")
         initArkLib()
+        DIManager.init(this)
         FoldersRepo.init(this)
     }
 }

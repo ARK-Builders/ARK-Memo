@@ -4,14 +4,26 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.asComposePath
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.BrushAdapter
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColor
 import dev.arkbuilders.arkmemo.ui.adapters.BrushColorBlack
@@ -28,7 +40,11 @@ import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeMedium
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeSmall
 import dev.arkbuilders.arkmemo.ui.adapters.BrushSizeTiny
 import dev.arkbuilders.arkmemo.ui.adapters.EqualSpacingItemDecoration
+import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
+import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
+import dev.arkbuilders.arkmemo.ui.views.data.Resolution
+import dev.arkbuilders.arkmemo.ui.views.presentation.edit.EditScreen
 import dev.arkbuilders.arkmemo.utils.getBrushSize
 import dev.arkbuilders.arkmemo.utils.getColorCode
 import dev.arkbuilders.arkmemo.utils.getParcelableCompat
@@ -36,246 +52,68 @@ import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.setDrawableColor
 import dev.arkbuilders.arkmemo.utils.visible
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.nio.file.Paths
+import kotlin.io.path.Path
+import dev.arkbuilders.arkmemo.ui.views.presentation.drawing.DrawPath as DrawPathCompose
 @AndroidEntryPoint
-class EditGraphicNotesFragment: BaseEditNoteFragment() {
-
+class EditGraphicNotesFragment : BaseFragment() {
+    val notesViewModel: NotesViewModel by activityViewModels()
     private val graphicNotesViewModel: GraphicNotesViewModel by viewModels()
     private var note = GraphicNote()
+    val hostActivity by lazy { activity as MainActivity }
 
-    private val colorBrushes by lazy {
-        listOf(
-            BrushColorBlack, BrushColorGrey, BrushColorRed,
-            BrushColorOrange, BrushColorGreen, BrushColorBlue, BrushColorPurple)
-    }
-
-    private val sizeBrushes by lazy {
-        listOf(
-            BrushSizeTiny, BrushSizeSmall, BrushSizeMedium,
-            BrushSizeLarge, BrushSizeHuge)
+    override fun onBackPressed() {
+        parentFragmentManager.popBackStack()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notesViewModel.init {}
-        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         arguments?.getParcelableCompat(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
             note = it
             graphicNotesViewModel.onNoteOpened(note)
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        var title = note.title
-        val notesCanvas = binding.notesCanvas
-        val btnSave = binding.toolbar.tvRightActionText
-        val noteTitle = binding.edtTitle
-        val noteTitleChangeListener = object: TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                title = s?.toString() ?: ""
-                if (title.isEmpty()) {
-                    binding.edtTitle.hint = getString(R.string.hint_new_graphical_note)
-                }
-                enableSaveText(isContentChanged() && !isContentEmpty())
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-
-        }
-
-        hostActivity.title = getString(R.string.edit_note)
-        hostActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        noteTitle.hint = getString(R.string.hint_new_graphical_note)
-        noteTitle.setText(title)
-        noteTitle.addTextChangedListener(noteTitleChangeListener)
-        notesCanvas.isVisible = true
-        notesCanvas.setViewModel(graphicNotesViewModel.apply {
-            colorBrushes.firstOrNull { it.isSelected }?.let { color ->
-                val colorCode = color.getColorCode()
-                setPaintColor(colorCode)
-                binding.layoutGraphicsControl.tvBrushColor.setDrawableColor(colorCode)
-            }
-
-            sizeBrushes.firstOrNull { it.isSelected }?.let {
-                setBrushSize(it.getBrushSize())
-            }
-        })
-        btnSave.setOnClickListener {
-            val note = createNewNote()
-            notesViewModel.onSaveClick(note, parentNote = this.note) { show ->
-                hostActivity.showProgressBar(show)
+    val coroutineScope = CoroutineScope(Dispatchers.IO)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        coroutineScope.launch {
+            val svgpaths = SVG.parse(Path("/storage/emulated/0/Documents/32254-1096105931.svg"))
+            svgpaths.getPaths().map {
+                DrawPathCompose(
+                    path = it.path.asComposePath(),
+                    paint = Paint().apply {
+                        color = Color(it.paint.color)
+                    }
+                )
             }
         }
-        enableSaveText(false)
+        return ComposeView(requireContext()).apply {
 
-        binding.tvLastModified.gone()
-        binding.editTextDescription.setText(this.note.description)
-        initBottomControls()
-        observeDrawEvent()
-    }
-
-    private fun observeDrawEvent() {
-        graphicNotesViewModel.observableSvgLiveData.observe(viewLifecycleOwner) {
-            enableSaveText(it.getPaths().isNotEmpty())
-        }
-    }
-
-    override fun createNewNote(): Note {
-        return GraphicNote(
-            title = binding.edtTitle.text.toString(),
-            svg = graphicNotesViewModel.svg(),
-            description = binding.editTextDescription.text.toString(),
-            resource = note.resource
-        )
-    }
-
-    override fun getCurrentNote(): Note {
-        return note
-    }
-
-    override fun isContentChanged(): Boolean {
-        val originalPaths = note.svg?.getPaths() ?: emptyList()
-        val newPaths = graphicNotesViewModel.svg().getPaths()
-
-        return note.title != binding.edtTitle.text.toString()
-                || ((newPaths.size != originalPaths.size) || (!newPaths.containsAll(originalPaths)))
-    }
-
-    override fun isContentEmpty(): Boolean {
-        return graphicNotesViewModel.svg().getPaths().isEmpty()
-    }
-
-    private fun initBottomControls() {
-        val tvBrushSize = binding.layoutGraphicsControl.tvBrushSize
-        tvBrushSize.setOnClickListener {
-            tvBrushSize.isSelected = !tvBrushSize.isSelected
-            if (tvBrushSize.isSelected) {
-                binding.layoutGraphicsControl.layoutSizeChooser.root.visible()
-                showBrushSizeList()
-                binding.layoutGraphicsControl.layoutColorChooser.root.gone()
-                binding.layoutGraphicsControl.tvEraser.isSelected = false
-                binding.layoutGraphicsControl.tvBrushColor.isSelected = false
-                graphicNotesViewModel.setEraseMode(false)
-            } else {
-                binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
+            setContent {
+                EditScreen(
+                    imagePath = Path(note.drawPath),
+                    imageUri = null,
+                    fragmentManager = parentFragmentManager,
+                    navigateBack = { onBackPressed() },
+                    launchedFromIntent = true,
+                    maxResolution = Resolution(120, 120),
+                    onSaveSvg = { graphicNotesViewModel.onSave(note) }
+                )
             }
-        }
-
-        val tvEraser = binding.layoutGraphicsControl.tvEraser
-        tvEraser.setOnClickListener {
-            tvEraser.isSelected = !tvEraser.isSelected
-            if (tvEraser.isSelected) {
-                binding.layoutGraphicsControl.layoutSizeChooser.root.visible()
-                showBrushSizeList(isEraseMode = true)
-                binding.layoutGraphicsControl.layoutColorChooser.root.gone()
-                binding.layoutGraphicsControl.tvBrushSize.isSelected = false
-                binding.layoutGraphicsControl.tvBrushColor.isSelected = false
-            } else {
-                binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
-                graphicNotesViewModel.setEraseMode(false)
-            }
-            graphicNotesViewModel.setEraseMode(tvEraser.isSelected)
-        }
-
-        val tvColor = binding.layoutGraphicsControl.tvBrushColor
-        tvColor.setOnClickListener {
-            tvColor.isSelected = !tvColor.isSelected
-            if (tvColor.isSelected) {
-                showBrushColorList()
-                binding.layoutGraphicsControl.layoutColorChooser.root.visible()
-                binding.layoutGraphicsControl.layoutSizeChooser.root.gone()
-                binding.layoutGraphicsControl.tvBrushSize.isSelected = false
-                binding.layoutGraphicsControl.tvEraser.isSelected = false
-                graphicNotesViewModel.setEraseMode(false)
-            } else {
-                binding.layoutGraphicsControl.layoutColorChooser.root.gone()
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hostActivity.fragment = this
-    }
-
-    private fun showBrushSizeList(isEraseMode: Boolean = false) {
-
-        val brushSizeAdapter = BrushAdapter(
-            attributes = sizeBrushes.apply {
-                val selectedIndex = this.indexOfFirst { it.isSelected }
-                if (selectedIndex == -1) {
-                    sizeBrushes[0].isSelected = true
-                }
-            },
-            onItemClick = { attribute, pos ->
-                Log.v(TAG, "onSizeSelected: " + attribute)
-                graphicNotesViewModel.setBrushSize((attribute as BrushSize).getBrushSize())
-                graphicNotesViewModel.setEraseMode(isEraseMode)
-            }
-        )
-
-        val layoutMgr = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        binding.layoutGraphicsControl.layoutSizeChooser.rvBrushSizes.apply {
-            while (this.itemDecorationCount > 0) {
-                this.removeItemDecorationAt(0)
-            }
-            addItemDecoration(EqualSpacingItemDecoration(context.resources.getDimensionPixelSize(
-                R.dimen.brush_size_item_margin), EqualSpacingItemDecoration.HORIZONTAL)
-            )
-            this.isNestedScrollingEnabled = false
-            layoutManager = layoutMgr
-            adapter = brushSizeAdapter
-        }
-    }
-
-    private fun showBrushColorList() {
-
-        val brushColorAdapter = BrushAdapter(
-            attributes = colorBrushes.apply {
-                val selectedIndex = this.indexOfFirst { it.isSelected }
-                if (selectedIndex == -1) {
-                    colorBrushes[0].isSelected = true
-                }
-            },
-            onItemClick = { attribute, pos ->
-                Log.v(TAG, "onColorSelected: " + attribute)
-                (attribute as BrushColor).getColorCode().let { colorCode ->
-                    graphicNotesViewModel.setPaintColor(colorCode)
-                    binding.layoutGraphicsControl.tvBrushColor.setDrawableColor(colorCode)
-                }
-            }
-        )
-
-        val layoutMgr = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        binding.layoutGraphicsControl.layoutColorChooser.rvBrushColors.apply {
-            while (this.itemDecorationCount > 0) {
-                this.removeItemDecorationAt(0)
-            }
-            addItemDecoration(EqualSpacingItemDecoration(context.resources.getDimensionPixelSize(
-                R.dimen.brush_color_item_margin), EqualSpacingItemDecoration.HORIZONTAL)
-            )
-            this.isNestedScrollingEnabled = false
-            layoutManager = layoutMgr
-            adapter = brushColorAdapter
-        }
-    }
-
-    private fun enableSaveText(enabled: Boolean) {
-        binding.toolbar.tvRightActionText.isEnabled = enabled
-        if (enabled) {
-            binding.toolbar.tvRightActionText.alpha = 1f
-        } else {
-            binding.toolbar.tvRightActionText.alpha = 0.4f
         }
     }
 
     companion object {
         const val TAG = "EditGraphicNotesFragment"
         private const val GRAPHICAL_NOTE_KEY = "graphical note"
+        const val PATH = "image_path"
 
         fun newInstance() = EditGraphicNotesFragment()
 

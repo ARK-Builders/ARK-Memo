@@ -14,5 +14,6 @@ data class GraphicNote(
     val svg: SVG? = null,
     @IgnoredOnParcel
     override var resource: Resource? = null,
-    override var pendingForDelete: Boolean = false
+    override var pendingForDelete: Boolean = false,
+    val drawPath : String = "/storage/emulated/0/Documents/.ark/user/properties/3841-96509498.svg"
 ) : Note, Parcelable
