@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class dev.arkbuilders.arklib.** { *; }
+-dontwarn javax.xml.stream.XMLResolver
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-dontobfuscate
+
+-keepattributes Signature
