@@ -62,6 +62,8 @@ class NotesListAdapter(
 
         if (note is TextNote) {
             holder.contentPreview.text = note.text
+        } else {
+            holder.contentPreview.text = ""
         }
         holder.layoutAudioView.root.gone()
         if (note is VoiceNote) {
