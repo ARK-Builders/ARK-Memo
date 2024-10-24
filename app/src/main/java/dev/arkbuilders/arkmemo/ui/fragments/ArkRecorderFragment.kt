@@ -1,7 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
@@ -19,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.graphics.ColorCode
@@ -33,9 +33,11 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.RecorderState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkRecorderViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
+import dev.arkbuilders.arkmemo.utils.Permission
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
+import dev.arkbuilders.arkmemo.utils.openAppSettings
 import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -47,13 +49,25 @@ import kotlin.io.path.Path
 @AndroidEntryPoint
 class ArkRecorderFragment: BaseEditNoteFragment() {
 
+    private val settingActivityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) { _ ->
+        if (Permission.hasPermission(activity, Manifest.permission.RECORD_AUDIO)) {
+            observeDataStates()
+        }
+    }
+
     private val activity by lazy { requireActivity() as MainActivity }
 
     private var shouldRecord = false
     private val audioRecordingPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             shouldRecord = isGranted
-            if (!shouldRecord) activity.onBackPressedDispatcher.onBackPressed()
+            if (!shouldRecord) {
+                showPermissionSettingToast()
+            } else {
+                observeDataStates()
+                onRecordButtonClick()
+            }
         }
 
     private val arkRecorderViewModel: ArkRecorderViewModel by viewModels()
@@ -77,24 +91,29 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         observeViewModel()
         observeKeyboardVisibility()
 
-        shouldRecord = context?.let {
-            it.checkSelfPermission(Manifest.permission.RECORD_AUDIO) ==
-                    PackageManager.PERMISSION_GRANTED
-        } ?: false
+        shouldRecord = Permission.hasPermission(activity, Manifest.permission.RECORD_AUDIO)
         if (shouldRecord) {
-            notesViewModel.init {}
-            viewLifecycleOwner.lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
-                    arkRecorderViewModel.collect(
-                        stateToUI = {
-                            showState(it)
-                        },
-                        handleSideEffect = { handleSideEffect(it) }
-                    )
-                }
+            observeDataStates()
+        }
+    }
+
+    private fun observeRecordingState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                arkRecorderViewModel.collect(
+                    stateToUI = {
+                        showState(it)
+                    },
+                    handleSideEffect = { handleSideEffect(it) }
+                )
             }
-            observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
-        } else audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    private fun observeDataStates() {
+        notesViewModel.init {}
+        observeRecordingState()
+        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
     }
 
     private fun observeKeyboardVisibility() {
@@ -147,23 +166,12 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         etTitle.addTextChangedListener(etTitleWatcher)
 
         ivRecord.setOnClickListener {
-            if (!arkRecorderViewModel.isRecording()
-                && (arkRecorderViewModel.isRecordExisting() ||
-                        File(getCurrentRecordingPath()).length() > 0L)) {
-
-                CommonActionDialog(title = R.string.dialog_replace_recording_title,
-                    message = R.string.dialog_replace_recording_message,
-                    positiveText = R.string.dialog_replace_recording_positive_text,
-                    negativeText = R.string.discard,
-                    onPositiveClick = {
-                        binding.layoutAudioView.root.gone()
-                        arkRecorderViewModel.onStartStopClick() },
-
-                    onNegativeClicked = {  }
-                ).show(parentFragmentManager, CommonActionDialog.TAG)
-            } else {
-                arkRecorderViewModel.onStartStopClick()
+            if (!Permission.hasPermission(activity, Manifest.permission.RECORD_AUDIO)) {
+                audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                return@setOnClickListener
             }
+
+            onRecordButtonClick()
         }
 
         ivPauseResume.setOnClickListener {
@@ -449,6 +457,7 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
         if (mediaPlayViewModel.isPlaying()) {
             mediaPlayViewModel.onPlayOrPauseClick(getCurrentRecordingPath())
         }
+        notesViewModel.getSaveNoteResultLiveData().removeObservers(this)
     }
 
     override fun onDestroy() {
@@ -471,6 +480,40 @@ class ArkRecorderFragment: BaseEditNoteFragment() {
 
     fun deleteTempFile() {
         arkRecorderViewModel.deleteTempFile()
+    }
+
+    private fun onRecordButtonClick() {
+        if (!arkRecorderViewModel.isRecording()
+            && (arkRecorderViewModel.isRecordExisting() ||
+                    File(getCurrentRecordingPath()).length() > 0L)) {
+
+            CommonActionDialog(title = R.string.dialog_replace_recording_title,
+                message = R.string.dialog_replace_recording_message,
+                positiveText = R.string.dialog_replace_recording_positive_text,
+                negativeText = R.string.discard,
+                onPositiveClick = {
+                    binding.layoutAudioView.root.gone()
+                    arkRecorderViewModel.onStartStopClick() },
+
+                onNegativeClicked = {  }
+            ).show(parentFragmentManager, CommonActionDialog.TAG)
+        } else {
+            arkRecorderViewModel.onStartStopClick()
+        }
+    }
+
+    private fun showPermissionSettingToast() {
+        val snackBar = Snackbar.make(hostActivity.window.decorView.rootView,
+            getString(R.string.allow_permission_record_audio_msg), Snackbar.LENGTH_SHORT)
+
+        snackBar.setAction(getString(R.string.settings)) {
+            hostActivity.openAppSettings(settingActivityLauncher)
+        }
+        snackBar.setActionTextColor(ContextCompat.getColor(hostActivity, R.color.warning_primary))
+        val snackBarActionTextView: TextView =
+            snackBar.view.findViewById(com.google.android.material.R.id.snackbar_action)
+        snackBarActionTextView.isAllCaps = false
+        snackBar.show()
     }
 
     companion object {

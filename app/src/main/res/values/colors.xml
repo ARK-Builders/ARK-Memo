@@ -24,6 +24,7 @@
     <color name="warning_100">#FEF0C7</color>
     <color name="warning_300">#FEC84B</color>
     <color name="warning_700">#B54708</color>
+    <color name="warning_primary">#DC6803</color>
     <color name="text_secondary">#344054</color>
     <color name="text_tag">#B54708</color>
     <color name="bg_tag">#FFFAEB</color>
