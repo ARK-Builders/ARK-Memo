@@ -22,4 +22,12 @@ interface ArkMediaPlayer:
     fun currentPosition(): Int
 
     fun isPlaying(): Boolean
+
+    fun isInitialized(): Boolean
+
+    fun getAudioSessionId(): Int
+
+    fun getMaxAmplitude(): Int
+
+    fun setMaxAmplitude(maxAmplitude: Int)
 }

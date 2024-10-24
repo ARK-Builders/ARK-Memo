@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextXSmall">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+    <style name="TextSmall">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_tertiary</item>
+    </style>
+
+    <style name="TextMedium">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="TextLarge">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextXLarge">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="TextHeading1">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="ActionTextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:background">@drawable/ripple_border_primary_r8</item>
+        <item name="android:clickable">true</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:paddingHorizontal">18dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="SwitchButton">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="sb_show_indicator">false</item>
+        <item name="sb_checked_color">@color/warning</item>
+    </style>
+    
+    <style name="PositiveButton" parent="TextMedium">
+        <item name="android:background">@drawable/bg_positive_button</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="NegativeButton" parent="TextMedium">
+        <item name="android:background">@drawable/bg_negative_button</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AlertButton" parent="TextMedium">
+        <item name="android:background">@drawable/bg_red_button</item>
+        <item name="android:paddingVertical">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="MemoDialog" parent="Theme.AppCompat.Dialog">
+        <item name="dialogCornerRadius">@dimen/radius_medium</item>
+    </style>
+
+</resources>

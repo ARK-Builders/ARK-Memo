@@ -52,7 +52,7 @@
             android:layout_margin="5dp"
             android:background="@null"
             android:visibility="gone"
-            android:contentDescription="@string/playpause"
+            android:contentDescription="@string/ark_memo_play_pause"
             android:src="@drawable/ic_play"
             app:tint="@color/purple_700" />
         <ImageButton
@@ -61,7 +61,7 @@
             android:layout_height="50dp"
             android:layout_margin="5dp"
             android:background="@null"
-            android:contentDescription="@string/delete"
+            android:contentDescription="@string/delete_note"
             android:src="@drawable/delete" />
     </androidx.appcompat.widget.LinearLayoutCompat>
     <View

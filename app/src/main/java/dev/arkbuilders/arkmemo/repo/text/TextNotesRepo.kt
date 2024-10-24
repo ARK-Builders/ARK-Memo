@@ -68,7 +68,7 @@ class TextNotesRepo @Inject constructor(
         val resourcePath = root.resolve("$id.$NOTE_EXT")
         if (resourcePath.exists()) {
             if (isPropertiesChanged) {
-                callback(SaveNoteResult.SUCCESS)
+                callback(SaveNoteResult.SUCCESS_UPDATED)
             } else {
                 Log.d(TEXT_REPO, "resource with similar content already exists")
                 callback(SaveNoteResult.ERROR_EXISTING)
@@ -83,7 +83,7 @@ class TextNotesRepo @Inject constructor(
             resourceId = id
         )
         Log.d(TEXT_REPO, "resource renamed to $resourcePath successfully")
-        callback(SaveNoteResult.SUCCESS)
+        callback(SaveNoteResult.SUCCESS_NEW)
     }
 
     private suspend fun readStorage(): List<TextNote> = withContext(iODispatcher) {
@@ -97,23 +97,30 @@ class TextNotesRepo @Inject constructor(
                 modified = path.getLastModifiedTime()
             )
 
-            path.readLines { data ->
-                val userNoteProperties = helper.readProperties(
-                    id,
-                    data.substringBefore("\n")
-                )
+            try {
+                path.readLines { data ->
+                    val userNoteProperties = helper.readProperties(
+                        id,
+                        data.substringBefore("\n")
+                    )
 
+                    TextNote(
+                        title = userNoteProperties.title,
+                        description = userNoteProperties.description,
+                        text = data,
+                        resource = resource
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
                 TextNote(
-                    title = userNoteProperties.title,
-                    description = userNoteProperties.description,
-                    text = data,
-                    resource = resource
+                    text = "",
                 )
             }
-        }
+        }.filter { textNote -> textNote.text.isNotEmpty() }
     }
 }
 
-private const val TEXT_REPO = "text-repo"
+private const val TEXT_REPO = "TextNotesRepo"
 private const val NOTE_EXT = "note"
 
