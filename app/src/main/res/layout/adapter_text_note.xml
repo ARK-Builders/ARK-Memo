@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
     android:layout_marginBottom="@dimen/note_item_padding"
-    android:foreground="?attr/selectableItemBackgroundBorderless">
+    android:background="@drawable/ripple_note_item">
 
     <CheckBox
         android:layout_width="wrap_content"
