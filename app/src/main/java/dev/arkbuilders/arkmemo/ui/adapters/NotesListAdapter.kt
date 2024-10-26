@@ -243,10 +243,16 @@ class NotesListAdapter(
         this.notes = notes.toMutableList()
     }
 
-    fun toggleActionMode() {
+    fun toggleActionMode(pos: Int) {
         mActionMode = !mActionMode
-        notes.forEach { it.selected = false }
-        selectedNoteCount.postValue(0)
+        var selectedCount = 0
+        notes.forEachIndexed { index, note ->
+            note.selected = mActionMode && index == pos
+            if (index == pos) {
+                selectedCount++
+            }
+        }
+        selectedNoteCount.postValue(selectedCount)
         notifyDataSetChanged()
     }
 

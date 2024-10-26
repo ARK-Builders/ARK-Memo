@@ -239,7 +239,12 @@ class NotesFragment : BaseFragment() {
         observePlayerSideEffect()
         notesAdapter?.setActivity(activity)
         notesAdapter?.onItemLongPressed = { pos, note ->
-            toggleActionMode()
+            toggleActionMode(pos = pos)
+        }
+        notesAdapter?.onItemClicked = {
+            if (mIsActionMode) {
+                toggleActionMode()
+            }
         }
         binding.rvPinnedNotes.apply {
             this.layoutManager = layoutManager
@@ -318,10 +323,6 @@ class NotesFragment : BaseFragment() {
                 (notesAdapter?.getNotes()?.getOrNull(playingAudioPosition) as? VoiceNote)?.isPlaying = false
                 notesAdapter?.notifyItemChanged(playingAudioPosition)
             }
-        }
-
-        if (mIsActionMode) {
-            toggleActionMode()
         }
     }
 
@@ -424,7 +425,7 @@ class NotesFragment : BaseFragment() {
         }
     }
 
-    private fun toggleActionMode() {
+    private fun toggleActionMode(pos: Int = -1) {
         if (mIsActionMode) {
             binding.groupActionModeTexts.gone()
             binding.layoutBottomControl.visible()
@@ -451,7 +452,7 @@ class NotesFragment : BaseFragment() {
                 showBatchDeletionDialog()
             }
         }
-        (binding.rvPinnedNotes.adapter as? NotesListAdapter)?.toggleActionMode()
+        (binding.rvPinnedNotes.adapter as? NotesListAdapter)?.toggleActionMode(pos)
         mIsActionMode = !mIsActionMode
     }
 
@@ -524,6 +525,8 @@ class NotesFragment : BaseFragment() {
             binding.edtSearch.text.clear()
             binding.edtSearch.clearFocus()
             binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
+        } else if (mIsActionMode) {
+            toggleActionMode()
         } else {
             activity.onBackPressedDispatcher.onBackPressed()
         }
