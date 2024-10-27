@@ -441,11 +441,9 @@ class NotesFragment : BaseFragment() {
                 toggleActionMode()
             }
             binding.tvActionModeSelectAll.setOnClickListener {
-                if (selectedCountForDelete == notesAdapter?.getNotes()?.size) {
-                    notesAdapter?.toggleSelectAllItems(selected = false)
-                } else {
-                    notesAdapter?.toggleSelectAllItems(selected = true)
-                }
+                notesAdapter?.toggleSelectAllItems(
+                    selected = selectedCountForDelete != notesAdapter?.getNotes()?.size,
+                )
                 updateSelectStateTexts(selectedCountForDelete)
             }
             binding.btnDelete.setOnClickListener {
@@ -512,11 +510,7 @@ class NotesFragment : BaseFragment() {
             selectedCountForDelete = count
             updateSelectStateTexts(count)
 
-            if (count > 0) {
-                changeDeleteButtonState(enabled = true)
-            } else {
-                changeDeleteButtonState(enabled = false)
-            }
+            changeDeleteButtonState(enabled = count > 0)
         }
     }
 

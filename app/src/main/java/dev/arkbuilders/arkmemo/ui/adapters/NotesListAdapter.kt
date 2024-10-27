@@ -237,6 +237,7 @@ class NotesListAdapter(
 
     fun removeNote(noteToRemove: Note) {
         notes.remove(noteToRemove)
+        selectedNoteCount.postValue(notes.size)
     }
 
     fun setNotes(notes: List<Note>) {
