@@ -1,0 +1,73 @@
+[versions]
+coil = "2.6.0"
+androidxFragmentKtx = "1.6.1"
+orbitMvi = "6.1.0"
+viewbindingPropertyDelegate = "1.5.9"
+androidXCore = "1.9.0"
+androidXAppcompat = "1.6.1"
+androidMaterial = "1.11.0"
+androidGradlePlugin = "8.3.0"
+kotlinAndroidPlugin = "1.9.24"
+hiltAndroidPlugin = "2.48"
+googleServicesPlugin = "4.4.2"
+firebaseCrashlyticsPlugin = "3.0.2"
+gradleKtLintPlugin = "12.1.1"
+junit = "4.13.2"
+androidXTestJunit = "1.1.5"
+androidXTestEspresso = "3.5.1"
+skydovesBalloon = "1.6.4"
+flexbox = "3.0.0"
+constraintlayout = "2.1.4"
+navigationFragmentKtx = "2.5.2"
+preferenceKtx = "1.2.0"
+lifecycleViewmodelKtx = "2.5.1"
+arkFilepicker = "0.1.1"
+arkLib = "0.3.5"
+googleHiltAndroid = "2.48"
+googleHiltCompiler = "2.48"
+googleFirebaseBom = "33.3.0"
+androidxHiltCompiler = "1.0.0"
+airbnbLottie = "6.4.0"
+qrgenerator = "1.0.1"
+
+[libraries]
+coil = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
+coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coil" }
+coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
+coil-video = { group = "io.coil-kt", name = "coil-video", version.ref = "coil" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidxFragmentKtx" }
+orbit-mvi-viewmodel = { group = "org.orbit-mvi", name = "orbit-viewmodel", version.ref = "orbitMvi" }
+orbit-mvi-compose = { group = "org.orbit-mvi", name = "orbit-compose", version.ref = "orbitMvi" }
+viewbinding-property-delegate-noreflection = { group = "com.github.kirich1409", name = "viewbindingpropertydelegate-noreflection", version.ref = "viewbindingPropertyDelegate" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidXCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidXAppcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preferenceKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidxHiltCompiler" }
+
+google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "googleHiltAndroid" }
+google-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "googleHiltCompiler" }
+google-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "googleFirebaseBom" }
+google-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version = "none" }
+google-firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version = "none" }
+
+android-material = { group = "com.google.android.material", name = "material", version.ref = "androidMaterial" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidXTestJunit" }
+androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidXTestEspresso" }
+skydoves-balloon = { group = "com.github.skydoves", name = "balloon", version.ref = "skydovesBalloon" }
+flexbox = { group = "com.google.android.flexbox", name = "flexbox", version.ref = "flexbox" }
+arkbuilders-arkfilepicker = { group = "dev.arkbuilders", name = "arkfilepicker", version.ref = "arkFilepicker" }
+arkbuilders-arklib = { group = "dev.arkbuilders", name = "arklib", version.ref = "arkLib" }
+airbnb-lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "airbnbLottie" }
+qr-generator = { group = "com.github.androidmads", name = "QRGenerator", version.ref = "qrgenerator" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin"}
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinAndroidPlugin"}
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroidPlugin"}
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServicesPlugin"}
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin"}
+gradle-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "gradleKtLintPlugin"}

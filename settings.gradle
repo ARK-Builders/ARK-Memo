@@ -27,6 +27,12 @@ dependencyResolutionManagement {
             }
         }
     }
+
+    versionCatalogs {
+        create("libraries") {
+            from(files("./gradle/libs.versions.toml"))
+        }
+    }
 }
 
 rootProject.name = "ARK Memo"
