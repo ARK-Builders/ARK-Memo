@@ -1,12 +1,12 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     id 'kotlin-kapt'
-    id 'dagger.hilt.android.plugin'
+    alias(libs.plugins.hilt.android)
     id 'kotlin-parcelize'
-    id 'com.google.gms.google-services'
-    id 'com.google.firebase.crashlytics'
-    id 'org.jlleitschuh.gradle.ktlint'
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.gradle.ktlint)
 }
 
 android {
@@ -81,36 +81,35 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.2'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation(libraries.androidx.core.ktx)
+    implementation(libraries.androidx.appcompat)
+    implementation(libraries.android.material)
+    implementation(libraries.androidx.constraintlayout)
+    implementation(libraries.androidx.navigation.fragment.ktx)
+    implementation(libraries.androidx.preference.ktx)
+    implementation(libraries.androidx.lifecycle.viewmodel.ktx)
 
-    implementation 'dev.arkbuilders:arkfilepicker:0.1.1'
-    implementation 'dev.arkbuilders:arklib:0.3.3'
+    implementation(libraries.arkbuilders.arkfilepicker)
+    implementation(libraries.arkbuilders.arklib)
 
-    implementation 'androidx.preference:preference:1.2.0'
-    implementation "com.google.dagger:hilt-android:2.48"
-    kapt "com.google.dagger:hilt-compiler:2.48"
-    kapt 'androidx.hilt:hilt-compiler:1.0.0'
+    implementation(libraries.google.dagger.hilt.android)
+    kapt(libraries.google.dagger.hilt.compiler)
+    kapt(libraries.androidx.hilt.compiler)
 
-    implementation 'com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9'
+    implementation(libraries.viewbinding.property.delegate.noreflection)
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    testImplementation(libraries.junit)
+    androidTestImplementation(libraries.androidx.test.junit)
+    androidTestImplementation(libraries.androidx.test.espresso)
 
-    implementation 'com.airbnb.android:lottie:6.4.0'
-    implementation 'com.github.androidmads:QRGenerator:1.0.1'
-    implementation("io.coil-kt:coil:2.6.0")
-    implementation("com.github.skydoves:balloon:1.6.4")
+    implementation(libraries.airbnb.lottie)
+    implementation(libraries.qr.generator)
+    implementation(libraries.coil)
+    implementation(libraries.skydoves.balloon)
 
-    implementation platform('com.google.firebase:firebase-bom:33.3.0')
-    implementation "com.google.firebase:firebase-crashlytics"
-    implementation "com.google.firebase:firebase-analytics"
+    implementation(platform(libraries.google.firebase.bom))
+    implementation(libraries.google.firebase.crashlytics)
+    implementation(libraries.google.firebase.analytics)
 }
 
 tasks.preBuild.dependsOn ktlintCheck
