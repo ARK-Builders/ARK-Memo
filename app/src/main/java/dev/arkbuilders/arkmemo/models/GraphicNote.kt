@@ -14,5 +14,5 @@ data class GraphicNote(
     val svg: SVG? = null,
     @IgnoredOnParcel
     override var resource: Resource? = null,
-    override var pendingForDelete: Boolean = false
+    override var pendingForDelete: Boolean = false,
 ) : Note, Parcelable

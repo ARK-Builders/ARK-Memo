@@ -2,7 +2,6 @@ package dev.arkbuilders.arkmemo.graphics
 
 import android.graphics.Paint
 import android.util.Log
-import android.graphics.Path as AndroidDrawPath
 import android.util.Xml
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.utils.getColorCode
@@ -11,6 +10,7 @@ import org.xmlpull.v1.XmlPullParser
 import java.nio.file.Path
 import kotlin.io.path.reader
 import kotlin.io.path.writer
+import android.graphics.Path as AndroidDrawPath
 
 class SVG {
     private var strokeColor = Color.BLACK.value
@@ -21,14 +21,15 @@ class SVG {
     private val paths = ArrayDeque<DrawPath>()
 
     private val paint
-        get() = Paint().also {
-            it.color = strokeColor.getColorCode()
-            it.style = Paint.Style.STROKE
-            it.strokeWidth = strokeSize.getStrokeSize()
-            it.strokeCap = Paint.Cap.ROUND
-            it.strokeJoin = Paint.Join.ROUND
-            it.isAntiAlias = true
-        }
+        get() =
+            Paint().also {
+                it.color = strokeColor.getColorCode()
+                it.style = Paint.Style.STROKE
+                it.strokeWidth = strokeSize.getStrokeSize()
+                it.strokeCap = Paint.Cap.ROUND
+                it.strokeJoin = Paint.Join.ROUND
+                it.isAntiAlias = true
+            }
 
     fun addCommand(command: SVGCommand) {
         commands.addLast(command)
@@ -61,13 +62,14 @@ class SVG {
 
     fun getPaths(): Collection<DrawPath> = paths
 
-    fun copy(): SVG = SVG().apply {
-        strokeColor = this@SVG.strokeColor
-        fill = this@SVG.fill
-        viewBox = this@SVG.viewBox
-        commands.addAll(this@SVG.commands)
-        paths.addAll(this@SVG.paths)
-    }
+    fun copy(): SVG =
+        SVG().apply {
+            strokeColor = this@SVG.strokeColor
+            fill = this@SVG.fill
+            viewBox = this@SVG.viewBox
+            commands.addAll(this@SVG.commands)
+            paths.addAll(this@SVG.paths)
+        }
 
     private fun createCanvasPaths() {
         if (commands.isNotEmpty()) {
@@ -90,10 +92,15 @@ class SVG {
                         path.lineTo(command.x, command.y)
                     }
                 }
-                paths.addLast(DrawPath(path, paint.apply {
-                    color = strokeColor.getColorCode()
-                    strokeWidth = strokeSize.getStrokeSize()
-                }))
+                paths.addLast(
+                    DrawPath(
+                        path,
+                        paint.apply {
+                            color = strokeColor.getColorCode()
+                            strokeWidth = strokeSize.getStrokeSize()
+                        },
+                    ),
+                )
             }
         }
     }
@@ -116,9 +123,10 @@ class SVG {
                                 XmlPullParser.START_TAG -> {
                                     when (tag) {
                                         SVG_TAG -> {
-                                            viewBox = ViewBox.fromString(
-                                                getAttributeValue("", Attributes.VIEW_BOX)
-                                            )
+                                            viewBox =
+                                                ViewBox.fromString(
+                                                    getAttributeValue("", Attributes.VIEW_BOX),
+                                                )
                                         }
                                         PATH_TAG -> {
                                             pathCount += 1
@@ -149,10 +157,12 @@ class SVG {
                                     if (commandElements.size > 4) {
                                         strokeSize = commandElements[4].toInt()
                                     }
-                                    commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
-                                        paintColor = strokeColor
-                                        brushSizeId = strokeSize
-                                    })
+                                    commands.addLast(
+                                        SVGCommand.MoveTo.fromString(command).apply {
+                                            paintColor = strokeColor
+                                            brushSizeId = strokeSize
+                                        },
+                                    )
                                 }
                                 SVGCommand.AbsLineTo.CODE -> {
                                     if (commandElements.size > 3) {
@@ -161,10 +171,12 @@ class SVG {
                                     if (commandElements.size > 4) {
                                         strokeSize = commandElements[4].toInt()
                                     }
-                                    commands.addLast(SVGCommand.MoveTo.fromString(command).apply {
-                                        paintColor = strokeColor
-                                        brushSizeId = strokeSize
-                                    })
+                                    commands.addLast(
+                                        SVGCommand.MoveTo.fromString(command).apply {
+                                            paintColor = strokeColor
+                                            brushSizeId = strokeSize
+                                        },
+                                    )
                                 }
                                 SVGCommand.AbsQuadTo.CODE -> {
                                     if (commandElements.size > 5) {
@@ -173,10 +185,12 @@ class SVG {
                                     if (commandElements.size > 6) {
                                         strokeSize = commandElements[6].toInt()
                                     }
-                                    commands.addLast(SVGCommand.AbsQuadTo.fromString(command).apply {
-                                        paintColor = strokeColor
-                                        brushSizeId = strokeSize
-                                    })
+                                    commands.addLast(
+                                        SVGCommand.AbsQuadTo.fromString(command).apply {
+                                            paintColor = strokeColor
+                                            brushSizeId = strokeSize
+                                        },
+                                    )
                                 }
                                 else -> {}
                             }
@@ -208,7 +222,7 @@ data class ViewBox(
     val x: Float = 0f,
     val y: Float = 0f,
     val width: Float = 100f,
-    val height: Float = 100f
+    val height: Float = 100f,
 ) {
     override fun toString(): String = "$x $y $width $height"
 
@@ -219,20 +233,19 @@ data class ViewBox(
                 viewBox[0].toFloat(),
                 viewBox[1].toFloat(),
                 viewBox[2].toFloat(),
-                viewBox[3].toFloat()
+                viewBox[3].toFloat(),
             )
         }
     }
 }
 
 sealed class SVGCommand {
-
     var paintColor = Color.BLACK.value
     var brushSizeId = Size.TINY.id
 
     class MoveTo(
         val x: Float,
-        val y: Float
+        val y: Float,
     ) : SVGCommand() {
         override fun toString(): String = "$CODE $x $y $paintColor $brushSizeId"
 
@@ -255,7 +268,7 @@ sealed class SVGCommand {
 
     class AbsLineTo(
         val x: Float,
-        val y: Float
+        val y: Float,
     ) : SVGCommand() {
         override fun toString(): String = "$CODE $x $y $paintColor $brushSizeId"
 
@@ -280,7 +293,7 @@ sealed class SVGCommand {
         val x1: Float,
         val y1: Float,
         val x2: Float,
-        val y2: Float
+        val y2: Float,
     ) : SVGCommand() {
         override fun toString(): String = "$CODE $x1 $y1 $x2 $y2 $paintColor $brushSizeId"
 

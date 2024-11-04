@@ -20,13 +20,6 @@ import dev.arkbuilders.arkmemo.utils.dpToPx
  * SwitchButton.
  */
 class SwitchButton : View, Checkable {
-    private val ANIMATE_STATE_NONE = 0
-    private val ANIMATE_STATE_PENDING_DRAG = 1
-    private val ANIMATE_STATE_DRAGING = 2
-    private val ANIMATE_STATE_PENDING_RESET = 3
-    private val ANIMATE_STATE_PENDING_SETTLE = 4
-    private val ANIMATE_STATE_SWITCH = 5
-
     constructor(context: Context) : super(context) {
         init(context, null)
     }
@@ -38,7 +31,7 @@ class SwitchButton : View, Checkable {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context,
         attrs,
-        defStyleAttr
+        defStyleAttr,
     ) {
         init(context, attrs)
     }
@@ -47,124 +40,152 @@ class SwitchButton : View, Checkable {
         context: Context,
         attrs: AttributeSet?,
         defStyleAttr: Int,
-        defStyleRes: Int
+        defStyleRes: Int,
     ) : super(context, attrs, defStyleAttr, defStyleRes) {
         init(context, attrs)
     }
 
-    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
+    override fun setPadding(
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+    ) {
         super.setPadding(0, 0, 0, 0)
     }
 
-    private fun init(context: Context, attrs: AttributeSet?) {
+    private fun init(
+        context: Context,
+        attrs: AttributeSet?,
+    ) {
         var typedArray: TypedArray? = null
         if (attrs != null) {
             typedArray = context.obtainStyledAttributes(attrs, R.styleable.SwitchButton)
         }
-        shadowEffect = optBoolean(
-            typedArray,
-            R.styleable.SwitchButton_sb_shadow_effect,
-            true
-        )
-        uncheckCircleColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_uncheckcircle_color,
-            R.color.sb_unchecked_circle_color
-        )
-        uncheckCircleWidth = optPixelSize(
-            typedArray,
-            R.styleable.SwitchButton_sb_uncheckcircle_width,
-            dpToPxInt(1.5f)
-        )
+        shadowEffect =
+            optBoolean(
+                typedArray,
+                R.styleable.SwitchButton_sb_shadow_effect,
+                true,
+            )
+        uncheckCircleColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_uncheckcircle_color,
+                R.color.sb_unchecked_circle_color,
+            )
+        uncheckCircleWidth =
+            optPixelSize(
+                typedArray,
+                R.styleable.SwitchButton_sb_uncheckcircle_width,
+                dpToPxInt(1.5f),
+            )
         uncheckCircleOffsetX = 10f.dpToPx()
-        uncheckCircleRadius = optPixelSize(
-            typedArray,
-            R.styleable.SwitchButton_sb_uncheckcircle_radius,
-            4f.dpToPx()
-        )
+        uncheckCircleRadius =
+            optPixelSize(
+                typedArray,
+                R.styleable.SwitchButton_sb_uncheckcircle_radius,
+                4f.dpToPx(),
+            )
         checkedLineOffsetX = 4f.dpToPx()
         checkedLineOffsetY = 4f.dpToPx()
-        shadowRadius = optPixelSize(
-            typedArray,
-            R.styleable.SwitchButton_sb_shadow_radius,
-            dpToPxInt(2.5f)
-        )
-        shadowOffset = optPixelSize(
-            typedArray,
-            R.styleable.SwitchButton_sb_shadow_offset,
-            dpToPxInt(1.5f)
-        )
-        shadowColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_shadow_color,
-            R.color.sb_shadow_color
-        )
-        uncheckColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_uncheck_color,
-            R.color.sb_unchecked_color
-        )
-        checkedColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_checked_color,
-            R.color.sb_checked_color
-        )
-        borderWidth = optPixelSize(
-            typedArray,
-            R.styleable.SwitchButton_sb_border_width,
-            dpToPxInt(1f)
-        )
-        checkLineColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_checkline_color,
-            Color.WHITE
-        )
-        checkLineWidth = optPixelSize(
-            typedArray,
-            R.styleable.SwitchButton_sb_checkline_width,
-            dpToPxInt(1f)
-        )
+        shadowRadius =
+            optPixelSize(
+                typedArray,
+                R.styleable.SwitchButton_sb_shadow_radius,
+                dpToPxInt(2.5f),
+            )
+        shadowOffset =
+            optPixelSize(
+                typedArray,
+                R.styleable.SwitchButton_sb_shadow_offset,
+                dpToPxInt(1.5f),
+            )
+        shadowColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_shadow_color,
+                R.color.sb_shadow_color,
+            )
+        uncheckColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_uncheck_color,
+                R.color.sb_unchecked_color,
+            )
+        checkedColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_checked_color,
+                R.color.sb_checked_color,
+            )
+        borderWidth =
+            optPixelSize(
+                typedArray,
+                R.styleable.SwitchButton_sb_border_width,
+                dpToPxInt(1f),
+            )
+        checkLineColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_checkline_color,
+                Color.WHITE,
+            )
+        checkLineWidth =
+            optPixelSize(
+                typedArray,
+                R.styleable.SwitchButton_sb_checkline_width,
+                dpToPxInt(1f),
+            )
         checkLineLength = 6f.dpToPx()
-        val buttonColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_button_color,
-            Color.WHITE
-        )
-        uncheckButtonColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_uncheckbutton_color,
-            buttonColor
-        )
-        checkedButtonColor = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_checkedbutton_color,
-            buttonColor
-        )
-        val effectDuration = optInt(
-            typedArray,
-            R.styleable.SwitchButton_sb_effect_duration,
-            300
-        )
-        isChecked = optBoolean(
-            typedArray,
-            R.styleable.SwitchButton_sb_checked,
-            false
-        )
-        showIndicator = optBoolean(
-            typedArray,
-            R.styleable.SwitchButton_sb_show_indicator,
-            true
-        )
-        background = optColor(
-            typedArray,
-            R.styleable.SwitchButton_sb_background,
-            Color.WHITE
-        )
-        enableEffect = optBoolean(
-            typedArray,
-            R.styleable.SwitchButton_sb_enable_effect,
-            true
-        )
+        val buttonColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_button_color,
+                Color.WHITE,
+            )
+        uncheckButtonColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_uncheckbutton_color,
+                buttonColor,
+            )
+        checkedButtonColor =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_checkedbutton_color,
+                buttonColor,
+            )
+        val effectDuration =
+            optInt(
+                typedArray,
+                R.styleable.SwitchButton_sb_effect_duration,
+                300,
+            )
+        isChecked =
+            optBoolean(
+                typedArray,
+                R.styleable.SwitchButton_sb_checked,
+                false,
+            )
+        showIndicator =
+            optBoolean(
+                typedArray,
+                R.styleable.SwitchButton_sb_show_indicator,
+                true,
+            )
+        background =
+            optColor(
+                typedArray,
+                R.styleable.SwitchButton_sb_background,
+                Color.WHITE,
+            )
+        enableEffect =
+            optBoolean(
+                typedArray,
+                R.styleable.SwitchButton_sb_enable_effect,
+                true,
+            )
         typedArray?.recycle()
         paint = Paint(Paint.ANTI_ALIAS_FLAG)
         buttonPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -172,8 +193,9 @@ class SwitchButton : View, Checkable {
         if (shadowEffect) {
             buttonPaint.setShadowLayer(
                 shadowRadius.toFloat(),
-                0f, shadowOffset.toFloat(),
-                shadowColor
+                0f,
+                shadowOffset.toFloat(),
+                shadowColor,
             )
         }
         viewState = ViewState()
@@ -189,25 +211,33 @@ class SwitchButton : View, Checkable {
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int,
+    ) {
         var newWidthSpec = widthMeasureSpec
         var newHeightSpec = heightMeasureSpec
         val widthMode = MeasureSpec.getMode(newWidthSpec)
         val heightMode = MeasureSpec.getMode(newHeightSpec)
-        if (widthMode == MeasureSpec.UNSPECIFIED
-            || widthMode == MeasureSpec.AT_MOST
+        if (widthMode == MeasureSpec.UNSPECIFIED ||
+            widthMode == MeasureSpec.AT_MOST
         ) {
             newWidthSpec = MeasureSpec.makeMeasureSpec(DEFAULT_WIDTH, MeasureSpec.EXACTLY)
         }
-        if (heightMode == MeasureSpec.UNSPECIFIED
-            || heightMode == MeasureSpec.AT_MOST
+        if (heightMode == MeasureSpec.UNSPECIFIED ||
+            heightMode == MeasureSpec.AT_MOST
         ) {
             newHeightSpec = MeasureSpec.makeMeasureSpec(DEFAULT_HEIGHT, MeasureSpec.EXACTLY)
         }
         super.onMeasure(newWidthSpec, newHeightSpec)
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int,
+    ) {
         super.onSizeChanged(w, h, oldw, oldh)
         val viewPadding = (shadowRadius + shadowOffset).coerceAtLeast(borderWidth).toFloat()
         height = h - viewPadding - viewPadding
@@ -260,40 +290,58 @@ class SwitchButton : View, Checkable {
         paint.color = background
         drawRoundRect(
             canvas,
-            left, top, right, bottom,
-            viewRadius, paint
+            left,
+            top,
+            right,
+            bottom,
+            viewRadius,
+            paint,
         )
         paint.style = Paint.Style.STROKE
         paint.color = uncheckColor
         drawRoundRect(
             canvas,
-            left, top, right, bottom,
-            viewRadius, paint
+            left,
+            top,
+            right,
+            bottom,
+            viewRadius,
+            paint,
         )
         if (showIndicator) {
             drawUncheckIndicator(canvas)
         }
-        val des = viewState.radius * .5f //[0-backgroundRadius*0.5f]
+        val des = viewState.radius * .5f // [0-backgroundRadius*0.5f]
         paint.style = Paint.Style.STROKE
         paint.color = viewState.checkStateColor
         paint.strokeWidth = borderWidth + des * 2f
         drawRoundRect(
             canvas,
-            left + des, top + des, right - des, bottom - des,
-            viewRadius, paint
+            left + des,
+            top + des,
+            right - des,
+            bottom - des,
+            viewRadius,
+            paint,
         )
         paint.style = Paint.Style.FILL
         paint.strokeWidth = 1f
         drawArc(
             canvas,
-            left, top,
-            left + 2 * viewRadius, top + 2 * viewRadius,
-            90f, 180f, paint
+            left,
+            top,
+            left + 2 * viewRadius,
+            top + 2 * viewRadius,
+            90f,
+            180f,
+            paint,
         )
         canvas.drawRect(
-            left + viewRadius, top,
-            viewState.buttonX, top + 2 * viewRadius,
-            paint
+            left + viewRadius,
+            top,
+            viewState.buttonX,
+            top + 2 * viewRadius,
+            paint,
         )
         if (showIndicator) {
             drawCheckedIndicator(canvas)
@@ -313,14 +361,17 @@ class SwitchButton : View, Checkable {
         ex: Float =
             left + viewRadius - checkedLineOffsetY,
         ey: Float = centerY + checkLineLength,
-        paint: Paint = this.paint
+        paint: Paint = this.paint,
     ) {
         paint.style = Paint.Style.STROKE
         paint.color = color
         paint.strokeWidth = lineWidth
         canvas.drawLine(
-            sx, sy, ex, ey,
-            paint
+            sx,
+            sy,
+            ex,
+            ey,
+            paint,
         )
     }
 
@@ -329,9 +380,10 @@ class SwitchButton : View, Checkable {
             canvas,
             uncheckCircleColor,
             uncheckCircleWidth.toFloat(),
-            right - uncheckCircleOffsetX, centerY,
+            right - uncheckCircleOffsetX,
+            centerY,
             uncheckCircleRadius,
-            paint
+            paint,
         )
     }
 
@@ -339,9 +391,10 @@ class SwitchButton : View, Checkable {
         canvas: Canvas,
         color: Int,
         lineWidth: Float,
-        centerX: Float, centerY: Float,
+        centerX: Float,
+        centerY: Float,
         radius: Float,
-        paint: Paint
+        paint: Paint,
     ) {
         paint.style = Paint.Style.STROKE
         paint.color = color
@@ -351,31 +404,51 @@ class SwitchButton : View, Checkable {
 
     private fun drawArc(
         canvas: Canvas,
-        left: Float, top: Float,
-        right: Float, bottom: Float,
-        startAngle: Float, sweepAngle: Float,
-        paint: Paint
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        startAngle: Float,
+        sweepAngle: Float,
+        paint: Paint,
     ) {
         canvas.drawArc(
-            left, top, right, bottom,
-            startAngle, sweepAngle, true, paint
+            left,
+            top,
+            right,
+            bottom,
+            startAngle,
+            sweepAngle,
+            true,
+            paint,
         )
     }
 
     private fun drawRoundRect(
         canvas: Canvas,
-        left: Float, top: Float,
-        right: Float, bottom: Float,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
         backgroundRadius: Float,
-        paint: Paint
+        paint: Paint,
     ) {
         canvas.drawRoundRect(
-            left, top, right, bottom,
-            backgroundRadius, backgroundRadius, paint
+            left,
+            top,
+            right,
+            bottom,
+            backgroundRadius,
+            backgroundRadius,
+            paint,
         )
     }
 
-    private fun drawButton(canvas: Canvas, x: Float, y: Float) {
+    private fun drawButton(
+        canvas: Canvas,
+        x: Float,
+        y: Float,
+    ) {
         canvas.drawCircle(x, y, buttonRadius, buttonPaint)
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 1f
@@ -403,7 +476,10 @@ class SwitchButton : View, Checkable {
         toggle(animate, true)
     }
 
-    private fun toggle(animate: Boolean, broadcast: Boolean) {
+    private fun toggle(
+        animate: Boolean,
+        broadcast: Boolean,
+    ) {
         if (!isEnabled) {
             return
         }
@@ -471,20 +547,25 @@ class SwitchButton : View, Checkable {
                 if (isPendingDragState) {
                     var fraction = eventX / getWidth()
                     fraction = 0f.coerceAtLeast(1f.coerceAtMost(fraction))
-                    viewState.buttonX = (buttonMinX
-                            + (buttonMaxX - buttonMinX)
-                            * fraction)
+                    viewState.buttonX = (
+                        buttonMinX +
+                            (buttonMaxX - buttonMinX) *
+                            fraction
+                    )
                 } else if (isDragState) {
                     var fraction = eventX / getWidth()
                     fraction = 0f.coerceAtLeast(1f.coerceAtMost(fraction))
-                    viewState.buttonX = (buttonMinX
-                            + (buttonMaxX - buttonMinX)
-                            * fraction)
-                    viewState.checkStateColor = argbEvaluator.evaluate(
-                        fraction,
-                        uncheckColor,
-                        checkedColor
-                    ) as Int
+                    viewState.buttonX = (
+                        buttonMinX +
+                            (buttonMaxX - buttonMinX) *
+                            fraction
+                    )
+                    viewState.checkStateColor =
+                        argbEvaluator.evaluate(
+                            fraction,
+                            uncheckColor,
+                            checkedColor,
+                        ) as Int
                     postInvalidate()
                 }
             }
@@ -513,8 +594,8 @@ class SwitchButton : View, Checkable {
             MotionEvent.ACTION_CANCEL -> {
                 isTouchingDown = false
                 removeCallbacks(postPendingDrag)
-                if (isPendingDragState
-                    || isDragState
+                if (isPendingDragState ||
+                    isDragState
                 ) {
                     pendingCancelDragState()
                 }
@@ -526,10 +607,12 @@ class SwitchButton : View, Checkable {
     private val isInAnimating: Boolean
         get() = animateState != ANIMATE_STATE_NONE
     private val isPendingDragState: Boolean
-        get() = (animateState == ANIMATE_STATE_PENDING_DRAG
-                || animateState == ANIMATE_STATE_PENDING_RESET)
+        get() = (
+            animateState == ANIMATE_STATE_PENDING_DRAG ||
+                animateState == ANIMATE_STATE_PENDING_RESET
+        )
     private val isDragState: Boolean
-        get() = animateState == ANIMATE_STATE_DRAGING
+        get() = animateState == ANIMATE_STATE_DRAGGING
 
     fun setShadowEffect(shadowEffect: Boolean) {
         if (this.shadowEffect == shadowEffect) {
@@ -539,14 +622,16 @@ class SwitchButton : View, Checkable {
         if (this.shadowEffect) {
             buttonPaint.setShadowLayer(
                 shadowRadius.toFloat(),
-                0f, shadowOffset.toFloat(),
-                shadowColor
+                0f,
+                shadowOffset.toFloat(),
+                shadowColor,
             )
         } else {
             buttonPaint.setShadowLayer(
                 0f,
-                0f, 0f,
-                0
+                0f,
+                0f,
+                0,
             )
         }
     }
@@ -611,13 +696,18 @@ class SwitchButton : View, Checkable {
     }
 
     override fun setOnClickListener(l: OnClickListener?) {}
+
     override fun setOnLongClickListener(l: OnLongClickListener?) {}
+
     fun setOnCheckedChangeListener(l: OnCheckedChangeListener?) {
         onCheckedChangeListener = l
     }
 
     interface OnCheckedChangeListener {
-        fun onCheckedChanged(view: SwitchButton?, isChecked: Boolean)
+        fun onCheckedChanged(
+            view: SwitchButton?,
+            isChecked: Boolean,
+        )
     }
 
     private var shadowRadius = 0
@@ -675,147 +765,175 @@ class SwitchButton : View, Checkable {
     private var isEventBroadcast = false
     private var onCheckedChangeListener: OnCheckedChangeListener? = null
     private var touchDownTime: Long = 0
-    private val postPendingDrag: Runnable = Runnable {
-        if (!isInAnimating) {
-            pendingDragState()
-        }
-    }
-    private val animatorUpdateListener: AnimatorUpdateListener = object : AnimatorUpdateListener {
-        override fun onAnimationUpdate(animation: ValueAnimator) {
-            val value = animation.animatedValue as Float
-            when (animateState) {
-                ANIMATE_STATE_PENDING_SETTLE -> {
-                    run {
-                        viewState.checkedLineColor = argbEvaluator.evaluate(
-                            value,
-                            beforeState.checkedLineColor,
-                            afterState.checkedLineColor
-                        ) as Int
-                        viewState.radius = (beforeState.radius
-                                + (afterState.radius - beforeState.radius) * value)
-                        if (animateState != ANIMATE_STATE_PENDING_DRAG) {
-                            viewState.buttonX = (beforeState.buttonX
-                                    + (afterState.buttonX - beforeState.buttonX) * value)
-                        }
-                        viewState.checkStateColor = argbEvaluator.evaluate(
-                            value,
-                            beforeState.checkStateColor,
-                            afterState.checkStateColor
-                        ) as Int
-                    }
-                }
-
-                ANIMATE_STATE_PENDING_RESET -> {
-                    run {
-                        viewState.checkedLineColor = argbEvaluator.evaluate(
-                            value,
-                            beforeState.checkedLineColor,
-                            afterState.checkedLineColor
-                        ) as Int
-                        viewState.radius = (beforeState.radius
-                                + (afterState.radius - beforeState.radius) * value)
-                        if (animateState != ANIMATE_STATE_PENDING_DRAG) {
-                            viewState.buttonX = (beforeState.buttonX
-                                    + (afterState.buttonX - beforeState.buttonX) * value)
-                        }
-                        viewState.checkStateColor = argbEvaluator.evaluate(
-                            value,
-                            beforeState.checkStateColor,
-                            afterState.checkStateColor
-                        ) as Int
-                    }
-                }
-
-                ANIMATE_STATE_PENDING_DRAG -> {
-                    viewState.checkedLineColor = argbEvaluator.evaluate(
-                        value,
-                        beforeState.checkedLineColor,
-                        afterState.checkedLineColor
-                    ) as Int
-                    viewState.radius = (beforeState.radius
-                            + (afterState.radius - beforeState.radius) * value)
-                    if (animateState != ANIMATE_STATE_PENDING_DRAG) {
-                        viewState.buttonX = (beforeState.buttonX
-                                + (afterState.buttonX - beforeState.buttonX) * value)
-                    }
-                    viewState.checkStateColor = argbEvaluator.evaluate(
-                        value,
-                        beforeState.checkStateColor,
-                        afterState.checkStateColor
-                    ) as Int
-                }
-
-                ANIMATE_STATE_SWITCH -> {
-                    viewState.buttonX = (beforeState.buttonX
-                            + (afterState.buttonX - beforeState.buttonX) * value)
-                    val fraction = (viewState.buttonX - buttonMinX) / (buttonMaxX - buttonMinX)
-                    viewState.checkStateColor = argbEvaluator.evaluate(
-                        fraction,
-                        uncheckColor,
-                        checkedColor
-                    ) as Int
-                    viewState.radius = fraction * viewRadius
-                    viewState.checkedLineColor = argbEvaluator.evaluate(
-                        fraction,
-                        Color.TRANSPARENT,
-                        checkLineColor
-                    ) as Int
-                }
-
-                ANIMATE_STATE_DRAGING -> {
-                }
-
-                ANIMATE_STATE_NONE -> {}
-                else -> {
-                }
-            }
-            postInvalidate()
-        }
-    }
-    private val animatorListener: Animator.AnimatorListener = object : Animator.AnimatorListener {
-        override fun onAnimationStart(animation: Animator) {}
-        override fun onAnimationEnd(animation: Animator) {
-            when (animateState) {
-                ANIMATE_STATE_DRAGING -> {}
-                ANIMATE_STATE_PENDING_DRAG -> {
-                    animateState = ANIMATE_STATE_DRAGING
-                    viewState.checkedLineColor = Color.TRANSPARENT
-                    viewState.radius = viewRadius
-                    postInvalidate()
-                }
-
-                ANIMATE_STATE_PENDING_RESET -> {
-                    animateState = ANIMATE_STATE_NONE
-                    postInvalidate()
-                }
-
-                ANIMATE_STATE_PENDING_SETTLE -> {
-                    animateState = ANIMATE_STATE_NONE
-                    postInvalidate()
-                    broadcastEvent()
-                }
-
-                ANIMATE_STATE_SWITCH -> {
-                    isChecked = !isChecked
-                    animateState = ANIMATE_STATE_NONE
-                    postInvalidate()
-                    broadcastEvent()
-                }
-
-                ANIMATE_STATE_NONE -> {}
-                else -> {}
+    private val postPendingDrag: Runnable =
+        Runnable {
+            if (!isInAnimating) {
+                pendingDragState()
             }
         }
+    private val animatorUpdateListener: AnimatorUpdateListener =
+        object : AnimatorUpdateListener {
+            override fun onAnimationUpdate(animation: ValueAnimator) {
+                val value = animation.animatedValue as Float
+                when (animateState) {
+                    ANIMATE_STATE_PENDING_SETTLE -> {
+                        run {
+                            viewState.checkedLineColor =
+                                argbEvaluator.evaluate(
+                                    value,
+                                    beforeState.checkedLineColor,
+                                    afterState.checkedLineColor,
+                                ) as Int
+                            viewState.radius = (
+                                beforeState.radius +
+                                    (afterState.radius - beforeState.radius) * value
+                            )
+                            if (animateState != ANIMATE_STATE_PENDING_DRAG) {
+                                viewState.buttonX = (
+                                    beforeState.buttonX +
+                                        (afterState.buttonX - beforeState.buttonX) * value
+                                )
+                            }
+                            viewState.checkStateColor =
+                                argbEvaluator.evaluate(
+                                    value,
+                                    beforeState.checkStateColor,
+                                    afterState.checkStateColor,
+                                ) as Int
+                        }
+                    }
 
-        override fun onAnimationCancel(animation: Animator) {}
-        override fun onAnimationRepeat(animation: Animator) {}
-    }
+                    ANIMATE_STATE_PENDING_RESET -> {
+                        run {
+                            viewState.checkedLineColor =
+                                argbEvaluator.evaluate(
+                                    value,
+                                    beforeState.checkedLineColor,
+                                    afterState.checkedLineColor,
+                                ) as Int
+                            viewState.radius = (
+                                beforeState.radius +
+                                    (afterState.radius - beforeState.radius) * value
+                            )
+                            if (animateState != ANIMATE_STATE_PENDING_DRAG) {
+                                viewState.buttonX = (
+                                    beforeState.buttonX +
+                                        (afterState.buttonX - beforeState.buttonX) * value
+                                )
+                            }
+                            viewState.checkStateColor =
+                                argbEvaluator.evaluate(
+                                    value,
+                                    beforeState.checkStateColor,
+                                    afterState.checkStateColor,
+                                ) as Int
+                        }
+                    }
+
+                    ANIMATE_STATE_PENDING_DRAG -> {
+                        viewState.checkedLineColor =
+                            argbEvaluator.evaluate(
+                                value,
+                                beforeState.checkedLineColor,
+                                afterState.checkedLineColor,
+                            ) as Int
+                        viewState.radius = (
+                            beforeState.radius +
+                                (afterState.radius - beforeState.radius) * value
+                        )
+                        if (animateState != ANIMATE_STATE_PENDING_DRAG) {
+                            viewState.buttonX = (
+                                beforeState.buttonX +
+                                    (afterState.buttonX - beforeState.buttonX) * value
+                            )
+                        }
+                        viewState.checkStateColor =
+                            argbEvaluator.evaluate(
+                                value,
+                                beforeState.checkStateColor,
+                                afterState.checkStateColor,
+                            ) as Int
+                    }
+
+                    ANIMATE_STATE_SWITCH -> {
+                        viewState.buttonX = (
+                            beforeState.buttonX +
+                                (afterState.buttonX - beforeState.buttonX) * value
+                        )
+                        val fraction = (viewState.buttonX - buttonMinX) / (buttonMaxX - buttonMinX)
+                        viewState.checkStateColor =
+                            argbEvaluator.evaluate(
+                                fraction,
+                                uncheckColor,
+                                checkedColor,
+                            ) as Int
+                        viewState.radius = fraction * viewRadius
+                        viewState.checkedLineColor =
+                            argbEvaluator.evaluate(
+                                fraction,
+                                Color.TRANSPARENT,
+                                checkLineColor,
+                            ) as Int
+                    }
+
+                    ANIMATE_STATE_DRAGGING -> {
+                    }
+
+                    ANIMATE_STATE_NONE -> {}
+                    else -> {
+                    }
+                }
+                postInvalidate()
+            }
+        }
+    private val animatorListener: Animator.AnimatorListener =
+        object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+
+            override fun onAnimationEnd(animation: Animator) {
+                when (animateState) {
+                    ANIMATE_STATE_DRAGGING -> {}
+                    ANIMATE_STATE_PENDING_DRAG -> {
+                        animateState = ANIMATE_STATE_DRAGGING
+                        viewState.checkedLineColor = Color.TRANSPARENT
+                        viewState.radius = viewRadius
+                        postInvalidate()
+                    }
+
+                    ANIMATE_STATE_PENDING_RESET -> {
+                        animateState = ANIMATE_STATE_NONE
+                        postInvalidate()
+                    }
+
+                    ANIMATE_STATE_PENDING_SETTLE -> {
+                        animateState = ANIMATE_STATE_NONE
+                        postInvalidate()
+                        broadcastEvent()
+                    }
+
+                    ANIMATE_STATE_SWITCH -> {
+                        isChecked = !isChecked
+                        animateState = ANIMATE_STATE_NONE
+                        postInvalidate()
+                        broadcastEvent()
+                    }
+
+                    ANIMATE_STATE_NONE -> {}
+                    else -> {}
+                }
+            }
+
+            override fun onAnimationCancel(animation: Animator) {}
+
+            override fun onAnimationRepeat(animation: Animator) {}
+        }
 
     private class ViewState {
         var buttonX = 0f
         var checkStateColor = 0
         var checkedLineColor = 0
         var radius = 0f
+
         fun copy(source: ViewState) {
             buttonX = source.buttonX
             checkStateColor = source.checkStateColor
@@ -825,6 +943,12 @@ class SwitchButton : View, Checkable {
     }
 
     companion object {
+        private const val ANIMATE_STATE_NONE = 0
+        private const val ANIMATE_STATE_PENDING_DRAG = 1
+        private const val ANIMATE_STATE_DRAGGING = 2
+        private const val ANIMATE_STATE_PENDING_RESET = 3
+        private const val ANIMATE_STATE_PENDING_SETTLE = 4
+        private const val ANIMATE_STATE_SWITCH = 5
         private val DEFAULT_WIDTH = dpToPxInt(50f)
         private val DEFAULT_HEIGHT = dpToPxInt(31f)
 
@@ -835,7 +959,7 @@ class SwitchButton : View, Checkable {
         private fun optInt(
             typedArray: TypedArray?,
             index: Int,
-            def: Int
+            def: Int,
         ): Int {
             return typedArray?.getInt(index, def) ?: def
         }
@@ -843,7 +967,7 @@ class SwitchButton : View, Checkable {
         private fun optPixelSize(
             typedArray: TypedArray?,
             index: Int,
-            def: Float
+            def: Float,
         ): Float {
             return typedArray?.getDimension(index, def) ?: def
         }
@@ -851,7 +975,7 @@ class SwitchButton : View, Checkable {
         private fun optPixelSize(
             typedArray: TypedArray?,
             index: Int,
-            def: Int
+            def: Int,
         ): Int {
             return typedArray?.getDimensionPixelOffset(index, def) ?: def
         }
@@ -859,7 +983,7 @@ class SwitchButton : View, Checkable {
         private fun optColor(
             typedArray: TypedArray?,
             index: Int,
-            def: Int
+            def: Int,
         ): Int {
             return typedArray?.getColor(index, def) ?: def
         }
@@ -867,7 +991,7 @@ class SwitchButton : View, Checkable {
         private fun optBoolean(
             typedArray: TypedArray?,
             index: Int,
-            def: Boolean
+            def: Boolean,
         ): Boolean {
             return typedArray?.getBoolean(index, def) ?: def
         }

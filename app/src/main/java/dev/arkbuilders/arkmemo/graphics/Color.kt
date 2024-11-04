@@ -1,7 +1,6 @@
 package dev.arkbuilders.arkmemo.graphics
 
 enum class Color(val code: Int, val value: String) {
-
     BLACK(ColorCode.black, "black"),
 
     GRAY(ColorCode.gray, "gray"),
@@ -16,5 +15,5 @@ enum class Color(val code: Int, val value: String) {
 
     PURPLE(ColorCode.purple, "purple"),
 
-    WHITE(ColorCode.white, "white")
+    WHITE(ColorCode.white, "white"),
 }

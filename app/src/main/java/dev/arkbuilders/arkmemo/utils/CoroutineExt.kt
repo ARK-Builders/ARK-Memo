@@ -9,17 +9,18 @@ import kotlinx.coroutines.isActive
 fun CoroutineScope.launchPeriodicAsync(
     repeatMillis: Long,
     repeatCondition: Boolean,
-    action: () -> Unit
+    action: () -> Unit,
 ): Deferred<Unit> {
-    val deferred = this.async {
-        if (repeatMillis > 0) {
-            while (this.isActive && repeatCondition) {
+    val deferred =
+        this.async {
+            if (repeatMillis > 0) {
+                while (this.isActive && repeatCondition) {
+                    action()
+                    delay(repeatMillis)
+                }
+            } else {
                 action()
-                delay(repeatMillis)
             }
-        } else {
-            action()
         }
-    }
     return deferred
 }

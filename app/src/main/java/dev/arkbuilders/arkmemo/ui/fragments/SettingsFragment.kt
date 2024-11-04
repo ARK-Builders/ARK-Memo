@@ -13,10 +13,13 @@ import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.openLink
 import dev.arkbuilders.arkmemo.utils.visible
 
-open class SettingsFragment: Fragment(R.layout.fragment_settings) {
-
+open class SettingsFragment : Fragment(R.layout.fragment_settings) {
     val binding by viewBinding(FragmentSettingsBinding::bind)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbarCustom.ivBack.setOnClickListener {
@@ -31,7 +34,6 @@ open class SettingsFragment: Fragment(R.layout.fragment_settings) {
         binding.tvAppVersion.text = getString(R.string.setting_app_version, BuildConfig.VERSION_NAME)
 
         initSettingActions()
-
     }
 
     private fun initSettingActions() {
@@ -60,7 +62,8 @@ open class SettingsFragment: Fragment(R.layout.fragment_settings) {
                 walletAddress = "bc1qx8n9r4uwpgrhgnamt2uew53lmrxd8tuevp7lv5",
                 title = getString(R.string.setting_donate_btc),
                 onPositiveClick = {
-                }).show(childFragmentManager, CommonActionDialog.TAG)
+                },
+            ).show(childFragmentManager, CommonActionDialog.TAG)
         }
 
         binding.tvDonateEth.setOnClickListener {
@@ -68,7 +71,8 @@ open class SettingsFragment: Fragment(R.layout.fragment_settings) {
                 walletAddress = "0x9765C5aC38175BFbd2dC7a840b63e50762B80a1b",
                 title = getString(R.string.setting_donate_eth),
                 onPositiveClick = {
-            }).show(childFragmentManager, CommonActionDialog.TAG)
+                },
+            ).show(childFragmentManager, CommonActionDialog.TAG)
         }
 
         binding.tvDiscoverIssues.setOnClickListener {

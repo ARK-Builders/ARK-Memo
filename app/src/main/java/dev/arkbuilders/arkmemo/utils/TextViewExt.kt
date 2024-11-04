@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat.getColor
 import dev.arkbuilders.arkmemo.R
 
 fun TextView.highlightWord(word: String) {
-
     val textString = this.text.toString()
     val wordToSpan = SpannableString(textString)
     val startIndex = textString.lowercase().indexOf(word.lowercase())
@@ -19,13 +18,20 @@ fun TextView.highlightWord(word: String) {
     if (startIndex == -1) return
 
     val endIndex = startIndex + word.length
-    wordToSpan.setSpan(BackgroundColorSpan(
-        getColor(this.context, R.color.warning_300)),
-        startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+    wordToSpan.setSpan(
+        BackgroundColorSpan(
+            getColor(this.context, R.color.warning_300),
+        ),
+        startIndex,
+        endIndex,
+        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+    )
     text = wordToSpan
 }
 
-fun TextView.setDrawableColor(@ColorInt color: Int) {
+fun TextView.setDrawableColor(
+    @ColorInt color: Int,
+) {
     compoundDrawables.filterNotNull().forEach {
         it.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
     }

@@ -13,16 +13,16 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.QRViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
 import dev.arkbuilders.arkmemo.utils.copyToClipboard
 
-
-class DonateDialog(private val walletAddress: String,
-                   private val title: String,
-                   private val onPositiveClick: (() -> Unit)? = null,
-                   private val onCloseClicked: (() -> Unit)? = null,
-): DialogFragment() {
-
+class DonateDialog(
+    private val walletAddress: String,
+    private val title: String,
+    private val onPositiveClick: (() -> Unit)? = null,
+    private val onCloseClicked: (() -> Unit)? = null,
+) : DialogFragment() {
     companion object {
         val TAG: String = DonateDialog::class.java.name
     }
+
     private lateinit var binding: DialogDonateQrBinding
     private val qrViewModel: QRViewModel by activityViewModels()
 
@@ -37,7 +37,6 @@ class DonateDialog(private val walletAddress: String,
     }
 
     private fun initViews() {
-
         dialog?.setCanceledOnTouchOutside(false)
 
         binding.ivClose.setOnClickListener {
@@ -54,8 +53,10 @@ class DonateDialog(private val walletAddress: String,
 
         binding.tvAddress.text = walletAddress
         binding.layoutCopy.setOnClickListener {
-            context?.copyToClipboard(getString(R.string.setting_donate_wallet_clipboard_label),
-                walletAddress)
+            context?.copyToClipboard(
+                getString(R.string.setting_donate_wallet_clipboard_label),
+                walletAddress,
+            )
         }
 
         initQRImage()
@@ -76,12 +77,13 @@ class DonateDialog(private val walletAddress: String,
 
     override fun onResume() {
         super.onResume()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+        )
     }
 
     override fun getTheme(): Int {
         return R.style.MemoDialog
     }
-
 }

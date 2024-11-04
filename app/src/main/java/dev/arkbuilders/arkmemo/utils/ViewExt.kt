@@ -30,25 +30,25 @@ fun View.setOnDebounceTouchListener(action: (v: View, e: MotionEvent) -> Unit) {
             postDelayed({ isTouched = false }, 500)
         }
         true
-
     }
 }
 
 fun View.showAvailabilityToolTip() {
-    val balloon = Balloon.Builder(context)
-        .setWidthRatio(1.0f)
-        .setHeight(BalloonSizeSpec.WRAP)
-        .setText(context.getString(R.string.tips_will_be_available_soon))
-        .setTextColorResource(R.color.white)
-        .setTextSize(12f)
-        .setArrowPositionRules(ArrowPositionRules.ALIGN_ANCHOR)
-        .setArrowSize(10)
-        .setArrowPosition(0.5f)
-        .setPadding(12)
-        .setCornerRadius(8f)
-        .setWidthRatio(0.5f)
-        .setBackgroundColorResource(R.color.warning_300)
-        .setBalloonAnimation(BalloonAnimation.ELASTIC)
-        .build()
+    val balloon =
+        Balloon.Builder(context)
+            .setWidthRatio(1.0f)
+            .setHeight(BalloonSizeSpec.WRAP)
+            .setText(context.getString(R.string.tips_will_be_available_soon))
+            .setTextColorResource(R.color.white)
+            .setTextSize(12f)
+            .setArrowPositionRules(ArrowPositionRules.ALIGN_ANCHOR)
+            .setArrowSize(10)
+            .setArrowPosition(0.5f)
+            .setPadding(12)
+            .setCornerRadius(8f)
+            .setWidthRatio(0.5f)
+            .setBackgroundColorResource(R.color.warning_300)
+            .setBalloonAnimation(BalloonAnimation.ELASTIC)
+            .build()
     showAlignTop(balloon)
 }

@@ -19,7 +19,8 @@ fun Note.getAutoTitle(context: Context? = null): String {
             is GraphicNote -> {
                 title.ifEmpty {
                     String.format(
-                        context.getString(R.string.ark_memo_graphic_note), resource?.id
+                        context.getString(R.string.ark_memo_graphic_note),
+                        resource?.id,
                     )
                 }
             }
@@ -27,12 +28,17 @@ fun Note.getAutoTitle(context: Context? = null): String {
             is VoiceNote -> {
                 title.ifEmpty {
                     String.format(
-                        context.getString(R.string.ark_memo_voice_note), resource?.id
+                        context.getString(R.string.ark_memo_voice_note),
+                        resource?.id,
                     )
                 }
             }
 
-            else -> { "" }
+            else -> {
+                ""
+            }
         }
-    } else { "" }
+    } else {
+        ""
+    }
 }

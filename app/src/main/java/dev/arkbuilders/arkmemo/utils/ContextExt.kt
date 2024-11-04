@@ -10,7 +10,8 @@ import androidx.activity.result.ActivityResultLauncher
 fun Context.openLink(url: String) {
     try {
         startActivity(
-            Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)))
+            Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)),
+        )
     } catch (e: Exception) {
         Log.e("openLink", " exception: " + e.message)
     }
@@ -18,10 +19,11 @@ fun Context.openLink(url: String) {
 
 fun Context.openAppSettings(activityLauncher: ActivityResultLauncher<Intent>? = null) {
     try {
-        val settingIntent = Intent().apply {
-            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-            data = Uri.fromParts("package", this@openAppSettings.packageName, null)
-        }
+        val settingIntent =
+            Intent().apply {
+                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                data = Uri.fromParts("package", this@openAppSettings.packageName, null)
+            }
         activityLauncher?.let {
             activityLauncher.launch(settingIntent)
         } ?: {
@@ -30,5 +32,4 @@ fun Context.openAppSettings(activityLauncher: ActivityResultLauncher<Intent>? = 
     } catch (e: Exception) {
         Log.e("openAppSettings", " exception: " + e.message)
     }
-
 }

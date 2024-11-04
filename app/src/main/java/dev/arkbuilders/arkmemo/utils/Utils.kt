@@ -19,7 +19,6 @@ import java.nio.file.Path
 import kotlin.io.path.extension
 import kotlin.io.path.forEachLine
 
-
 fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
     result.observe(this) {
         if (!isResumed) return@observe
@@ -35,7 +34,10 @@ fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
     }
 }
 
-fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
+fun AppCompatActivity.replaceFragment(
+    fragment: Fragment,
+    tag: String,
+) {
     supportFragmentManager.beginTransaction().apply {
         val backStackName = fragment.javaClass.name
         val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
@@ -49,27 +51,36 @@ fun AppCompatActivity.replaceFragment(fragment: Fragment, tag: String) {
     }
 }
 
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
+fun AppCompatActivity.resumeFragment(fragment: Fragment) {
+    supportFragmentManager.beginTransaction().apply {
         show(fragment)
         commit()
     }
 }
 
-fun Context.getTextFromClipBoard(view: View?, onSuccess: (text: String?) -> Unit) {
+fun Context.getTextFromClipBoard(
+    view: View?,
+    onSuccess: (text: String?) -> Unit,
+) {
     view?.post {
         val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         onSuccess.invoke(clipboardManager.primaryClip?.getItemAt(0)?.text?.toString())
     } ?: return
 }
 
-fun Context.copyToClipboard(label: String, text: String) {
+fun Context.copyToClipboard(
+    label: String,
+    text: String,
+) {
     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
     val clip = ClipData.newPlainText(label, text)
     clipboard?.setPrimaryClip(clip)
 }
 
-fun <R> Path.listFiles(extension: String, process: (Path) -> R): List<R> =
+fun <R> Path.listFiles(
+    extension: String,
+    process: (Path) -> R,
+): List<R> =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         Files.list(this).toList().filter { it.extension == extension }.map {
             process(it)
@@ -118,9 +129,10 @@ fun extractDuration(path: String): String {
     return try {
         val metadataRetriever = MediaMetadataRetriever()
         metadataRetriever.setDataSource(path)
-        val duration = metadataRetriever.extractMetadata(
-            MediaMetadataRetriever.METADATA_KEY_DURATION
-        )?.toLong() ?: 0L
+        val duration =
+            metadataRetriever.extractMetadata(
+                MediaMetadataRetriever.METADATA_KEY_DURATION,
+            )?.toLong() ?: 0L
         millisToString(duration)
     } catch (e: Exception) {
         Log.e("ExtractDuration", "extractDuration exception: " + e.message)

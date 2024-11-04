@@ -24,8 +24,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
-class ArkMediaPlayerFragment: BaseEditNoteFragment() {
-
+class ArkMediaPlayerFragment : BaseEditNoteFragment() {
     private val activity by lazy {
         requireActivity() as MainActivity
     }
@@ -34,7 +33,10 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
 
     private lateinit var note: VoiceNote
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         activity.initEditUI()
         initUI()
@@ -58,15 +60,15 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
     }
 
     private fun initUI() {
-
         binding.toolbar.ivRightActionIcon.setOnClickListener {
             showDeleteNoteDialog(note)
         }
 
-        val defaultTitle = getString(
-            R.string.ark_memo_voice_note,
-            LocalDate.now().format(DateTimeFormatter.ISO_DATE)
-        )
+        val defaultTitle =
+            getString(
+                R.string.ark_memo_voice_note,
+                LocalDate.now().format(DateTimeFormatter.ISO_DATE),
+            )
         binding.edtTitle.hint = defaultTitle
         binding.edtTitle.setText(note.title)
 
@@ -79,7 +81,6 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
             arkMediaPlayerViewModel.getDurationString { duration ->
                 binding.layoutAudioView.tvDuration.text = duration
             }
-
         } else {
             binding.layoutAudioView.root.gone()
             binding.layoutAudioRecord.root.gone()
@@ -91,7 +92,6 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
             arkMediaPlayerViewModel.onPlayOrPauseClick(recordingPath)
             binding.layoutAudioView.tvPlayingPosition.visible()
         }
-
     }
 
     private fun showState(state: ArkMediaPlayerState) {
@@ -148,29 +148,31 @@ class ArkMediaPlayerFragment: BaseEditNoteFragment() {
     }
 
     private fun showPlayIcon() {
-        val playIcon = ResourcesCompat.getDrawable(
-            activity.resources,
-            R.drawable.ic_play_circle,
-            null
-        )
+        val playIcon =
+            ResourcesCompat.getDrawable(
+                activity.resources,
+                R.drawable.ic_play_circle,
+                null,
+            )
         binding.layoutAudioView.ivPlayAudio.setImageDrawable(playIcon)
     }
 
     private fun showPauseIcon() {
-        val playIcon = ResourcesCompat.getDrawable(
-            activity.resources,
-            R.drawable.ic_pause_circle,
-            null
-        )
+        val playIcon =
+            ResourcesCompat.getDrawable(
+                activity.resources,
+                R.drawable.ic_pause_circle,
+                null,
+            )
         binding.layoutAudioView.ivPlayAudio.setImageDrawable(playIcon)
     }
 
     companion object {
-
         const val TAG = "ark-media-player-fragment"
 
-        fun newInstance(note: VoiceNote) = ArkMediaPlayerFragment().apply {
-            setNote(note)
-        }
+        fun newInstance(note: VoiceNote) =
+            ArkMediaPlayerFragment().apply {
+                setNote(note)
+            }
     }
 }
