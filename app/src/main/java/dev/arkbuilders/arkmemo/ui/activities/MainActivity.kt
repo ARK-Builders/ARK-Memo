@@ -1,16 +1,13 @@
 package dev.arkbuilders.arkmemo.ui.activities
 
-import android.Manifest
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -19,15 +16,16 @@ import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.fragments.BaseFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
-import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
+
     private val binding by viewBinding(ActivityMainBinding::bind)
 
     @Inject
@@ -36,44 +34,30 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     @IdRes
     private val fragContainer = R.id.container
 
-    private var menu: Menu? = null
-
     var fragment: Fragment = NotesFragment()
-
-    private var shouldRecord = false
-    private val audioRecordingPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            shouldRecord = isGranted
-        }
 
     init {
         FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) {
-                    FilePickerDialog.show()
-                } else {
-                    finish()
-                }
+                if (isGranted) FilePickerDialog.show()
+                else finish()
             }
 
-        FilePickerDialog.readPermLauncherSdkR =
+        FilePickerDialog.readPermLauncher_SDK_R =
             registerForActivityResult(PermissionContract()) { isGranted ->
-                if (isGranted) {
-                    FilePickerDialog.show()
-                } else {
-                    finish()
-                }
+                if (isGranted) FilePickerDialog.show()
+                else finish()
             }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setStatusBarColor(ContextCompat.getColor(this, R.color.white), true)
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-        audioRecordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
 
         fun showFragment() {
             val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
@@ -84,17 +68,19 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     commit()
                 }
             } else {
-                if (savedInstanceState == null) {
+                if (savedInstanceState == null)
                     supportFragmentManager.beginTransaction().apply {
                         add(fragContainer, fragment, NotesFragment.TAG)
                         commit()
                     }
-                } else {
+                else {
                     supportFragmentManager.apply {
-                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)!!
-                        fragment = findFragmentByTag(tag)!!
-                        if (!fragment.isInLayout) {
-                            resumeFragment(fragment)
+                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
+                        findFragmentByTag(tag)?.let {
+                            fragment = it
+                            if (!fragment.isInLayout) {
+                                resumeFragment(fragment)
+                            }
                         }
                     }
                 }
@@ -108,40 +94,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 memoPreferences.storePath(it.toString())
                 showFragment()
             }
-        } else {
-            showFragment()
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        this.menu = menu
-        if (fragment.tag != NotesFragment.TAG) {
-            showSettingsButton(false)
-        }
-        return true
+        else showFragment()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(CURRENT_FRAGMENT_TAG, fragment.tag)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.settings -> {
-                fragment = SettingsFragment()
-                replaceFragment(fragment, SettingsFragment.TAG)
-            }
-        }
-        return true
-    }
-
-    fun showSettingsButton(show: Boolean = true) {
-        if (menu != null) {
-            val settingsItem = menu?.findItem(R.id.settings)
-            settingsItem?.isVisible = show
-        }
     }
 
     fun showProgressBar(show: Boolean) {
@@ -151,39 +110,30 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     fun initEditUI() {
         title = getString(R.string.edit_note)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        showSettingsButton(false)
     }
 
-    companion object {
+    private fun setStatusBarColor(color: Int, isLight: Boolean) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = color
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
+    }
+
+    override fun onBackPressed() {
+        if (fragment is BaseFragment) {
+            (fragment as BaseFragment).onBackPressed()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    companion object{
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }
 }
 
-fun AppCompatActivity.replaceFragment(
-    fragment: Fragment,
-    tag: String,
-) {
-    supportFragmentManager.beginTransaction().apply {
-        val backStackName = fragment.javaClass.name
-        val popBackStack = supportFragmentManager.popBackStackImmediate(backStackName, 0)
-        if (!popBackStack) {
-            replace(R.id.container, fragment, tag)
-            addToBackStack(backStackName)
-        } else {
-            show(fragment)
-        }
-        commit()
-    }
-}
-
-fun AppCompatActivity.resumeFragment(fragment: Fragment) {
-    supportFragmentManager.beginTransaction().apply {
+fun AppCompatActivity.resumeFragment(fragment: Fragment){
+    supportFragmentManager.beginTransaction().apply{
         show(fragment)
         commit()
     }
-}
-
-fun Context.getTextFromClipBoard(): String? {
-    val clipboardManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-    return clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
 }

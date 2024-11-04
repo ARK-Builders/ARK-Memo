@@ -2,66 +2,80 @@ package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
 import android.view.View
-import androidx.preference.PreferenceFragmentCompat
-import dagger.hilt.android.AndroidEntryPoint
-import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
+import androidx.fragment.app.Fragment
+import by.kirich1409.viewbindingdelegate.viewBinding
+import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
-import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
-import dev.arkbuilders.arkmemo.ui.views.PathPreference
-import javax.inject.Inject
+import dev.arkbuilders.arkmemo.databinding.FragmentSettingsBinding
+import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
+import dev.arkbuilders.arkmemo.ui.dialogs.DonateDialog
+import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.openLink
+import dev.arkbuilders.arkmemo.utils.visible
 
-@AndroidEntryPoint
-class SettingsFragment : PreferenceFragmentCompat() {
-    @Inject
-    lateinit var memoPreferences: MemoPreferences
+open class SettingsFragment: Fragment(R.layout.fragment_settings) {
 
-    private val activity: MainActivity by lazy {
-        requireActivity() as MainActivity
-    }
-
-    override fun onCreatePreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-    ) {
-        setPreferencesFromResource(R.xml.root_preferences, rootKey)
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
+    val binding by viewBinding(FragmentSettingsBinding::bind)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val pathKey = getString(R.string.path_pref_key)
-        val pathPref: PathPreference? =
-            findPreference<PathPreference?>(pathKey)?.apply {
-                onBindView = {
-                    setPath(memoPreferences.getPath())
-                }
-            }
-        activity.title = getString(R.string.settings)
-        activity.showSettingsButton(false)
-        activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        pathPref?.setOnPreferenceClickListener {
-            FilePickerDialog.show(activity, parentFragmentManager)
-            true
+        binding.toolbarCustom.ivBack.setOnClickListener {
+            activity?.onBackPressedDispatcher?.onBackPressed()
         }
+        binding.toolbarCustom.tvTitle.text = getString(R.string.about)
+        binding.toolbarCustom.tvTitle.visible()
 
-        parentFragmentManager.onArkPathPicked(viewLifecycleOwner) {
-            val pathString = it.toString()
-            memoPreferences.storePath(pathString)
-            pathPref?.setPath(pathString)
-        }
+        binding.toolbarCustom.tvRightActionText.gone()
+        binding.toolbarCustom.ivRightActionIcon.gone()
+
+        binding.tvAppVersion.text = getString(R.string.setting_app_version, BuildConfig.VERSION_NAME)
+
+        initSettingActions()
+
     }
 
-    override fun onResume() {
-        super.onResume()
-        activity.fragment = this
-    }
+    private fun initSettingActions() {
+        binding.tvWebsite.setOnClickListener {
+            context?.openLink("https://www.ark-builders.dev/")
+        }
 
-    companion object {
-        const val TAG = "Settings"
+        binding.tvTelegram.setOnClickListener {
+            context?.openLink("https://t.me/ark_builders")
+        }
+
+        binding.tvDiscord.setOnClickListener {
+            context?.openLink("https://discord.gg/tPUJTxud")
+        }
+
+        binding.tvDonatePatreon.setOnClickListener {
+            context?.openLink("https://www.patreon.com/ARKBuilders")
+        }
+
+        binding.tvDonateCoffee.setOnClickListener {
+            context?.openLink("https://buymeacoffee.com/arkbuilders")
+        }
+
+        binding.tvDonateBtc.setOnClickListener {
+            DonateDialog(
+                walletAddress = "bc1qx8n9r4uwpgrhgnamt2uew53lmrxd8tuevp7lv5",
+                title = getString(R.string.setting_donate_btc),
+                onPositiveClick = {
+                }).show(childFragmentManager, CommonActionDialog.TAG)
+        }
+
+        binding.tvDonateEth.setOnClickListener {
+            DonateDialog(
+                walletAddress = "0x9765C5aC38175BFbd2dC7a840b63e50762B80a1b",
+                title = getString(R.string.setting_donate_eth),
+                onPositiveClick = {
+            }).show(childFragmentManager, CommonActionDialog.TAG)
+        }
+
+        binding.tvDiscoverIssues.setOnClickListener {
+            context?.openLink("https://www.ark-builders.dev/contribute/?tab=goodFirstIssue")
+        }
+
+        binding.tvBounties.setOnClickListener {
+        }
     }
 }

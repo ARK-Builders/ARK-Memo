@@ -6,10 +6,11 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class TextNote(
+data class TextNote (
     override val title: String = "",
     override val description: String = "",
     val text: String = "",
     @IgnoredOnParcel
     override var resource: Resource? = null,
-) : Note, Parcelable
+    override var pendingForDelete: Boolean = false
+): Note, Parcelable

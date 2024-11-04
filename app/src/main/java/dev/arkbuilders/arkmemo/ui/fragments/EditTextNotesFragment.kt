@@ -1,152 +1,206 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver.OnWindowFocusChangeListener
+import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
+import androidx.core.widget.addTextChangedListener
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
+import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
-import dev.arkbuilders.arkmemo.ui.activities.MainActivity
-import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
+import dev.arkbuilders.arkmemo.utils.getParcelableCompat
+import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
+import dev.arkbuilders.arkmemo.utils.gone
+import dev.arkbuilders.arkmemo.utils.insertStringAtPosition
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
+import java.lang.StringBuilder
 
 @AndroidEntryPoint
-class EditTextNotesFragment : BaseEditNoteFragment() {
-    private val activity: MainActivity by lazy {
-        requireActivity() as MainActivity
-    }
-
-    private val notesViewModel: NotesViewModel by activityViewModels()
+class EditTextNotesFragment: BaseEditNoteFragment() {
 
     private var note = TextNote()
     private var noteStr: String? = null
+
+    private val pasteNoteClickListener = View.OnClickListener {
+        requireContext().getTextFromClipBoard(view) { clipBoardText ->
+            if (clipBoardText != null) {
+                val newTextBuilder = StringBuilder()
+                val cursorPos = binding.editNote.selectionStart
+                val noteContent = binding.editNote.text.toString()
+
+                val newCursorPos = if (cursorPos < 0) {
+                    (clipBoardText.length + noteContent.length - 1).coerceAtLeast(0)
+                } else {
+                    clipBoardText.length + cursorPos
+                }
+                try {
+                    newTextBuilder.append(noteContent.insertStringAtPosition(clipBoardText, cursorPos))
+                } catch (e: IndexOutOfBoundsException) {
+                    Log.e(TAG, "pasteNoteClickListener exception: ${e.message}")
+                    newTextBuilder.append(noteContent).append(clipBoardText)
+                }
+
+                binding.editNote.setText(newTextBuilder.toString())
+                binding.editNote.setSelection(newCursorPos)
+            }
+            else Toast.makeText(requireContext(),
+                getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val windowFocusedListener = OnWindowFocusChangeListener {
+        if (it) {
+            observeClipboardContent()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
         observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
-        if (arguments != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                requireArguments().getParcelable(NOTE_KEY, TextNote::class.java)?.let {
-                    note = it
-                }
-            } else {
-                requireArguments().getParcelable<TextNote>(NOTE_KEY)?.let {
-                    note = it
-                }
+        if(arguments != null) {
+            requireArguments().getParcelableCompat(NOTE_KEY, TextNote::class.java)?.let {
+                note = it
             }
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
         }
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var title = this.note.title
-        var data = note.text
-        val editTextListener =
-            object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) = Unit
-
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int,
-                ) = Unit
-
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int,
-                ) {
-                    data = s?.toString() ?: ""
-                }
-            }
-        val noteTitle = binding.noteTitle
+        var title: String
+        val noteTitle = binding.edtTitle
         val editNote = binding.editNote
-        val btnSave = binding.btnSave
-        val noteTitleChangeListener =
-            object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int,
-                ) {}
+        val noteTitleChangeListener = object: TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-                override fun onTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    before: Int,
-                    count: Int,
-                ) {
-                    title = s?.toString() ?: ""
-                    if (title.isEmpty()) {
-                        binding.noteTitle.hint = getString(R.string.hint_new_text_note)
-                    }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                title = s?.toString() ?: ""
+                if (title.isEmpty()) {
+                    binding.edtTitle.hint = getString(R.string.hint_new_text_note)
                 }
-
-                override fun afterTextChanged(s: Editable?) {}
+                enableSaveText(isContentChanged() && !isContentEmpty())
             }
 
-        activity.title = getString(R.string.edit_note)
-        activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        activity.showSettingsButton(false)
+            override fun afterTextChanged(s: Editable?) {}
+        }
+
+        hostActivity.title = getString(R.string.edit_note)
+        hostActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         noteTitle.setText(this.note.title)
         noteTitle.addTextChangedListener(noteTitleChangeListener)
-        editNote.isVisible = true
-        editNote.requestFocus()
-        editNote.addTextChangedListener(editTextListener)
-        editNote.setText(this.note.text)
-
-        if (noteStr != null) {
-            editNote.setText(noteStr)
+        editNote.addTextChangedListener {
+            enableSaveText(isContentChanged() && !isContentEmpty())
         }
 
-        btnSave.setOnClickListener {
-            val note =
-                TextNote(
-                    title = title,
-                    description = binding.editTextDescription.text.toString(),
-                    text = data,
-                    resource = note.resource,
-                )
-            notesViewModel.onSaveClick(note) { show ->
-                activity.showProgressBar(show)
+        activity?.window?.decorView?.rootView?.let { rootView ->
+            ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
+                val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+                editNote.isCursorVisible = isKeyboardVisible
+                insets
             }
         }
 
+        editNote.isVisible = true
+        editNote.requestFocus()
+        editNote.setText(this.note.text)
+
+        if(noteStr != null)
+            editNote.setText(noteStr)
+
+        binding.tvSave.setOnClickListener {
+            notesViewModel.onSaveClick(createNewNote(), parentNote = note) { show ->
+                hostActivity.showProgressBar(show)
+            }
+        }
+        enableSaveText(noteStr?.isNotBlank() == true)
+
+        binding.tvPaste.setOnClickListener(pasteNoteClickListener)
+
         binding.editTextDescription.setText(this.note.description)
+        binding.toolbar.ivRightActionIcon.setImageResource(R.drawable.ic_delete_note)
+        binding.toolbar.ivRightActionIcon.setOnClickListener {
+            showDeleteNoteDialog(note)
+        }
+        arguments?.getParcelableCompat(NOTE_KEY, TextNote::class.java)
+            ?: binding.toolbar.ivRightActionIcon.gone()
+
+        view.viewTreeObserver.addOnWindowFocusChangeListener(windowFocusedListener)
     }
 
-    companion object {
-        const val TAG = "Edit Text Notes"
+    override fun isContentChanged(): Boolean {
+        return note.title != binding.edtTitle.text.toString()
+                || note.text != binding.editNote.text.toString()
+    }
+
+    override fun isContentEmpty(): Boolean {
+        return binding.editNote.text.toString().trim().isEmpty()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        view?.viewTreeObserver?.removeOnWindowFocusChangeListener(windowFocusedListener)
+    }
+
+    override fun createNewNote(): Note {
+        return TextNote(
+            title = binding.edtTitle.text.toString(),
+            description = binding.editTextDescription.text.toString(),
+            text = binding.editNote.text.toString(),
+            resource = note.resource
+        )
+    }
+
+    override fun getCurrentNote(): Note {
+        return note
+    }
+
+    private fun observeClipboardContent() {
+        context?.getTextFromClipBoard(view) {
+            val clipboardTextEmpty = it.isNullOrEmpty()
+            if (clipboardTextEmpty) {
+                binding.tvPaste.alpha = 0.4f
+                binding.tvPaste.isClickable = false
+            } else {
+                binding.tvPaste.alpha = 1f
+                binding.tvPaste.isClickable = true
+            }
+            enableSaveText(!clipboardTextEmpty && isContentChanged())
+        }
+    }
+
+    private fun enableSaveText(enabled: Boolean) {
+        binding.tvSave.isEnabled = enabled
+        if (enabled) {
+            binding.tvSave.alpha = 1f
+        } else {
+            binding.tvSave.alpha = 0.4f
+        }
+    }
+
+    companion object{
+        const val TAG = "EditTextNotesFragment"
         private const val NOTE_STRING_KEY = "note string"
         private const val NOTE_KEY = "note key"
 
-        fun newInstance(note: String) =
-            EditTextNotesFragment().apply {
-                arguments =
-                    Bundle().apply {
-                        putString(NOTE_STRING_KEY, note)
-                    }
+        fun newInstance(note: String) = EditTextNotesFragment().apply{
+            arguments = Bundle().apply {
+                putString(NOTE_STRING_KEY, note)
             }
+        }
 
-        fun newInstance(note: TextNote) =
-            EditTextNotesFragment().apply {
-                arguments =
-                    Bundle().apply {
-                        putParcelable(NOTE_KEY, note)
-                    }
+        fun newInstance(note: TextNote) = EditTextNotesFragment().apply{
+            arguments = Bundle().apply{
+                putParcelable(NOTE_KEY, note)
             }
+        }
     }
 }

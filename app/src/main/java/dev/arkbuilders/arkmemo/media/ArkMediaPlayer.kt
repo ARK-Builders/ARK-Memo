@@ -2,15 +2,12 @@ package dev.arkbuilders.arkmemo.media
 
 import android.media.MediaPlayer
 
-interface ArkMediaPlayer :
+interface ArkMediaPlayer:
     MediaPlayer.OnCompletionListener,
     MediaPlayer.OnPreparedListener,
     MediaPlayer.OnSeekCompleteListener {
-    fun init(
-        path: String,
-        onCompletion: () -> Unit,
-        onPrepared: () -> Unit,
-    )
+
+    fun init(path: String, onCompletion: () -> Unit, onPrepared: () -> Unit)
 
     fun play()
 
@@ -25,4 +22,12 @@ interface ArkMediaPlayer :
     fun currentPosition(): Int
 
     fun isPlaying(): Boolean
+
+    fun isInitialized(): Boolean
+
+    fun getAudioSessionId(): Int
+
+    fun getMaxAmplitude(): Int
+
+    fun setMaxAmplitude(maxAmplitude: Int)
 }

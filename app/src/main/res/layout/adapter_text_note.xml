@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/bg_big_radius"
+    android:clickable="true"
+    android:layout_marginBottom="@dimen/note_item_padding"
+    android:foreground="?attr/selectableItemBackgroundBorderless">
+
+    <include layout="@layout/media_player_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/layout_audio_view"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="13dp"
+        android:background="@color/yellow_700" />
+    
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/TextMedium"
+        android:textColor="@color/text_primary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/canvas_graphic_thumb"
+        android:gravity="start"
+        app:layout_constraintTop_toBottomOf="@+id/layout_audio_view"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginTop="@dimen/common_padding"
+        android:layout_marginHorizontal="@dimen/padding_horizontal_common"
+        android:id="@+id/tv_title"
+        tools:text="UX review"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/TextSmall"
+        android:textColor="@color/text_primary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/canvas_graphic_thumb"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_marginTop="4dp"
+        android:layout_marginHorizontal="@dimen/padding_horizontal_common"
+        android:layout_marginBottom="@dimen/common_padding"
+        android:id="@+id/tv_content_preview"
+        tools:text="How do you create compelling presentations that wow your colleagues and impress your managers?"/>
+
+    <dev.arkbuilders.arkmemo.ui.views.NotesCanvas
+        android:id="@+id/canvas_graphic_thumb"
+        android:layout_width="90dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="80dp"
+        android:visibility="gone"
+        tools:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="@dimen/common_padding"
+        android:layout_marginBottom="@dimen/common_padding"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@+id/tv_content_preview"
+        android:id="@+id/rv_tags"
+        android:visibility="gone"
+        android:layout_marginTop="12dp"/>
+
+    <TextView
+        android:layout_width="76dp"
+        android:layout_height="0dp"
+        android:background="@color/bg_error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/action_delete"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:id="@+id/tv_delete"
+        android:visibility="gone"
+        android:gravity="center"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

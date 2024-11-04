@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="@dimen/home_toolbar_icon_size"
+        android:layout_height="@dimen/home_toolbar_icon_size"
+        android:src="@drawable/ic_toolbar_about"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="@dimen/home_horizontal_margin"
+        android:background="@drawable/ripple_support_text"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="12dp"
+        android:layout_marginTop="@dimen/home_padding_top"
+        android:id="@+id/iv_settings"/>
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="@dimen/home_toolbar_icon_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/iv_settings"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toTopOf="@+id/iv_settings"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_settings"
+        android:drawableStart="@drawable/ic_search"
+        android:background="@drawable/bg_border_r8"
+        android:drawablePadding="8dp"
+        android:id="@+id/edt_search"
+        android:hint="@string/ark_memo_search"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
+        android:paddingHorizontal="16dp"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ark_memo_no_notes_instructions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/text_tertiary"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/tv_instructions"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_x_large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_instructions"
+        android:text="@string/ark_memo_no_notes_header"
+        android:gravity="center_horizontal"
+        android:textStyle="bold"
+        android:layout_marginBottom="6dp"
+        android:id="@+id/tv_header"/>
+
+    <ImageView
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_header"
+        android:layout_marginBottom="16dp"
+        android:id="@+id/iv_empty_state"
+        android:src="@drawable/ic_no_notes"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ark_memo_new_memo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_instructions"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_rect_button"
+        android:paddingVertical="12dp"
+        android:id="@+id/tv_new_memo"
+        style="@style/TextMedium"
+        android:clickable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:paddingHorizontal="18dp"
+        android:drawablePadding="6dp"
+        app:drawableStartCompat="@drawable/ic_add" />
+
+    <ImageView
+        android:layout_width="@dimen/common_button_height"
+        android:layout_height="@dimen/common_button_height"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/iv_draw"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/tv_new_memo"
+        android:src="@drawable/ic_record_new"
+        android:layout_marginTop="@dimen/common_padding"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:padding="14dp"
+        android:id="@+id/iv_record"
+        android:clickable="true"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:background="@drawable/bg_rect_button"
+        android:contentDescription="@string/ark_memo_record" />
+
+    <ImageView
+        android:layout_width="@dimen/common_button_height"
+        android:layout_height="@dimen/common_button_height"
+        app:layout_constraintStart_toEndOf="@+id/iv_record"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toTopOf="@+id/iv_record"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_record"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_draw"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:padding="14dp"
+        android:id="@+id/iv_draw"
+        android:background="@drawable/bg_rect_button"
+        android:contentDescription="@string/hint_new_graphical_note" />
+
+    <TextView
+        android:text="@string/ark_memo_paste"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_record"
+        android:layout_marginTop="@dimen/common_padding"
+        android:drawablePadding="6dp"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:id="@+id/tv_paste"
+        style="@style/ActionTextView"
+        app:drawableStartCompat="@drawable/ic_clipboard" />
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/group_empty_state"
+        app:constraint_referenced_ids="iv_empty_state,tv_header,tv_instructions,tv_new_memo,iv_record,iv_draw,tv_paste"
+        android:visibility="gone"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="@color/bg_primary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/view_bottom_panel"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view_bottom_panel"
+        android:background="@color/border_secondary"
+        android:id="@+id/divider_bottom_control"/>
+
+    <TextView
+        android:text="@string/ark_memo_paste"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view_bottom_panel"
+        app:layout_constraintBottom_toBottomOf="@+id/view_bottom_panel"
+        android:drawablePadding="6dp"
+        android:layout_marginStart="@dimen/home_horizontal_margin"
+        android:drawableStart="@drawable/ic_add"
+        android:id="@+id/tv_bottom_panel_paste"
+        style="@style/ActionTextView" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_new_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:collapsedSize="72dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:icon="@drawable/add"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/view_bottom_panel"
+        android:paddingHorizontal="@dimen/home_horizontal_margin"
+        android:id="@+id/rv_pinned_notes"
+        app:layout_constraintTop_toBottomOf="@+id/edt_search"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_draw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabCustomSize="@dimen/fab_size"
+        android:src="@drawable/ic_draw"
+        app:layout_constraintEnd_toEndOf="@+id/fab_new_action"
+        app:layout_constraintStart_toStartOf="@+id/fab_new_action"
+        app:layout_constraintBottom_toTopOf="@+id/fab_new_action"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginBottom="@dimen/common_padding"
+        android:contentDescription="@string/hint_new_graphical_note" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_record_voice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabCustomSize="@dimen/fab_size"
+        android:src="@drawable/ic_record_big"
+        app:layout_constraintEnd_toEndOf="@+id/fab_new_action"
+        app:layout_constraintStart_toStartOf="@+id/fab_new_action"
+        app:layout_constraintBottom_toTopOf="@+id/fab_draw"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginBottom="@dimen/common_padding"
+        android:contentDescription="@string/fab_record_voice" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_simple_memo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabCustomSize="@dimen/fab_size"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintEnd_toEndOf="@+id/fab_new_action"
+        app:layout_constraintStart_toStartOf="@+id/fab_new_action"
+        app:layout_constraintBottom_toTopOf="@+id/fab_record_voice"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_marginBottom="@dimen/common_padding"
+        android:contentDescription="@string/ark_memo_add_new_note" />
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/group_fab_actions"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:constraint_referenced_ids="view_fab_background,fab_draw,tv_create_drawing,fab_record_voice,tv_record_voice,fab_simple_memo,tv_simple_memo"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#0C111D"
+        android:alpha="0.7"
+        android:id="@+id/view_fab_background"
+        android:visibility="gone"
+        android:clickable="true"
+        app:layout_constraintBottom_toTopOf="@+id/divider_bottom_control"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/TextLarge"
+        app:layout_constraintEnd_toStartOf="@+id/fab_draw"
+        app:layout_constraintTop_toTopOf="@+id/fab_draw"
+        app:layout_constraintBottom_toBottomOf="@+id/fab_draw"
+        android:text="@string/fab_create_drawing_text"
+        android:layout_marginEnd="@dimen/fab_text_margin"
+        android:id="@+id/tv_create_drawing"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/TextLarge"
+        app:layout_constraintEnd_toStartOf="@+id/fab_record_voice"
+        app:layout_constraintTop_toTopOf="@+id/fab_record_voice"
+        app:layout_constraintBottom_toBottomOf="@+id/fab_record_voice"
+        android:text="@string/fab_record_voice"
+        android:layout_marginEnd="@dimen/fab_text_margin"
+        android:id="@+id/tv_record_voice"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/TextLarge"
+        app:layout_constraintEnd_toStartOf="@+id/fab_simple_memo"
+        app:layout_constraintTop_toTopOf="@+id/fab_simple_memo"
+        app:layout_constraintBottom_toBottomOf="@+id/fab_simple_memo"
+        android:text="@string/fab_simple_memo"
+        android:layout_marginEnd="@dimen/fab_text_margin"
+        android:id="@+id/tv_simple_memo"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_bottom_control"
+        android:visibility="gone"
+        app:constraint_referenced_ids="tv_bottom_panel_paste,fab_new_action,divider_bottom_control"/>
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:indeterminate="true"
+        android:indeterminateDrawable="@drawable/ic_animated_loading"/>
+
+    <ImageView
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/ic_search_result_empty"
+        android:contentDescription="@string/ark_memo_search_result_empty"
+        android:id="@+id/iv_search_result_empty"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_search_result_empty"
+        android:text="@string/ark_memo_search_result_empty"
+        style="@style/TextXLarge"
+        android:id="@+id/tv_search_result_empty"
+        android:layout_marginTop="@dimen/common_padding"/>
+
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="iv_search_result_empty,tv_search_result_empty"
+        android:id="@+id/group_search_result_empty"
+        android:visibility="gone"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,9 +11,15 @@ import kotlin.io.path.createTempFile
 class VoiceNote(
     override val title: String = "",
     override val description: String = "",
-    val duration: String = "",
+    var duration: String = "",
     @IgnoredOnParcel
     var path: Path = createTempFile(),
     @IgnoredOnParcel
     override var resource: Resource? = null,
-) : Note, Parcelable
+    override var pendingForDelete: Boolean = false,
+    var isPlaying: Boolean = false,
+    var pendingForPlaybackReset: Boolean = false,
+    var waitToBeResumed: Boolean = false,
+    var currentPlayingPos: Int = 0,
+    var currentMaxAmplitude: Int = 0
+): Note, Parcelable
