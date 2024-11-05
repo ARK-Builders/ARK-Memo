@@ -8,8 +8,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 
-class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
-
+class WaveView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     var waveColor = Color.WHITE
     private val paint by lazy {
         Paint().also {
@@ -25,8 +24,15 @@ class WaveView(context: Context, attrs: AttributeSet): View(context, attrs) {
         super.onDraw(canvas)
         if (bars.isNotEmpty()) {
             bars.forEach {
-                canvas.drawRoundRect(it.left.toFloat(), it.top.toFloat(), it.right.toFloat(),
-                    it.bottom.toFloat(), radius, radius, paint)
+                canvas.drawRoundRect(
+                    it.left.toFloat(),
+                    it.top.toFloat(),
+                    it.right.toFloat(),
+                    it.bottom.toFloat(),
+                    radius,
+                    radius,
+                    paint,
+                )
             }
         }
     }

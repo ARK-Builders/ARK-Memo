@@ -9,57 +9,63 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import dev.arkbuilders.arkmemo.R
 
-class GraphicControlTextView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-) : androidx.appcompat.widget.AppCompatTextView(context, attrs) {
+class GraphicControlTextView
+    @JvmOverloads
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+    ) : androidx.appcompat.widget.AppCompatTextView(context, attrs) {
+        private var iconTintColor: Int
 
-    private var iconTintColor: Int
+        init {
+            val typedArray: TypedArray =
+                context.obtainStyledAttributes(attrs, R.styleable.GraphicControlTextView)
+            val drawableResId =
+                typedArray.getResourceId(R.styleable.GraphicControlTextView_gct_drawable, 0)
+            val isSelected =
+                typedArray.getBoolean(R.styleable.GraphicControlTextView_gct_selected, false)
+            iconTintColor = typedArray.getColor(R.styleable.GraphicControlTextView_gct_icon_tint, -1)
 
-    init {
-        val typedArray: TypedArray =
-            context.obtainStyledAttributes(attrs, R.styleable.GraphicControlTextView)
-        val drawableResId =
-            typedArray.getResourceId(R.styleable.GraphicControlTextView_gct_drawable, 0)
-        val isSelected =
-            typedArray.getBoolean(R.styleable.GraphicControlTextView_gct_selected, false)
-        iconTintColor = typedArray.getColor(R.styleable.GraphicControlTextView_gct_icon_tint, -1)
+            drawableResId.let {
+                this.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0)
+            }
+            setSelected(isSelected)
 
-        drawableResId.let {
-            this.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0)
+            typedArray.recycle()
         }
-        setSelected(isSelected)
 
-        typedArray.recycle()
-    }
+        override fun setSelected(selected: Boolean) {
+            super.setSelected(selected)
+            if (selected) {
+                this.background =
+                    ContextCompat.getDrawable(
+                        context, R.drawable.bg_graphic_control_text_selected,
+                    )
+                val selectedColor = ContextCompat.getColor(context, R.color.warning_700)
 
-    override fun setSelected(selected: Boolean) {
-        super.setSelected(selected)
-        if (selected) {
-            this.background = ContextCompat.getDrawable(
-                context, R.drawable.bg_graphic_control_text_selected
-            )
-            val selectedColor = ContextCompat.getColor(context, R.color.warning_700)
+                this.setTextColor(selectedColor)
+                setDrawableTint(selectedColor)
+            } else {
+                this.background =
+                    ContextCompat.getDrawable(
+                        context, R.drawable.bg_border_r8,
+                    )
+                val selectedColor = ContextCompat.getColor(context, R.color.text_tertiary)
+                val drawableColor = if (iconTintColor != -1) iconTintColor else selectedColor
 
-            this.setTextColor(selectedColor)
-            setDrawableTint(selectedColor)
-        } else {
-            this.background = ContextCompat.getDrawable(
-                context, R.drawable.bg_border_r8
-            )
-            val selectedColor = ContextCompat.getColor(context, R.color.text_tertiary)
-            val drawableColor = if (iconTintColor != -1) iconTintColor else selectedColor
+                this.setTextColor(selectedColor)
+                setDrawableTint(drawableColor)
+            }
+        }
 
-            this.setTextColor(selectedColor)
-            setDrawableTint(drawableColor)
+        private fun setDrawableTint(
+            @ColorInt color: Int,
+        ) {
+            if (iconTintColor == -1) {
+                TextViewCompat.setCompoundDrawableTintList(
+                    this,
+                    ColorStateList.valueOf(color),
+                )
+            }
         }
     }
-
-    private fun setDrawableTint(@ColorInt color: Int) {
-        if (iconTintColor == -1) {
-            TextViewCompat.setCompoundDrawableTintList(this,
-                ColorStateList.valueOf(color)
-            )
-        }
-    }
-}

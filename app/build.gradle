@@ -6,6 +6,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
+    id 'org.jlleitschuh.gradle.ktlint'
 }
 
 android {
@@ -111,3 +112,9 @@ dependencies {
     implementation "com.google.firebase:firebase-crashlytics"
     implementation "com.google.firebase:firebase-analytics"
 }
+
+tasks.preBuild.dependsOn ktlintCheck
+
+tasks.preBuild.dependsOn ktlintFormat
+
+tasks.ktlintCheck.shouldRunAfter ktlintFormat

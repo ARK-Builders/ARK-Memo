@@ -9,73 +9,77 @@ import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.createTempFile
 
-class ArkAudioRecorderImpl @Inject constructor(
-    @ApplicationContext private val context: Context
-): ArkAudioRecorder {
+class ArkAudioRecorderImpl
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) : ArkAudioRecorder {
+        private val tag = "ArkAudioRecorderImpl"
 
-    private val TAG = "ArkAudioRecorderImpl"
+        private var recorder: MediaRecorder? = null
+        private val tempFile = createTempFile().toFile()
 
-    private var recorder: MediaRecorder? = null
-    private val tempFile = createTempFile().toFile()
-
-    override fun init() {
-        recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            MediaRecorder(context)
-        else MediaRecorder()
-        recorder?.apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setOutputFile(tempFile)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-            prepare()
-        }
-    }
-
-    override fun start() {
-        recorder?.start()
-    }
-
-    override fun pause() {
-        recorder?.pause()
-    }
-
-    override fun resume() {
-        recorder?.resume()
-    }
-
-    override fun reset() {
-        recorder?.reset()
-    }
-
-    override fun stop() {
-        recorder?.let {
-            try {
-                it.stop()
-            } catch (e: RuntimeException) {
-                Log.e(TAG, "stop exception: " + e.message)
+        override fun init() {
+            recorder =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    MediaRecorder(context)
+                } else {
+                    MediaRecorder()
+                }
+            recorder?.apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                setOutputFile(tempFile)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                prepare()
             }
-
-            it.release()
         }
-        recorder = null
-    }
 
-    override fun maxAmplitude(): Int {
-        return try {
-            recorder?.maxAmplitude ?: 0
-        } catch (e: Exception) {
-            0
+        override fun start() {
+            recorder?.start()
+        }
+
+        override fun pause() {
+            recorder?.pause()
+        }
+
+        override fun resume() {
+            recorder?.resume()
+        }
+
+        override fun reset() {
+            recorder?.reset()
+        }
+
+        override fun stop() {
+            recorder?.let {
+                try {
+                    it.stop()
+                } catch (e: RuntimeException) {
+                    Log.e(tag, "stop exception: " + e.message)
+                }
+
+                it.release()
+            }
+            recorder = null
+        }
+
+        override fun maxAmplitude(): Int {
+            return try {
+                recorder?.maxAmplitude ?: 0
+            } catch (e: Exception) {
+                0
+            }
+        }
+
+        override fun getRecording(): Path = tempFile.toPath()
+
+        override suspend fun deleteTempFile(): Boolean {
+            return try {
+                tempFile.delete()
+            } catch (e: Exception) {
+                Log.e(tag, "deleteTempFile exception: " + e.message)
+                false
+            }
         }
     }
-
-    override fun getRecording(): Path = tempFile.toPath()
-
-    override suspend fun deleteTempFile(): Boolean {
-        return try {
-            tempFile.delete()
-        } catch (e: Exception) {
-            Log.e(TAG, "deleteTempFile exception: " + e.message)
-            false
-        }
-    }
-}

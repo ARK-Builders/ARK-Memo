@@ -37,10 +37,8 @@ import dev.arkbuilders.arkmemo.utils.visible
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-
 @AndroidEntryPoint
-class NotesFragment: BaseFragment() {
-
+class NotesFragment : BaseFragment() {
     private lateinit var binding: FragmentHomeBinding
 
     private val activity: MainActivity by lazy {
@@ -56,67 +54,80 @@ class NotesFragment: BaseFragment() {
     private var playingAudioPosition = -1
     private var lastNoteItemPosition = 0
 
-    private val newTextNoteClickListener = View.OnClickListener {
-        onFloatingActionButtonClicked()
-    }
-
-    private val pasteNoteClickListener = View.OnClickListener {
-        requireContext().getTextFromClipBoard(view) { clipBoardText ->
-            if (clipBoardText != null) {
-                activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
-                activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
-            }
-            else Toast.makeText(requireContext(), getString(R.string.nothing_to_paste),
-                Toast.LENGTH_SHORT).show()
+    private val newTextNoteClickListener =
+        View.OnClickListener {
+            onFloatingActionButtonClicked()
         }
-    }
+
+    private val pasteNoteClickListener =
+        View.OnClickListener {
+            requireContext().getTextFromClipBoard(view) { clipBoardText ->
+                if (clipBoardText != null) {
+                    activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
+                    activity.replaceFragment(activity.fragment, EditTextNotesFragment.TAG)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.nothing_to_paste),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        }
 
     private var mItemTouchHelper: ItemTouchHelper? = null
-    private val mItemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder,
-        ): Boolean {
-            return false
+    private val mItemTouchCallback =
+        object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder,
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(
+                viewHolder: RecyclerView.ViewHolder,
+                direction: Int,
+            ) {
+                val deletePosition = viewHolder.bindingAdapterPosition
+                val noteToDelete =
+                    notesAdapter?.getNotes()?.getOrNull(deletePosition)?.apply {
+                        pendingForDelete = true
+                    } ?: return
+
+                val noteViewHolder = viewHolder as? NotesListAdapter.NoteViewHolder
+                noteViewHolder?.isSwiping = true
+
+                binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
+
+                CommonActionDialog(
+                    title = R.string.delete_note,
+                    message = R.string.ark_memo_delete_warn,
+                    positiveText = R.string.action_delete,
+                    negativeText = R.string.ark_memo_cancel,
+                    isAlert = true,
+                    onPositiveClick = {
+                        noteViewHolder?.isSwiping = false
+                        notesViewModel.onDeleteConfirmed(noteToDelete) {
+                            notesAdapter?.removeNote(noteToDelete)
+                            toast(requireContext(), getString(R.string.note_deleted))
+                            binding.rvPinnedNotes.adapter?.notifyItemRemoved(deletePosition)
+                        }
+                    },
+                    onNegativeClicked = {
+                        noteViewHolder?.isSwiping = false
+                        noteToDelete.pendingForDelete = false
+                        binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
+                    },
+                    onCloseClicked = {
+                        noteViewHolder?.isSwiping = false
+                        noteToDelete.pendingForDelete = false
+                        binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
+                    },
+                ).show(childFragmentManager, CommonActionDialog.TAG)
+            }
         }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val deletePosition = viewHolder.bindingAdapterPosition
-            val noteToDelete = notesAdapter?.getNotes()?.getOrNull(deletePosition)?.apply {
-                pendingForDelete = true
-            } ?: return
-
-            val noteViewHolder = viewHolder as? NotesListAdapter.NoteViewHolder
-            noteViewHolder?.isSwiping = true
-
-            binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
-
-            CommonActionDialog(title = R.string.delete_note,
-                message = R.string.ark_memo_delete_warn,
-                positiveText = R.string.action_delete,
-                negativeText = R.string.ark_memo_cancel,
-                isAlert = true,
-                onPositiveClick = {
-                    noteViewHolder?.isSwiping = false
-                    notesViewModel.onDeleteConfirmed(noteToDelete) {
-                        notesAdapter?.removeNote(noteToDelete)
-                        toast(requireContext(), getString(R.string.note_deleted))
-                        binding.rvPinnedNotes.adapter?.notifyItemRemoved(deletePosition)
-                    }
-
-            }, onNegativeClicked = {
-                    noteViewHolder?.isSwiping = false
-                    noteToDelete.pendingForDelete = false
-                    binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
-            }, onCloseClicked = {
-                    noteViewHolder?.isSwiping = false
-                    noteToDelete.pendingForDelete = false
-                    binding.rvPinnedNotes.adapter?.notifyItemChanged(deletePosition)
-            }).show(childFragmentManager, CommonActionDialog.TAG)
-        }
-
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,13 +137,16 @@ class NotesFragment: BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater)
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -146,9 +160,11 @@ class NotesFragment: BaseFragment() {
 
         binding.pbLoading.visible()
         notesViewModel.apply {
-            init { readAllNotes {
-                onNotesLoaded(it)
-            } }
+            init {
+                readAllNotes {
+                    onNotesLoaded(it)
+                }
+            }
         }
         initSearch()
     }
@@ -170,12 +186,13 @@ class NotesFragment: BaseFragment() {
                     }
                     notesAdapter?.updateData(notes, fromSearch = true, keyword = text.toString())
 
-                    //When search text is cleared, restore previous note item position in the list
+                    // When search text is cleared, restore previous note item position in the list
                     if (text.toString().isEmpty()) {
                         binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
                     }
                 }
-        })
+            },
+        )
 
         binding.edtSearch.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -187,37 +204,36 @@ class NotesFragment: BaseFragment() {
     private fun onNotesLoaded(notes: List<Note>) {
         binding.pbLoading.gone()
         if (notesAdapter == null) {
-            notesAdapter = NotesListAdapter(
-                notes.toMutableList(),
-                onPlayPauseClick = { path, pos, onStop ->
-                    playingAudioPath = path
-                    if (playingAudioPosition >= 0) {
-                        refreshVoiceNoteItem(playingAudioPosition)
-                    }
+            notesAdapter =
+                NotesListAdapter(
+                    notes.toMutableList(),
+                    onPlayPauseClick = { path, pos, onStop ->
+                        playingAudioPath = path
+                        if (playingAudioPosition >= 0) {
+                            refreshVoiceNoteItem(playingAudioPosition)
+                        }
 
-                    if (playingAudioPosition >= 0 && playingAudioPosition != pos) {
-                        //Another Voice note is being played compared to the previously played one
-                        markResetVoiceNotePlayback(playingAudioPosition)
-                    }
+                        if (playingAudioPosition >= 0 && playingAudioPosition != pos) {
+                            // Another Voice note is being played compared to the previously played one
+                            markResetVoiceNotePlayback(playingAudioPosition)
+                        }
 
-                    playingAudioPosition = pos ?: -1
+                        playingAudioPosition = pos ?: -1
 
-                    if (arkMediaPlayerViewModel.isPlaying()) {
-                        mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
-                        markWaitToBeResumed(playingAudioPosition)
-                    } else {
-                        mItemTouchHelper?.attachToRecyclerView(null)
-                    }
+                        if (arkMediaPlayerViewModel.isPlaying()) {
+                            mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
+                            markWaitToBeResumed(playingAudioPosition)
+                        } else {
+                            mItemTouchHelper?.attachToRecyclerView(null)
+                        }
 
-                    arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
-                },
-                onThumbPrepare = { graphicNote, noteCanvas ->
-                    val tempNoteViewModel: GraphicNotesViewModel by viewModels()
-                    noteCanvas.setViewModel(viewModel = tempNoteViewModel)
-
-                }
-            )
-
+                        arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
+                    },
+                    onThumbPrepare = { graphicNote, noteCanvas ->
+                        val tempNoteViewModel: GraphicNotesViewModel by viewModels()
+                        noteCanvas.setViewModel(viewModel = tempNoteViewModel)
+                    },
+                )
         } else {
             notesAdapter?.setNotes(notes)
         }
@@ -229,12 +245,13 @@ class NotesFragment: BaseFragment() {
         binding.rvPinnedNotes.apply {
             this.layoutManager = layoutManager
             this.adapter = notesAdapter
-            this.itemAnimator = object : DefaultItemAnimator() {
-                override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
-                    val isSwiping = (viewHolder as? NotesListAdapter.NoteViewHolder)?.isSwiping ?: false
-                    return !isSwiping
+            this.itemAnimator =
+                object : DefaultItemAnimator() {
+                    override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
+                        val isSwiping = (viewHolder as? NotesListAdapter.NoteViewHolder)?.isSwiping ?: false
+                        return !isSwiping
+                    }
                 }
-            }
         }
 
         mItemTouchHelper = ItemTouchHelper(mItemTouchCallback)
@@ -352,7 +369,6 @@ class NotesFragment: BaseFragment() {
         binding.tvPaste.setOnClickListener(pasteNoteClickListener)
         binding.tvInstructions.setOnClickListener {
         }
-
     }
 
     private fun observeClipboardContent() {
@@ -386,17 +402,19 @@ class NotesFragment: BaseFragment() {
         if (showingFloatingButtons) {
             binding.fabNewAction.shrink()
             binding.fabNewAction.icon = ContextCompat.getDrawable(activity, R.drawable.ic_add)
-            binding.fabNewAction.backgroundTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(activity, R.color.warning)
-            )
+            binding.fabNewAction.backgroundTintList =
+                ColorStateList.valueOf(
+                    ContextCompat.getColor(activity, R.color.warning),
+                )
             binding.groupFabActions.gone()
             showingFloatingButtons = false
         } else {
             binding.fabNewAction.extend()
             binding.fabNewAction.icon = ContextCompat.getDrawable(activity, R.drawable.ic_close)
-            binding.fabNewAction.backgroundTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(activity, R.color.warning_100)
-            )
+            binding.fabNewAction.backgroundTintList =
+                ColorStateList.valueOf(
+                    ContextCompat.getColor(activity, R.color.warning_100),
+                )
             binding.groupFabActions.visible()
             showingFloatingButtons = true
         }

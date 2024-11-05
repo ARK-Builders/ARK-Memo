@@ -16,8 +16,8 @@ import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
-import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.ui.fragments.BaseFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
@@ -25,7 +25,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
-
     private val binding by viewBinding(ActivityMainBinding::bind)
 
     @Inject
@@ -39,14 +38,20 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     init {
         FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) FilePickerDialog.show()
-                else finish()
+                if (isGranted) {
+                    FilePickerDialog.show()
+                } else {
+                    finish()
+                }
             }
 
-        FilePickerDialog.readPermLauncher_SDK_R =
+        FilePickerDialog.readPermLauncherSdkR =
             registerForActivityResult(PermissionContract()) { isGranted ->
-                if (isGranted) FilePickerDialog.show()
-                else finish()
+                if (isGranted) {
+                    FilePickerDialog.show()
+                } else {
+                    finish()
+                }
             }
     }
 
@@ -68,12 +73,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     commit()
                 }
             } else {
-                if (savedInstanceState == null)
+                if (savedInstanceState == null) {
                     supportFragmentManager.beginTransaction().apply {
                         add(fragContainer, fragment, NotesFragment.TAG)
                         commit()
                     }
-                else {
+                } else {
                     supportFragmentManager.apply {
                         val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
                         findFragmentByTag(tag)?.let {
@@ -94,8 +99,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 memoPreferences.storePath(it.toString())
                 showFragment()
             }
+        } else {
+            showFragment()
         }
-        else showFragment()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -112,7 +118,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun setStatusBarColor(color: Int, isLight: Boolean) {
+    private fun setStatusBarColor(
+        color: Int,
+        isLight: Boolean,
+    ) {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = color
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
@@ -126,13 +135,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
     }
 
-    companion object{
+    companion object {
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
     }
 }
 
-fun AppCompatActivity.resumeFragment(fragment: Fragment){
-    supportFragmentManager.beginTransaction().apply{
+fun AppCompatActivity.resumeFragment(fragment: Fragment) {
+    supportFragmentManager.beginTransaction().apply {
         show(fragment)
         commit()
     }

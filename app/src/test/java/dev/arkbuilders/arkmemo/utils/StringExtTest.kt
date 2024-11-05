@@ -1,11 +1,9 @@
 package dev.arkbuilders.arkmemo.utils
 
-import org.junit.Assert.*
-
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
 class StringExtTest {
-
     @Test
     fun `insert string in the middle of another string`() {
         val result = "Hello World".insertStringAtPosition("Beautiful ", 6)
@@ -67,5 +65,4 @@ class StringExtTest {
         val result = "Hello\nWorld".insertStringAtPosition(" Beautiful", 5)
         assertEquals("Hello Beautiful\nWorld", result)
     }
-
 }

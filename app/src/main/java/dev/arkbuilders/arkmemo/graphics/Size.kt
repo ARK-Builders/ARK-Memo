@@ -1,7 +1,6 @@
 package dev.arkbuilders.arkmemo.graphics
 
 enum class Size(val id: Int, val value: Float) {
-
     TINY(0, 5f),
 
     SMALL(1, 10f),
@@ -10,5 +9,5 @@ enum class Size(val id: Int, val value: Float) {
 
     LARGE(3, 20f),
 
-    HUGE(4, 25f)
+    HUGE(4, 25f),
 }

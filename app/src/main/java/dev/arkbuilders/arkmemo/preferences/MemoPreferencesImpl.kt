@@ -8,26 +8,29 @@ import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.Path
 
-
 private const val NAME = "memo_prefs"
 private const val CURRENT_NOTES_PATH = "current_notes_path"
 
-class MemoPreferencesImpl @Inject constructor(@ApplicationContext context: Context) :
+class MemoPreferencesImpl
+    @Inject
+    constructor(
+        @ApplicationContext context: Context,
+    ) :
     MemoPreferences {
-    private val sharedPreferences = context.getSharedPreferences(NAME, MODE_PRIVATE)
-    private val prefEditor = sharedPreferences.edit()
+        private val sharedPreferences = context.getSharedPreferences(NAME, MODE_PRIVATE)
+        private val prefEditor = sharedPreferences.edit()
 
-    override fun storePath(path: String) {
-        prefEditor.putString(CURRENT_NOTES_PATH, path).apply()
+        override fun storePath(path: String) {
+            prefEditor.putString(CURRENT_NOTES_PATH, path).apply()
+        }
+
+        override fun getPath(): String = sharedPreferences.getString(CURRENT_NOTES_PATH, "") ?: ""
+
+        override fun getNotesStorage(): Path = Path(getPath())
+
+        override fun storeCrashReportEnabled(enabled: Boolean) {
+            prefEditor.putBoolean(CRASH_REPORT_ENABLE, enabled).apply()
+        }
+
+        override fun getCrashReportEnabled(): Boolean = sharedPreferences.getBoolean(CRASH_REPORT_ENABLE, true)
     }
-
-    override fun getPath(): String = sharedPreferences.getString(CURRENT_NOTES_PATH, "") ?: ""
-
-    override fun getNotesStorage(): Path = Path(getPath())
-
-    override fun storeCrashReportEnabled(enabled: Boolean) {
-        prefEditor.putBoolean(CRASH_REPORT_ENABLE, enabled).apply()
-    }
-
-    override fun getCrashReportEnabled(): Boolean = sharedPreferences.getBoolean(CRASH_REPORT_ENABLE, true)
-}

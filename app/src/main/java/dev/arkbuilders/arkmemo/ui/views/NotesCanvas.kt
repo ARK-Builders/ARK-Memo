@@ -12,8 +12,7 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.GraphicNotesViewModel
 import dev.arkbuilders.arkmemo.utils.getBrushSizeId
 import dev.arkbuilders.arkmemo.utils.getStrokeColor
 
-class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
-
+class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var currentX = 0f
     private var currentY = 0f
     private lateinit var viewModel: GraphicNotesViewModel
@@ -33,14 +32,16 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
         val y = event.y
 
         var finishDrawing = false
-        when(event.action) {
+        when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
                 viewModel.svg().apply {
-                    addCommand(SVGCommand.MoveTo(x, y).apply {
-                        paintColor = viewModel.paint.color.getStrokeColor()
-                        brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
-                    })
+                    addCommand(
+                        SVGCommand.MoveTo(x, y).apply {
+                            paintColor = viewModel.paint.color.getStrokeColor()
+                            brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
+                        },
+                    )
                 }
                 currentX = x
                 currentY = y
@@ -50,10 +51,12 @@ class NotesCanvas(context: Context, attrs: AttributeSet): View(context, attrs) {
                 val y2 = (currentY + y) / 2
                 path.quadTo(currentX, currentY, x2, y2)
                 viewModel.svg().apply {
-                    addCommand(SVGCommand.AbsQuadTo(currentX, currentY, x2, y2).apply {
-                        paintColor = viewModel.paint.color.getStrokeColor()
-                        brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
-                    })
+                    addCommand(
+                        SVGCommand.AbsQuadTo(currentX, currentY, x2, y2).apply {
+                            paintColor = viewModel.paint.color.getStrokeColor()
+                            brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
+                        },
+                    )
                 }
                 currentX = x
                 currentY = y

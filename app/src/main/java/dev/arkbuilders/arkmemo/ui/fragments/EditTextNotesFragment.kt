@@ -23,49 +23,55 @@ import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import java.lang.StringBuilder
 
 @AndroidEntryPoint
-class EditTextNotesFragment: BaseEditNoteFragment() {
-
+class EditTextNotesFragment : BaseEditNoteFragment() {
     private var note = TextNote()
     private var noteStr: String? = null
 
-    private val pasteNoteClickListener = View.OnClickListener {
-        requireContext().getTextFromClipBoard(view) { clipBoardText ->
-            if (clipBoardText != null) {
-                val newTextBuilder = StringBuilder()
-                val cursorPos = binding.editNote.selectionStart
-                val noteContent = binding.editNote.text.toString()
+    private val pasteNoteClickListener =
+        View.OnClickListener {
+            requireContext().getTextFromClipBoard(view) { clipBoardText ->
+                if (clipBoardText != null) {
+                    val newTextBuilder = StringBuilder()
+                    val cursorPos = binding.editNote.selectionStart
+                    val noteContent = binding.editNote.text.toString()
 
-                val newCursorPos = if (cursorPos < 0) {
-                    (clipBoardText.length + noteContent.length - 1).coerceAtLeast(0)
+                    val newCursorPos =
+                        if (cursorPos < 0) {
+                            (clipBoardText.length + noteContent.length - 1).coerceAtLeast(0)
+                        } else {
+                            clipBoardText.length + cursorPos
+                        }
+                    try {
+                        newTextBuilder.append(noteContent.insertStringAtPosition(clipBoardText, cursorPos))
+                    } catch (e: IndexOutOfBoundsException) {
+                        Log.e(TAG, "pasteNoteClickListener exception: ${e.message}")
+                        newTextBuilder.append(noteContent).append(clipBoardText)
+                    }
+
+                    binding.editNote.setText(newTextBuilder.toString())
+                    binding.editNote.setSelection(newCursorPos)
                 } else {
-                    clipBoardText.length + cursorPos
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.nothing_to_paste),
+                        Toast.LENGTH_SHORT,
+                    ).show()
                 }
-                try {
-                    newTextBuilder.append(noteContent.insertStringAtPosition(clipBoardText, cursorPos))
-                } catch (e: IndexOutOfBoundsException) {
-                    Log.e(TAG, "pasteNoteClickListener exception: ${e.message}")
-                    newTextBuilder.append(noteContent).append(clipBoardText)
-                }
-
-                binding.editNote.setText(newTextBuilder.toString())
-                binding.editNote.setSelection(newCursorPos)
             }
-            else Toast.makeText(requireContext(),
-                getString(R.string.nothing_to_paste), Toast.LENGTH_SHORT).show()
         }
-    }
 
-    private val windowFocusedListener = OnWindowFocusChangeListener {
-        if (it) {
-            observeClipboardContent()
+    private val windowFocusedListener =
+        OnWindowFocusChangeListener {
+            if (it) {
+                observeClipboardContent()
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
         observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
-        if(arguments != null) {
+        if (arguments != null) {
             requireArguments().getParcelableCompat(NOTE_KEY, TextNote::class.java)?.let {
                 note = it
             }
@@ -73,24 +79,38 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         var title: String
         val noteTitle = binding.edtTitle
         val editNote = binding.editNote
-        val noteTitleChangeListener = object: TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        val noteTitleChangeListener =
+            object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int,
+                ) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                title = s?.toString() ?: ""
-                if (title.isEmpty()) {
-                    binding.edtTitle.hint = getString(R.string.hint_new_text_note)
+                override fun onTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int,
+                ) {
+                    title = s?.toString() ?: ""
+                    if (title.isEmpty()) {
+                        binding.edtTitle.hint = getString(R.string.hint_new_text_note)
+                    }
+                    enableSaveText(isContentChanged() && !isContentEmpty())
                 }
-                enableSaveText(isContentChanged() && !isContentEmpty())
-            }
 
-            override fun afterTextChanged(s: Editable?) {}
-        }
+                override fun afterTextChanged(s: Editable?) {}
+            }
 
         hostActivity.title = getString(R.string.edit_note)
         hostActivity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -113,8 +133,9 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         editNote.requestFocus()
         editNote.setText(this.note.text)
 
-        if(noteStr != null)
+        if (noteStr != null) {
             editNote.setText(noteStr)
+        }
 
         binding.tvSave.setOnClickListener {
             notesViewModel.onSaveClick(createNewNote(), parentNote = note) { show ->
@@ -137,8 +158,8 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
     }
 
     override fun isContentChanged(): Boolean {
-        return note.title != binding.edtTitle.text.toString()
-                || note.text != binding.editNote.text.toString()
+        return note.title != binding.edtTitle.text.toString() ||
+            note.text != binding.editNote.text.toString()
     }
 
     override fun isContentEmpty(): Boolean {
@@ -155,7 +176,7 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
             title = binding.edtTitle.text.toString(),
             description = binding.editTextDescription.text.toString(),
             text = binding.editNote.text.toString(),
-            resource = note.resource
+            resource = note.resource,
         )
     }
 
@@ -186,21 +207,25 @@ class EditTextNotesFragment: BaseEditNoteFragment() {
         }
     }
 
-    companion object{
+    companion object {
         const val TAG = "EditTextNotesFragment"
         private const val NOTE_STRING_KEY = "note string"
         private const val NOTE_KEY = "note key"
 
-        fun newInstance(note: String) = EditTextNotesFragment().apply{
-            arguments = Bundle().apply {
-                putString(NOTE_STRING_KEY, note)
+        fun newInstance(note: String) =
+            EditTextNotesFragment().apply {
+                arguments =
+                    Bundle().apply {
+                        putString(NOTE_STRING_KEY, note)
+                    }
             }
-        }
 
-        fun newInstance(note: TextNote) = EditTextNotesFragment().apply{
-            arguments = Bundle().apply{
-                putParcelable(NOTE_KEY, note)
+        fun newInstance(note: TextNote) =
+            EditTextNotesFragment().apply {
+                arguments =
+                    Bundle().apply {
+                        putParcelable(NOTE_KEY, note)
+                    }
             }
-        }
     }
 }

@@ -10,21 +10,26 @@ import dev.arkbuilders.arkmemo.models.Tag
 
 class TagAdapter(
     private val tags: List<Tag>,
-): RecyclerView.Adapter<TagAdapter.TagViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagViewHolder {
+) : RecyclerView.Adapter<TagAdapter.TagViewHolder>() {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): TagViewHolder {
         val binding = AdapterTagBinding.inflate(LayoutInflater.from(parent.context))
         return TagViewHolder(binding.root)
     }
 
-    override fun onBindViewHolder(holder: TagViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: TagViewHolder,
+        position: Int,
+    ) {
         val tag = tags[position]
         holder.title.text = tag.value
     }
 
     override fun getItemCount() = tags.size
 
-    inner class TagViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class TagViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding by viewBinding {
             AdapterTagBinding.bind(itemView)
         }

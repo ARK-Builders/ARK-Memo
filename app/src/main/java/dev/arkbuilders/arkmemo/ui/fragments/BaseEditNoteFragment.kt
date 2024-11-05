@@ -18,8 +18,7 @@ import dev.arkbuilders.arkmemo.utils.visible
 import java.util.Calendar
 import java.util.Locale
 
-abstract class BaseEditNoteFragment: BaseFragment() {
-
+abstract class BaseEditNoteFragment : BaseFragment() {
     lateinit var binding: FragmentEditNotesBinding
     val notesViewModel: NotesViewModel by activityViewModels()
     val hostActivity by lazy { activity as MainActivity }
@@ -27,23 +26,33 @@ abstract class BaseEditNoteFragment: BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         binding = FragmentEditNotesBinding.inflate(layoutInflater)
         return binding.root
     }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvDescription.setOnClickListener {
             if (binding.editTextDescription.visibility == View.GONE) {
                 binding.tvDescription.setCompoundDrawablesWithIntrinsicBounds(
-                    0, 0, R.drawable.ic_chevron_down, 0
+                    0,
+                    0,
+                    R.drawable.ic_chevron_down,
+                    0,
                 )
                 binding.editTextDescription.visibility = View.VISIBLE
             } else {
                 binding.tvDescription.setCompoundDrawablesWithIntrinsicBounds(
-                    0, 0, R.drawable.ic_chevron_right, 0
+                    0,
+                    0,
+                    R.drawable.ic_chevron_right,
+                    0,
                 )
                 binding.editTextDescription.visibility = View.GONE
             }
@@ -70,7 +79,6 @@ abstract class BaseEditNoteFragment: BaseFragment() {
                 if (this is EditTextNotesFragment) {
                     binding.groupTextControls.visible()
                 }
-
             } else {
                 binding.layoutGraphicsControl.root.visible()
                 binding.groupTextControls.gone()
@@ -92,48 +100,57 @@ abstract class BaseEditNoteFragment: BaseFragment() {
             val calendar = Calendar.getInstance(Locale.ENGLISH)
             calendar.timeInMillis = getCurrentNote().resource?.modified?.toMillis()
                 ?: System.currentTimeMillis()
-            val lastModifiedTime = DateFormat.format(
-                "dd MMM yyyy', 'hh:mm aa", calendar).toString()
+            val lastModifiedTime =
+                DateFormat.format(
+                    "dd MMM yyyy', 'hh:mm aa",
+                    calendar,
+                ).toString()
             binding.tvLastModified.text = getString(R.string.note_last_modified_time, lastModifiedTime)
         }
     }
 
-    private fun showSaveNoteDialog(needStopRecording: Boolean = false,
-                                   onDiscard: (needClearResource: Boolean) -> Unit) {
-        val saveNoteDialog = CommonActionDialog(
-            title = R.string.dialog_save_note_title,
-            message = R.string.dialog_save_note_message,
-            positiveText = R.string.save,
-            negativeText = R.string.discard,
-            isAlert = false,
-            onPositiveClick = {
-                if (needStopRecording) {
-                    (this as? ArkRecorderFragment)?.stopIfRecording()
-                }
-                notesViewModel.onSaveClick(createNewNote()) { show ->
-                    hostActivity.showProgressBar(show)
-                }
-            },
-            onNegativeClicked = {
-                onDiscard.invoke(getCurrentNote().resource?.id == null)
-                hostActivity.onBackPressedDispatcher.onBackPressed()
-            })
+    private fun showSaveNoteDialog(
+        needStopRecording: Boolean = false,
+        onDiscard: (needClearResource: Boolean) -> Unit,
+    ) {
+        val saveNoteDialog =
+            CommonActionDialog(
+                title = R.string.dialog_save_note_title,
+                message = R.string.dialog_save_note_message,
+                positiveText = R.string.save,
+                negativeText = R.string.discard,
+                isAlert = false,
+                onPositiveClick = {
+                    if (needStopRecording) {
+                        (this as? ArkRecorderFragment)?.stopIfRecording()
+                    }
+                    notesViewModel.onSaveClick(createNewNote()) { show ->
+                        hostActivity.showProgressBar(show)
+                    }
+                },
+                onNegativeClicked = {
+                    onDiscard.invoke(getCurrentNote().resource?.id == null)
+                    hostActivity.onBackPressedDispatcher.onBackPressed()
+                },
+            )
         saveNoteDialog.show(parentFragmentManager, CommonActionDialog.TAG)
     }
 
     fun showDeleteNoteDialog(note: Note) {
         CommonActionDialog(
             title = R.string.delete_note,
-            message = R.string.ark_memo_delete_warn ,
+            message = R.string.ark_memo_delete_warn,
             positiveText = R.string.action_delete,
             negativeText = R.string.ark_memo_cancel,
             isAlert = true,
             onPositiveClick = {
-                notesViewModel.onDeleteConfirmed(note){}
+                notesViewModel.onDeleteConfirmed(note) {}
                 hostActivity.onBackPressedDispatcher.onBackPressed()
                 toast(requireContext(), getString(R.string.note_deleted))
-            }, onNegativeClicked = {
-            }).show(parentFragmentManager, CommonActionDialog.TAG)
+            },
+            onNegativeClicked = {
+            },
+        ).show(parentFragmentManager, CommonActionDialog.TAG)
     }
 
     private fun handleBackPressed() {
@@ -141,7 +158,7 @@ abstract class BaseEditNoteFragment: BaseFragment() {
         val isRecording = recordFragment?.isRecordingVoiceNote() ?: false
 
         if (isContentChanged() && !isContentEmpty() || isRecording) {
-            showSaveNoteDialog (needStopRecording = isRecording) { needClearResource ->
+            showSaveNoteDialog(needStopRecording = isRecording) { needClearResource ->
                 if (needClearResource) {
                     recordFragment?.stopIfRecording()
                     recordFragment?.deleteTempFile()
@@ -157,7 +174,10 @@ abstract class BaseEditNoteFragment: BaseFragment() {
     }
 
     abstract fun createNewNote(): Note
+
     abstract fun getCurrentNote(): Note
+
     abstract fun isContentChanged(): Boolean
+
     abstract fun isContentEmpty(): Boolean
 }

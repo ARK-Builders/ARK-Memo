@@ -21,5 +21,5 @@ class VoiceNote(
     var pendingForPlaybackReset: Boolean = false,
     var waitToBeResumed: Boolean = false,
     var currentPlayingPos: Int = 0,
-    var currentMaxAmplitude: Int = 0
-): Note, Parcelable
+    var currentMaxAmplitude: Int = 0,
+) : Note, Parcelable

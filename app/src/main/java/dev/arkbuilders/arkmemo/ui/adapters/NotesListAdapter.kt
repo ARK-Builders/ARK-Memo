@@ -31,9 +31,8 @@ import dev.arkbuilders.arkmemo.utils.visible
 class NotesListAdapter(
     private var notes: MutableList<Note>,
     private val onPlayPauseClick: (path: String, pos: Int?, stopCallback: ((pos: Int) -> Unit)?) -> Unit,
-    private val onThumbPrepare : (note: GraphicNote, holder: NotesCanvas) -> Unit
-): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
-
+    private val onThumbPrepare: (note: GraphicNote, holder: NotesCanvas) -> Unit,
+) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
     private lateinit var activity: MainActivity
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
@@ -46,13 +45,19 @@ class NotesListAdapter(
         this.activity = activity as MainActivity
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): NoteViewHolder {
         val binding = AdapterTextNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         binding.root.clipToOutline = true
         return NoteViewHolder(binding.root)
     }
 
-    override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: NoteViewHolder,
+        position: Int,
+    ) {
         val note = notes[holder.bindingAdapterPosition]
         holder.title.text = note.getAutoTitle(activity)
 
@@ -103,7 +108,6 @@ class NotesListAdapter(
                     showPlaybackIdleState(holder)
                 }
             }
-
         } else if (note is GraphicNote) {
             holder.canvasGraphicThumb.visible()
             onThumbPrepare(note, holder.canvasGraphicThumb)
@@ -120,7 +124,7 @@ class NotesListAdapter(
 
     private fun handleMediaPlayerSideEffect(
         effect: ArkMediaPlayerSideEffect,
-        holder: NoteViewHolder
+        holder: NoteViewHolder,
     ) {
         when (effect) {
             is ArkMediaPlayerSideEffect.StartPlaying -> {
@@ -139,12 +143,16 @@ class NotesListAdapter(
         }
     }
 
-    private fun showPlaybackIdleState(holder: NoteViewHolder, isPaused: Boolean = false) {
-        val playIcon = ResourcesCompat.getDrawable(
-            activity.resources,
-            R.drawable.ic_play_circle,
-            null
-        )
+    private fun showPlaybackIdleState(
+        holder: NoteViewHolder,
+        isPaused: Boolean = false,
+    ) {
+        val playIcon =
+            ResourcesCompat.getDrawable(
+                activity.resources,
+                R.drawable.ic_play_circle,
+                null,
+            )
 
         holder.btnPlayPause.setImageDrawable(playIcon)
         if (!isPaused) {
@@ -156,16 +164,21 @@ class NotesListAdapter(
     }
 
     private fun showPlayingState(holder: NoteViewHolder) {
-        val playIcon = ResourcesCompat.getDrawable(
-            activity.resources,
-            R.drawable.ic_pause_circle,
-            null
-        )
+        val playIcon =
+            ResourcesCompat.getDrawable(
+                activity.resources,
+                R.drawable.ic_pause_circle,
+                null,
+            )
         holder.btnPlayPause.setImageDrawable(playIcon)
         holder.layoutAudioView.animAudioPlaying.background = null
     }
 
-    fun updateData(newNotes: List<Note>, fromSearch: Boolean? = null, keyword: String? = null) {
+    fun updateData(
+        newNotes: List<Note>,
+        fromSearch: Boolean? = null,
+        keyword: String? = null,
+    ) {
         notes = newNotes.toMutableList()
         isFromSearch = fromSearch ?: false
         searchKeyWord = keyword ?: ""
@@ -184,7 +197,7 @@ class NotesListAdapter(
         notes.remove(noteToRemove)
     }
 
-    inner class NoteViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding by viewBinding {
             AdapterTextNoteBinding.bind(itemView)
         }
@@ -198,21 +211,22 @@ class NotesListAdapter(
         val tvDelete = binding.tvDelete
         var isSwiping: Boolean = false
 
-        private val clickNoteToEditListener = View.OnClickListener {
-            var tag = EditTextNotesFragment.TAG
-            when (val selectedNote = notes[bindingAdapterPosition]) {
-                is TextNote -> activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
-                is GraphicNote -> {
-                    activity.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
-                    tag = EditGraphicNotesFragment.TAG
+        private val clickNoteToEditListener =
+            View.OnClickListener {
+                var tag = EditTextNotesFragment.TAG
+                when (val selectedNote = notes[bindingAdapterPosition]) {
+                    is TextNote -> activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
+                    is GraphicNote -> {
+                        activity.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
+                        tag = EditGraphicNotesFragment.TAG
+                    }
+                    is VoiceNote -> {
+                        activity.fragment = ArkRecorderFragment.newInstance(selectedNote)
+                        tag = ArkRecorderFragment.TAG
+                    }
                 }
-                is VoiceNote -> {
-                    activity.fragment = ArkRecorderFragment.newInstance(selectedNote)
-                    tag = ArkRecorderFragment.TAG
-                }
+                activity.replaceFragment(activity.fragment, tag)
             }
-            activity.replaceFragment(activity.fragment, tag)
-        }
 
         init {
             binding.root.setOnClickListener(clickNoteToEditListener)
