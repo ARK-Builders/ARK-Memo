@@ -20,7 +20,7 @@ import kotlin.io.path.extension
 import kotlin.io.path.forEachLine
 
 fun Fragment.observeSaveResult(result: LiveData<SaveNoteResult>) {
-    result.observe(this) {
+    result.observe(viewLifecycleOwner) {
         if (!isResumed) return@observe
 
         if (it == SaveNoteResult.SUCCESS_NEW || it == SaveNoteResult.SUCCESS_UPDATED) {
