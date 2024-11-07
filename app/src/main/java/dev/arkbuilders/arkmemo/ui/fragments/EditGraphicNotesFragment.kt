@@ -67,7 +67,6 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
-        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
         arguments?.getParcelableCompat(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
             note = it
             graphicNotesViewModel.onNoteOpened(note)
@@ -140,6 +139,7 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
         binding.editTextDescription.setText(this.note.description)
         initBottomControls()
         observeDrawEvent()
+        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
     }
 
     private fun observeDrawEvent() {

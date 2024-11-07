@@ -202,13 +202,14 @@ class NotesFragment : BaseFragment() {
     private fun onNotesLoaded(notes: List<Note>) {
         binding.pbLoading.gone()
         if (notesAdapter == null) {
-            notesAdapter = NotesListAdapter(
-                notes.toMutableList(),
-                onPlayPauseClick = { path, pos, onStop ->
-                    playingAudioPath = path
-                    if (playingAudioPosition >= 0) {
-                        refreshNoteItem(playingAudioPosition)
-                    }
+            notesAdapter =
+                NotesListAdapter(
+                    notes.toMutableList(),
+                    onPlayPauseClick = { path, pos, onStop ->
+                        playingAudioPath = path
+                        if (playingAudioPosition >= 0) {
+                            refreshNoteItem(playingAudioPosition)
+                        }
 
                         if (playingAudioPosition >= 0 && playingAudioPosition != pos) {
                             // Another Voice note is being played compared to the previously played one
@@ -224,10 +225,9 @@ class NotesFragment : BaseFragment() {
                             mItemTouchHelper?.attachToRecyclerView(null)
                         }
 
-                    arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
-                }
-            )
-
+                        arkMediaPlayerViewModel.onPlayOrPauseClick(path, pos, onStop)
+                    },
+                )
         } else {
             notesAdapter?.setNotes(notes)
         }

@@ -33,8 +33,7 @@ import dev.arkbuilders.arkmemo.utils.visible
 class NotesListAdapter(
     private var notes: MutableList<Note>,
     private val onPlayPauseClick: (path: String, pos: Int?, stopCallback: ((pos: Int) -> Unit)?) -> Unit,
-): RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
-
+) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
     private lateinit var activity: MainActivity
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
@@ -116,23 +115,26 @@ class NotesListAdapter(
                 }
             }
         } else if (note is GraphicNote) {
-            holder.ivGraphicThumb.background = BitmapDrawable(
-                holder.itemView.context.resources, note.thumb
-            )
+            holder.ivGraphicThumb.background =
+                BitmapDrawable(
+                    holder.itemView.context.resources, note.thumb,
+                )
             holder.ivGraphicThumb.visible()
-            holder.ivGraphicThumb.shapeAppearanceModel = ShapeAppearanceModel.builder()
-                .setBottomLeftCornerSize(0f)
-                .setTopLeftCornerSize(0f)
-                .setTopRightCorner(CornerFamily.ROUNDED, cornerRadius)
-                .setBottomRightCorner(CornerFamily.ROUNDED, cornerRadius)
-                .build()
+            holder.ivGraphicThumb.shapeAppearanceModel =
+                ShapeAppearanceModel.builder()
+                    .setBottomLeftCornerSize(0f)
+                    .setTopLeftCornerSize(0f)
+                    .setTopRightCorner(CornerFamily.ROUNDED, cornerRadius)
+                    .setBottomRightCorner(CornerFamily.ROUNDED, cornerRadius)
+                    .build()
         }
 
         if (note.pendingForDelete) {
             holder.tvDelete.visible()
             if (note is GraphicNote) {
-                holder.ivGraphicThumb.shapeAppearanceModel = ShapeAppearanceModel.builder()
-                    .setAllCorners(CornerFamily.ROUNDED, 0f).build()
+                holder.ivGraphicThumb.shapeAppearanceModel =
+                    ShapeAppearanceModel.builder()
+                        .setAllCorners(CornerFamily.ROUNDED, 0f).build()
             }
         } else {
             holder.tvDelete.gone()

@@ -16,6 +16,5 @@ data class GraphicNote(
     @IgnoredOnParcel
     override var resource: Resource? = null,
     override var pendingForDelete: Boolean = false,
-    var thumb: Bitmap? = null
-
+    var thumb: Bitmap? = null,
 ) : Note, Parcelable
