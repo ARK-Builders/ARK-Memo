@@ -38,6 +38,7 @@ class NotesListAdapter(
 ) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
     private lateinit var activity: MainActivity
     private var mActionMode = false
+    private var checkedByItemClick = false
 
     lateinit var observeItemSideEffect: () -> ArkMediaPlayerSideEffect
     lateinit var observeItemState: () -> ArkMediaPlayerState
@@ -289,6 +290,11 @@ class NotesListAdapter(
 
         private val clickNoteToEditListener =
             View.OnClickListener {
+                if (mActionMode) {
+                    checkedByItemClick = true
+                    binding.cbDelete.toggle()
+                    return@OnClickListener
+                }
                 var tag = EditTextNotesFragment.TAG
                 when (val selectedNote = notes[bindingAdapterPosition]) {
                     is TextNote -> activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
@@ -307,7 +313,9 @@ class NotesListAdapter(
 
         private val noteCheckedListener =
             CompoundButton.OnCheckedChangeListener { buttonView, isChecked ->
-                if (!buttonView.isPressed) return@OnCheckedChangeListener
+                if (!buttonView.isPressed && !checkedByItemClick) return@OnCheckedChangeListener
+                checkedByItemClick = false
+
                 val selectedNote = notes[bindingAdapterPosition]
                 selectedNote.selected = isChecked
                 if (isChecked) {
