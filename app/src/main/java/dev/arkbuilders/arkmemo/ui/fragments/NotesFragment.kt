@@ -112,6 +112,7 @@ class NotesFragment : BaseFragment() {
                             notesAdapter?.removeNote(noteToDelete)
                             toast(requireContext(), getString(R.string.note_deleted))
                             binding.rvPinnedNotes.adapter?.notifyItemRemoved(deletePosition)
+                            checkForEmptyState()
                         }
                     },
                     onNegativeClicked = {
@@ -200,7 +201,7 @@ class NotesFragment : BaseFragment() {
         }
     }
 
-    private fun onNotesLoaded(notes: MutableList<Note>) {
+    private fun onNotesLoaded(notes: List<Note>) {
         binding.pbLoading.gone()
         if (notesAdapter == null) {
             notesAdapter =
@@ -260,16 +261,20 @@ class NotesFragment : BaseFragment() {
         mItemTouchHelper = ItemTouchHelper(mItemTouchCallback)
         mItemTouchHelper?.attachToRecyclerView(binding.rvPinnedNotes)
 
-        if (notes.isNotEmpty()) {
-            binding.layoutBottomControl.visible()
-            binding.groupEmptyState.gone()
-            binding.rvPinnedNotes.visible()
-            binding.edtSearch.visible()
-        } else {
+        showEmptyState(isEmpty = notes.isEmpty())
+    }
+
+    private fun showEmptyState(isEmpty: Boolean) {
+        if (isEmpty) {
             binding.layoutBottomControl.gone()
             binding.groupEmptyState.visible()
             binding.rvPinnedNotes.gone()
             binding.edtSearch.gone()
+        } else {
+            binding.layoutBottomControl.visible()
+            binding.groupEmptyState.gone()
+            binding.rvPinnedNotes.visible()
+            binding.edtSearch.visible()
         }
     }
 
@@ -341,7 +346,7 @@ class NotesFragment : BaseFragment() {
         activity.fragment = this
         observeClipboardContent()
         binding.rvPinnedNotes.layoutManager?.scrollToPosition(lastNoteItemPosition)
-        if (notesAdapter?.observableSelectedNoteCount?.hasActiveObservers() == false) {
+        if (notesAdapter?.observableSelectedNotesCount?.hasActiveObservers() == false) {
             observeSelectedNoteForDelete()
         }
     }
@@ -431,6 +436,7 @@ class NotesFragment : BaseFragment() {
             binding.layoutBottomControl.visible()
             binding.edtSearch.visible()
             binding.ivSettings.visible()
+            notesAdapter?.toggleSelectAllItems(false)
         } else {
             binding.groupActionModeTexts.visible()
             updateSelectStateTexts(selectedCountForDelete)
@@ -468,13 +474,14 @@ class NotesFragment : BaseFragment() {
             isAlert = true,
             onPositiveClick = {
                 binding.pbLoading.visible()
-                val selectedNotes = notesAdapter?.selectedNotedForDelete ?: emptyList()
+                val selectedNotes = notesAdapter?.selectedNotesForDelete ?: emptyList()
                 notesViewModel.onDeleteConfirmed(selectedNotes) {
-                    notesAdapter?.getNotes()?.removeAll(selectedNotes)
+                    notesAdapter?.removeNotes(selectedNotes)
                     binding.pbLoading.gone()
                     toast(requireContext(), getString(R.string.note_deleted))
                     binding.rvPinnedNotes.adapter?.notifyDataSetChanged()
                     toggleActionMode()
+                    checkForEmptyState()
                 }
             },
             onNegativeClicked = {},
@@ -506,7 +513,7 @@ class NotesFragment : BaseFragment() {
     }
 
     private fun observeSelectedNoteForDelete() {
-        notesAdapter?.observableSelectedNoteCount?.observe(viewLifecycleOwner) { count ->
+        notesAdapter?.observableSelectedNotesCount?.observe(viewLifecycleOwner) { count ->
             selectedCountForDelete = count
             updateSelectStateTexts(count)
 
@@ -523,6 +530,12 @@ class NotesFragment : BaseFragment() {
             toggleActionMode()
         } else {
             activity.onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+    private fun checkForEmptyState() {
+        if (notesAdapter?.getNotes()?.isEmpty() == true) {
+            showEmptyState(true)
         }
     }
 

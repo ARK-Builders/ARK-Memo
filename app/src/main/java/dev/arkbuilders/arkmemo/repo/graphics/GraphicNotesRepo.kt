@@ -71,7 +71,7 @@ class GraphicNotesRepo
             }
 
         override suspend fun delete(notes: List<GraphicNote>) {
-            helper.deleteNote(notes)
+            helper.deleteNotes(notes)
         }
 
         override suspend fun read(): List<GraphicNote> =

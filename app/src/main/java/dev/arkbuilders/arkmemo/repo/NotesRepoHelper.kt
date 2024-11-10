@@ -91,7 +91,7 @@ class NotesRepoHelper
             return UserNoteProperties(title, description)
         }
 
-        suspend fun deleteNote(notes: List<Note>): Unit =
+        suspend fun deleteNotes(notes: List<Note>): Unit =
             withContext(Dispatchers.IO) {
                 notes.forEach { note ->
                     deleteNote(note)

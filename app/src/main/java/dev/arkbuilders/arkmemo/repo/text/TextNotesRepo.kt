@@ -47,7 +47,7 @@ class TextNotesRepo
         }
 
         override suspend fun delete(notes: List<TextNote>) {
-            helper.deleteNote(notes)
+            helper.deleteNotes(notes)
         }
 
         override suspend fun delete(note: TextNote) {
