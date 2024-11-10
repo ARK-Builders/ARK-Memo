@@ -53,9 +53,9 @@ class NotesListAdapter(
     var onItemLongPressed: ((pos: Int, note: Note) -> Unit)? = null
     var onItemClicked: (() -> Unit)? = null
 
-    private val selectedNoteCount by lazy { MutableLiveData<Int>() }
-    val observableSelectedNoteCount by lazy { selectedNoteCount }
-    val selectedNotedForDelete = mutableListOf<Note>()
+    private val selectedNotesCount by lazy { MutableLiveData<Int>() }
+    val observableSelectedNotesCount by lazy { selectedNotesCount }
+    val selectedNotesForDelete = mutableListOf<Note>()
 
     fun setActivity(activity: AppCompatActivity) {
         this.activity = activity as MainActivity
@@ -232,13 +232,17 @@ class NotesListAdapter(
         notifyDataSetChanged()
     }
 
-    fun getNotes(): MutableList<Note> {
+    fun getNotes(): List<Note> {
         return notes
     }
 
     fun removeNote(noteToRemove: Note) {
         notes.remove(noteToRemove)
-        selectedNoteCount.postValue(notes.size)
+        selectedNotesCount.postValue(notes.size)
+    }
+
+    fun removeNotes(notesToRemove: List<Note>) {
+        notes.removeAll(notesToRemove)
     }
 
     fun setNotes(notes: List<Note>) {
@@ -250,20 +254,21 @@ class NotesListAdapter(
         var selectedCount = 0
         notes.forEachIndexed { index, note ->
             note.selected = mActionMode && index == pos
-            if (index == pos) {
+            if (note.selected) {
                 selectedCount++
+                selectedNotesForDelete.add(note)
             }
         }
-        selectedNoteCount.postValue(selectedCount)
+        selectedNotesCount.postValue(selectedCount)
         notifyDataSetChanged()
     }
 
     fun toggleSelectAllItems(selected: Boolean) {
         notes.forEach { it.selected = selected }
-        selectedNotedForDelete.clear()
-        selectedNoteCount.postValue(
+        selectedNotesForDelete.clear()
+        selectedNotesCount.postValue(
             if (selected) {
-                selectedNotedForDelete.addAll(notes)
+                selectedNotesForDelete.addAll(notes)
                 notes.size
             } else {
                 0
@@ -319,15 +324,15 @@ class NotesListAdapter(
                 val selectedNote = notes[bindingAdapterPosition]
                 selectedNote.selected = isChecked
                 if (isChecked) {
-                    selectedNoteCount.value?.let { count ->
-                        selectedNoteCount.postValue(count + 1)
+                    selectedNotesCount.value?.let { count ->
+                        selectedNotesCount.postValue(count + 1)
                     }
-                    selectedNotedForDelete.add(selectedNote)
+                    selectedNotesForDelete.add(selectedNote)
                 } else {
-                    selectedNoteCount.value?.let { count ->
-                        selectedNoteCount.postValue(count - 1)
+                    selectedNotesCount.value?.let { count ->
+                        selectedNotesCount.postValue(count - 1)
                     }
-                    selectedNotedForDelete.remove(selectedNote)
+                    selectedNotesForDelete.remove(selectedNote)
                 }
 
                 buttonView.post {

@@ -43,7 +43,7 @@ class VoiceNotesRepo
             }
 
         override suspend fun delete(notes: List<VoiceNote>) {
-            helper.deleteNote(notes)
+            helper.deleteNotes(notes)
         }
 
         override suspend fun delete(note: VoiceNote) {

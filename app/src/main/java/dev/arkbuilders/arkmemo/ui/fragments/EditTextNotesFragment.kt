@@ -70,7 +70,7 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notesViewModel.init {}
-        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
+
         if (arguments != null) {
             requireArguments().getParcelableCompat(NOTE_KEY, TextNote::class.java)?.let {
                 note = it
@@ -155,6 +155,7 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
             ?: binding.toolbar.ivRightActionIcon.gone()
 
         view.viewTreeObserver.addOnWindowFocusChangeListener(windowFocusedListener)
+        observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
     }
 
     override fun isContentChanged(): Boolean {
