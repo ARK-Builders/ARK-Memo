@@ -15,13 +15,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
+import dev.arkbuilders.arkmemo.models.RootNotFound
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.ui.fragments.BaseFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import dev.arkbuilders.components.filepicker.onArkPathPicked
 import javax.inject.Inject
+import kotlin.io.path.exists
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
@@ -92,8 +95,13 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             }
         }
 
-        if (memoPreferences.getPath().isEmpty()) {
-            FilePickerDialog.show(this, supportFragmentManager)
+        val storageFolderExisting = memoPreferences.getNotesStorage().exists()
+        if (memoPreferences.storageNotAvailable()) {
+            if (!storageFolderExisting) {
+                showNoNoteStorageDialog(RootNotFound(rootPath = memoPreferences.getPath()))
+            } else {
+                FilePickerDialog.show(this, supportFragmentManager)
+            }
 
             supportFragmentManager.onArkPathPicked(this) {
                 memoPreferences.storePath(it.toString())
@@ -102,6 +110,27 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         } else {
             showFragment()
         }
+    }
+
+    private fun showNoNoteStorageDialog(error: RootNotFound) {
+        val loadFailDialog =
+            CommonActionDialog(
+                title = getString(R.string.error_load_notes_failed_title),
+                message = getString(R.string.error_load_notes_failed_description, error.rootPath),
+                positiveText = R.string.error_load_notes_failed_positive_action,
+                negativeText = R.string.error_load_notes_failed_negative_action,
+                isAlert = false,
+                onPositiveClick = {
+                    FilePickerDialog.show(this, supportFragmentManager)
+                },
+                onNegativeClicked = {
+                    finish()
+                },
+                onCloseClicked = {
+                    finish()
+                },
+            )
+        loadFailDialog.show(supportFragmentManager, CommonActionDialog.TAG)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

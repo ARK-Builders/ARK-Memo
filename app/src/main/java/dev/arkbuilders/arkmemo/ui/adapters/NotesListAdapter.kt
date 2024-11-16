@@ -23,6 +23,7 @@ import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.fragments.ArkRecorderFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditGraphicNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
+import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.utils.getAutoTitle
@@ -295,6 +296,11 @@ class NotesListAdapter(
 
         private val clickNoteToEditListener =
             View.OnClickListener {
+                val storageFolderExist = (activity.fragment as? NotesFragment)?.checkForStorageExistence() ?: true
+                if (!storageFolderExist) {
+                    return@OnClickListener
+                }
+
                 if (mActionMode) {
                     checkedByItemClick = true
                     binding.cbDelete.toggle()

@@ -12,6 +12,7 @@ import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
+import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.utils.extractDuration
 import kotlinx.coroutines.CoroutineDispatcher
@@ -38,6 +39,9 @@ class NotesViewModel
         private val notes = MutableStateFlow(listOf<Note>())
         private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
         private var searchJob: Job? = null
+
+        @Inject
+        lateinit var memoPreferences: MemoPreferences
 
         fun init(extraBlock: () -> Unit) {
             val initJob =
@@ -178,5 +182,13 @@ class NotesViewModel
 
         fun getSaveNoteResultLiveData(): LiveData<SaveNoteResult> {
             return mSaveNoteResultLiveData
+        }
+
+        fun storageFolderNotAvailable(): Boolean {
+            return memoPreferences.storageNotAvailable()
+        }
+
+        fun getStorageFolderPath(): String {
+            return memoPreferences.getPath()
         }
     }

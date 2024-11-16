@@ -24,19 +24,17 @@ class FilePickerDialog : ArkFilePickerFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (storageNotAvailable()) {
+        if (memoPreferences.storageNotAvailable()) {
             isCancelable = false
         }
     }
 
     override fun dismiss() {
         super.dismiss()
-        if (storageNotAvailable()) {
+        if (memoPreferences.storageNotAvailable()) {
             activity?.finish()
         }
     }
-
-    private fun storageNotAvailable(): Boolean = memoPreferences.getPath().isEmpty()
 
     companion object {
         private const val TAG = "file_picker"
