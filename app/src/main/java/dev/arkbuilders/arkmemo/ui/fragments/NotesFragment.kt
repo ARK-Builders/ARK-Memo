@@ -20,10 +20,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentHomeBinding
 import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.models.RootNotFound
 import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.adapters.NotesListAdapter
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
@@ -62,6 +64,10 @@ class NotesFragment : BaseFragment() {
 
     private val pasteNoteClickListener =
         View.OnClickListener {
+            if (!checkForStorageExistence()) {
+                return@OnClickListener
+            }
+
             requireContext().getTextFromClipBoard(view) { clipBoardText ->
                 if (clipBoardText != null) {
                     activity.fragment = EditTextNotesFragment.newInstance(clipBoardText)
@@ -151,6 +157,9 @@ class NotesFragment : BaseFragment() {
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         binding.ivSettings.setOnClickListener {
+            if (!checkForStorageExistence()) {
+                return@setOnClickListener
+            }
             activity.fragment = SettingsFragment()
             activity.replaceFragment(activity.fragment, SettingsFragment::class.java.name)
         }
@@ -419,6 +428,10 @@ class NotesFragment : BaseFragment() {
             binding.groupFabActions.gone()
             showingFloatingButtons = false
         } else {
+            if (!checkForStorageExistence()) {
+                return
+            }
+
             binding.fabNewAction.extend()
             binding.fabNewAction.icon = ContextCompat.getDrawable(activity, R.drawable.ic_close)
             binding.fabNewAction.backgroundTintList =
@@ -537,6 +550,35 @@ class NotesFragment : BaseFragment() {
         if (notesAdapter?.getNotes()?.isEmpty() == true) {
             showEmptyState(true)
         }
+    }
+
+    private fun showNoNoteStorageDialog(error: RootNotFound) {
+        val loadFailDialog =
+            CommonActionDialog(
+                title = getString(R.string.error_load_notes_failed_title),
+                message = getString(R.string.error_load_notes_failed_description, error.rootPath),
+                positiveText = R.string.error_load_notes_failed_positive_action,
+                negativeText = R.string.error_load_notes_failed_negative_action,
+                isAlert = false,
+                onPositiveClick = {
+                    FilePickerDialog.show(activity, fragmentManager = parentFragmentManager)
+                },
+                onNegativeClicked = {
+                    activity.finish()
+                },
+                onCloseClicked = {
+                    activity.finish()
+                },
+            )
+        loadFailDialog.show(parentFragmentManager, CommonActionDialog.TAG)
+    }
+
+    fun checkForStorageExistence(): Boolean {
+        if (notesViewModel.storageFolderNotAvailable()) {
+            showNoNoteStorageDialog(RootNotFound(rootPath = notesViewModel.getStorageFolderPath()))
+            return false
+        }
+        return true
     }
 
     companion object {
