@@ -5,8 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
-    android:layout_marginBottom="@dimen/note_item_padding"
-    android:background="@drawable/ripple_note_item">
+    android:layout_marginBottom="@dimen/note_item_padding">
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -30,6 +29,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@drawable/bg_big_radius"
+        android:id="@+id/view_item_content"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <include layout="@layout/media_player_view"
