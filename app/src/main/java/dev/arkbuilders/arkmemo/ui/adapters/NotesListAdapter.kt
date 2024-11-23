@@ -348,6 +348,7 @@ class NotesListAdapter(
             }
             binding.cbDelete.setOnCheckedChangeListener(noteCheckedListener)
             binding.layoutAudioView.root.setBackgroundResource(R.drawable.bg_audio_view_note_item)
+            binding.viewItemContent.clipToOutline = true
         }
     }
 }
