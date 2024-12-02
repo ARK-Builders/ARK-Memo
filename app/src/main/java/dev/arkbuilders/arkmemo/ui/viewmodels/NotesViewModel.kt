@@ -16,6 +16,7 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.utils.extractDuration
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -43,9 +44,19 @@ class NotesViewModel
         @Inject
         lateinit var memoPreferences: MemoPreferences
 
+        private val initExceptionHandler by lazy {
+            CoroutineExceptionHandler { _, throwable ->
+                throwable.printStackTrace()
+
+                // If the initialization fails with an exception for current storage path,
+                // clear the path for users to be able to re-select it next time.
+                memoPreferences.storePath("")
+            }
+        }
+
         fun init(extraBlock: () -> Unit) {
             val initJob =
-                viewModelScope.launch(iODispatcher) {
+                viewModelScope.launch(iODispatcher + initExceptionHandler) {
                     textNotesRepo.init()
                     graphicNotesRepo.init()
                     voiceNotesRepo.init()
