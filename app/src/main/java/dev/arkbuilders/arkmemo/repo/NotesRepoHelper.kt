@@ -7,13 +7,18 @@ import dev.arkbuilders.arklib.data.index.RootIndex
 import dev.arkbuilders.arklib.user.properties.Properties
 import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
+import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.utils.isEqual
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
 import javax.inject.Inject
+import javax.inject.Named
 import kotlin.NullPointerException
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
@@ -26,13 +31,21 @@ class NotesRepoHelper
     constructor(
         private val memoPreferences: MemoPreferences,
         private val propertiesStorageRepo: PropertiesStorageRepo,
+        @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     ) {
-        private lateinit var root: Path
+        private val root by lazy {
+            memoPreferences.getNotesStorage()
+        }
+
         private lateinit var propertiesStorage: PropertiesStorage
+        private val lazyPropertiesStorage by lazy {
+            CoroutineScope(iODispatcher).async {
+                propertiesStorageRepo.provide(RootIndex.provide(root))
+            }
+        }
 
         suspend fun init() {
-            root = memoPreferences.getNotesStorage()
-            propertiesStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
+            propertiesStorage = lazyPropertiesStorage.await()
         }
 
         suspend fun persistNoteProperties(
