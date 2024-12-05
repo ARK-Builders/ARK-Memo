@@ -7,6 +7,7 @@ import dev.arkbuilders.arkmemo.utils.CRASH_REPORT_ENABLE
 import java.nio.file.Path
 import javax.inject.Inject
 import kotlin.io.path.Path
+import kotlin.io.path.exists
 
 private const val NAME = "memo_prefs"
 private const val CURRENT_NOTES_PATH = "current_notes_path"
@@ -33,4 +34,8 @@ class MemoPreferencesImpl
         }
 
         override fun getCrashReportEnabled(): Boolean = sharedPreferences.getBoolean(CRASH_REPORT_ENABLE, true)
+
+        override fun storageNotAvailable(): Boolean {
+            return getPath().isEmpty() || !getNotesStorage().exists()
+        }
     }

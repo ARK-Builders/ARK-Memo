@@ -12,4 +12,6 @@ interface MemoPreferences {
     fun storeCrashReportEnabled(enabled: Boolean)
 
     fun getCrashReportEnabled(): Boolean
+
+    fun storageNotAvailable(): Boolean
 }
