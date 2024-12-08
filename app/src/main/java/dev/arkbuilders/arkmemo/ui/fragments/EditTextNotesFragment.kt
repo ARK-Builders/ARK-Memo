@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.TextNote
+import dev.arkbuilders.arkmemo.ui.activities.MainActivity.Companion.BUNDLE_KEY_STORAGE_PATH
 import dev.arkbuilders.arkmemo.utils.getParcelableCompat
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.gone
@@ -69,13 +70,15 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notesViewModel.init {}
 
         if (arguments != null) {
             requireArguments().getParcelableCompat(NOTE_KEY, TextNote::class.java)?.let {
                 note = it
             }
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
+            arguments?.getString(BUNDLE_KEY_STORAGE_PATH)?.let {
+                notesViewModel.init(it) {}
+            }
         }
     }
 

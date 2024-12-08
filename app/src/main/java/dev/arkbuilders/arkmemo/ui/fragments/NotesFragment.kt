@@ -168,10 +168,13 @@ class NotesFragment : BaseFragment() {
         initEmptyStateViews()
 
         binding.pbLoading.visible()
+        val root = arguments?.getString(MainActivity.BUNDLE_KEY_STORAGE_PATH) ?: ""
         notesViewModel.apply {
-            init {
+            storePath("")
+            init(root) {
                 readAllNotes {
                     onNotesLoaded(it)
+                    storePath(root)
                 }
             }
         }
