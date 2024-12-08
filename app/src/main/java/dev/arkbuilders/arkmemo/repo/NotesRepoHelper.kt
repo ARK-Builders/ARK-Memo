@@ -20,6 +20,7 @@ import java.nio.file.Path
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.NullPointerException
+import kotlin.io.path.Path
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.extension
 import kotlin.io.path.getLastModifiedTime
@@ -33,18 +34,19 @@ class NotesRepoHelper
         private val propertiesStorageRepo: PropertiesStorageRepo,
         @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     ) {
-        private val root by lazy {
-            memoPreferences.getNotesStorage()
-        }
+        lateinit var root: Path
 
         private lateinit var propertiesStorage: PropertiesStorage
         private val lazyPropertiesStorage by lazy {
             CoroutineScope(iODispatcher).async {
-                propertiesStorageRepo.provide(RootIndex.provide(root))
+                val propertyStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
+                memoPreferences.storePath(root.toString())
+                propertyStorage
             }
         }
 
-        suspend fun init() {
+        suspend fun init(root: String) {
+            this.root = Path(root)
             propertiesStorage = lazyPropertiesStorage.await()
         }
 

@@ -117,7 +117,6 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
     }
 
     private fun observeDataStates() {
-        notesViewModel.init {}
         observeRecordingState()
         observeSaveResult(notesViewModel.getSaveNoteResultLiveData())
     }

@@ -16,7 +16,6 @@ import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.utils.extractDuration
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -41,25 +40,18 @@ class NotesViewModel
         private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
         private var searchJob: Job? = null
 
-        @Inject
-        lateinit var memoPreferences: MemoPreferences
+        @set:Inject
+        internal lateinit var memoPreferences: MemoPreferences
 
-        private val initExceptionHandler by lazy {
-            CoroutineExceptionHandler { _, throwable ->
-                throwable.printStackTrace()
-
-                // If the initialization fails with an exception for current storage path,
-                // clear the path for users to be able to re-select it next time.
-                memoPreferences.storePath("")
-            }
-        }
-
-        fun init(extraBlock: () -> Unit) {
+        fun init(
+            root: String,
+            extraBlock: () -> Unit,
+        ) {
             val initJob =
-                viewModelScope.launch(iODispatcher + initExceptionHandler) {
-                    textNotesRepo.init()
-                    graphicNotesRepo.init()
-                    voiceNotesRepo.init()
+                viewModelScope.launch(iODispatcher) {
+                    textNotesRepo.init(root)
+                    graphicNotesRepo.init(root)
+                    voiceNotesRepo.init(root)
                 }
             viewModelScope.launch {
                 initJob.join()
@@ -201,5 +193,9 @@ class NotesViewModel
 
         fun getStorageFolderPath(): String {
             return memoPreferences.getPath()
+        }
+
+        fun storePath(path: String) {
+            memoPreferences.storePath(path)
         }
     }

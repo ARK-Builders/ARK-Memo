@@ -67,34 +67,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        fun showFragment() {
-            val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
-            if (textDataFromIntent != null) {
-                fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
-                supportFragmentManager.beginTransaction().apply {
-                    replace(fragContainer, fragment, EditTextNotesFragment.TAG)
-                    commit()
-                }
-            } else {
-                if (savedInstanceState == null) {
-                    supportFragmentManager.beginTransaction().apply {
-                        add(fragContainer, fragment, NotesFragment.TAG)
-                        commit()
-                    }
-                } else {
-                    supportFragmentManager.apply {
-                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
-                        findFragmentByTag(tag)?.let {
-                            fragment = it
-                            if (!fragment.isInLayout) {
-                                resumeFragment(fragment)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         val storageFolderExisting = memoPreferences.getNotesStorage().exists()
         if (memoPreferences.storageNotAvailable()) {
             if (!storageFolderExisting) {
@@ -104,11 +76,49 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             }
 
             supportFragmentManager.onArkPathPicked(this) {
-                memoPreferences.storePath(it.toString())
-                showFragment()
+                showFragment(savedInstanceState, it.toString())
             }
         } else {
-            showFragment()
+            showFragment(savedInstanceState, memoPreferences.getPath())
+        }
+    }
+
+    private fun showFragment(
+        savedInstanceState: Bundle?,
+        storagePath: String,
+    ) {
+        val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
+        if (textDataFromIntent != null) {
+            fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
+            fragment.arguments =
+                Bundle().apply {
+                    putString(BUNDLE_KEY_STORAGE_PATH, storagePath)
+                }
+            supportFragmentManager.beginTransaction().apply {
+                replace(fragContainer, fragment, EditTextNotesFragment.TAG)
+                commit()
+            }
+        } else {
+            fragment.arguments =
+                Bundle().apply {
+                    putString(BUNDLE_KEY_STORAGE_PATH, storagePath)
+                }
+            if (savedInstanceState == null) {
+                supportFragmentManager.beginTransaction().apply {
+                    add(fragContainer, fragment, NotesFragment.TAG)
+                    commit()
+                }
+            } else {
+                supportFragmentManager.apply {
+                    val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
+                    findFragmentByTag(tag)?.let {
+                        fragment = it
+                        if (!fragment.isInLayout) {
+                            resumeFragment(fragment)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -166,6 +176,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
+        const val BUNDLE_KEY_STORAGE_PATH = "bundle_key_storage_path"
     }
 }
 

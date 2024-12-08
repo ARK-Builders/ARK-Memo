@@ -16,7 +16,6 @@ import dev.arkbuilders.arkmemo.graphics.ColorCode
 import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.dpToPx
@@ -39,12 +38,11 @@ import kotlin.io.path.name
 class GraphicNotesRepo
     @Inject
     constructor(
-        private val memoPreferences: MemoPreferences,
         @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
         private val helper: NotesRepoHelper,
         @ApplicationContext private val context: Context,
     ) : NotesRepo<GraphicNote> {
-        private lateinit var root: Path
+        private val root: Path by lazy { helper.root }
 
         private val displayMetrics by lazy { Resources.getSystem().displayMetrics }
         private val screenWidth by lazy { displayMetrics.widthPixels }
@@ -53,9 +51,8 @@ class GraphicNotesRepo
 
         private val thumbDirectory by lazy { context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) }
 
-        override suspend fun init() {
-            helper.init()
-            root = memoPreferences.getNotesStorage()
+        override suspend fun init(root: String) {
+            helper.init(root)
         }
 
         override suspend fun save(
