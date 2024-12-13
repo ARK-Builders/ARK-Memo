@@ -9,7 +9,6 @@ import dev.arkbuilders.arklib.user.properties.PropertiesStorage
 import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.Note
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.utils.isEqual
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +29,6 @@ import kotlin.io.path.name
 class NotesRepoHelper
     @Inject
     constructor(
-        private val memoPreferences: MemoPreferences,
         private val propertiesStorageRepo: PropertiesStorageRepo,
         @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     ) {
@@ -40,7 +38,6 @@ class NotesRepoHelper
         private val lazyPropertiesStorage by lazy {
             CoroutineScope(iODispatcher).async {
                 val propertyStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
-                memoPreferences.storePath(root.toString())
                 propertyStorage
             }
         }

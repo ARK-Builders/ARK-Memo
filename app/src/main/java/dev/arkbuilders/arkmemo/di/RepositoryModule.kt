@@ -9,7 +9,6 @@ import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.repo.graphics.GraphicNotesRepo
@@ -38,8 +37,7 @@ object RepoHelperModule {
     @Singleton
     @Provides
     fun provideNotesRepoHelper(
-        memoPreferences: MemoPreferences,
         propertiesStorageRepo: PropertiesStorageRepo,
         @Named(IO_DISPATCHER) coroutineDispatcher: CoroutineDispatcher,
-    ) = NotesRepoHelper(memoPreferences, propertiesStorageRepo, coroutineDispatcher)
+    ) = NotesRepoHelper(propertiesStorageRepo, coroutineDispatcher)
 }

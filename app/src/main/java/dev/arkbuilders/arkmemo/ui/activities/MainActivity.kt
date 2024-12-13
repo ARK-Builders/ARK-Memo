@@ -67,6 +67,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             onBackPressedDispatcher.onBackPressed()
         }
 
+        supportFragmentManager.onArkPathPicked(this) {
+            memoPreferences.storePath(it.toString())
+            showFragment(savedInstanceState)
+        }
+
         val storageFolderExisting = memoPreferences.getNotesStorage().exists()
         if (memoPreferences.storageNotAvailable()) {
             if (!storageFolderExisting) {
@@ -74,35 +79,27 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             } else {
                 FilePickerDialog.show(this, supportFragmentManager)
             }
-
-            supportFragmentManager.onArkPathPicked(this) {
-                showFragment(savedInstanceState, it.toString())
-            }
         } else {
-            showFragment(savedInstanceState, memoPreferences.getPath())
+            if (memoPreferences.isLastLaunchSuccess()) {
+                showFragment(savedInstanceState)
+            } else {
+                showRetrySelectRootDialog(
+                    rootPath = memoPreferences.getPath(),
+                    savedInstanceState = savedInstanceState,
+                )
+            }
         }
     }
 
-    private fun showFragment(
-        savedInstanceState: Bundle?,
-        storagePath: String,
-    ) {
+    private fun showFragment(savedInstanceState: Bundle?) {
         val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
         if (textDataFromIntent != null) {
             fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
-            fragment.arguments =
-                Bundle().apply {
-                    putString(BUNDLE_KEY_STORAGE_PATH, storagePath)
-                }
             supportFragmentManager.beginTransaction().apply {
                 replace(fragContainer, fragment, EditTextNotesFragment.TAG)
                 commit()
             }
         } else {
-            fragment.arguments =
-                Bundle().apply {
-                    putString(BUNDLE_KEY_STORAGE_PATH, storagePath)
-                }
             if (savedInstanceState == null) {
                 supportFragmentManager.beginTransaction().apply {
                     add(fragContainer, fragment, NotesFragment.TAG)
@@ -135,6 +132,35 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 },
                 onNegativeClicked = {
                     finish()
+                },
+                onCloseClicked = {
+                    finish()
+                },
+            )
+        loadFailDialog.show(supportFragmentManager, CommonActionDialog.TAG)
+    }
+
+    private fun showRetrySelectRootDialog(
+        rootPath: String,
+        savedInstanceState: Bundle?,
+    ) {
+        val loadFailDialog =
+            CommonActionDialog(
+                title = getString(R.string.error_load_notes_crash_title),
+                message = getString(R.string.error_load_notes_crash_description, rootPath),
+                positiveText = R.string.error_load_notes_failed_retry_action,
+                negativeText = R.string.error_load_notes_failed_negative_action,
+                neutralText = R.string.error_load_notes_failed_positive_action,
+                isAlert = false,
+                enableNeutralOption = true,
+                onPositiveClick = {
+                    showFragment(savedInstanceState)
+                },
+                onNegativeClicked = {
+                    finish()
+                },
+                onNeutralClicked = {
+                    FilePickerDialog.show(this, supportFragmentManager)
                 },
                 onCloseClicked = {
                     finish()
@@ -176,7 +202,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
-        const val BUNDLE_KEY_STORAGE_PATH = "bundle_key_storage_path"
     }
 }
 

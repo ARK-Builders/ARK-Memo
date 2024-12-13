@@ -43,10 +43,8 @@ class NotesViewModel
         @set:Inject
         internal lateinit var memoPreferences: MemoPreferences
 
-        fun init(
-            root: String,
-            extraBlock: () -> Unit,
-        ) {
+        fun init(extraBlock: () -> Unit) {
+            val root = memoPreferences.getPath()
             val initJob =
                 viewModelScope.launch(iODispatcher) {
                     textNotesRepo.init(root)
@@ -195,7 +193,7 @@ class NotesViewModel
             return memoPreferences.getPath()
         }
 
-        fun storePath(path: String) {
-            memoPreferences.storePath(path)
+        fun setLastLaunchSuccess(success: Boolean) {
+            memoPreferences.setLastLaunchSuccess(success)
         }
     }
