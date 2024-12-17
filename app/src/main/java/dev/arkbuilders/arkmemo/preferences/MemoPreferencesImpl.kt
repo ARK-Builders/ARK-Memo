@@ -11,6 +11,7 @@ import kotlin.io.path.exists
 
 private const val NAME = "memo_prefs"
 private const val CURRENT_NOTES_PATH = "current_notes_path"
+private const val PREF_LAST_LAUNCH_SUCCESS = "pref_last_launch_success"
 
 class MemoPreferencesImpl
     @Inject
@@ -37,5 +38,13 @@ class MemoPreferencesImpl
 
         override fun storageNotAvailable(): Boolean {
             return getPath().isEmpty() || !getNotesStorage().exists()
+        }
+
+        override fun isLastLaunchSuccess(): Boolean {
+            return sharedPreferences.getBoolean(PREF_LAST_LAUNCH_SUCCESS, true)
+        }
+
+        override fun setLastLaunchSuccess(success: Boolean) {
+            prefEditor.putBoolean(PREF_LAST_LAUNCH_SUCCESS, success).apply()
         }
     }

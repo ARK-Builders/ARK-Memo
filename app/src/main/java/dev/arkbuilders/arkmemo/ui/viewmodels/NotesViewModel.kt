@@ -40,15 +40,16 @@ class NotesViewModel
         private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
         private var searchJob: Job? = null
 
-        @Inject
-        lateinit var memoPreferences: MemoPreferences
+        @set:Inject
+        internal lateinit var memoPreferences: MemoPreferences
 
         fun init(extraBlock: () -> Unit) {
+            val root = memoPreferences.getPath()
             val initJob =
                 viewModelScope.launch(iODispatcher) {
-                    textNotesRepo.init()
-                    graphicNotesRepo.init()
-                    voiceNotesRepo.init()
+                    textNotesRepo.init(root)
+                    graphicNotesRepo.init(root)
+                    voiceNotesRepo.init(root)
                 }
             viewModelScope.launch {
                 initJob.join()
@@ -190,5 +191,9 @@ class NotesViewModel
 
         fun getStorageFolderPath(): String {
             return memoPreferences.getPath()
+        }
+
+        fun setLastLaunchSuccess(success: Boolean) {
+            memoPreferences.setLastLaunchSuccess(success)
         }
     }
