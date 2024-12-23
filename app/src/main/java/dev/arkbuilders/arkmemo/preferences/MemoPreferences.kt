@@ -14,4 +14,8 @@ interface MemoPreferences {
     fun getCrashReportEnabled(): Boolean
 
     fun storageNotAvailable(): Boolean
+
+    fun isLastLaunchSuccess(): Boolean
+
+    fun setLastLaunchSuccess(success: Boolean)
 }

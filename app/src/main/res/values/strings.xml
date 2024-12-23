@@ -118,8 +118,11 @@
     <string name="select_all">Select All</string>
     <string name="deselect_all">Deselect All</string>
     <string name="error_load_notes_failed_title">Cannot find notes</string>
+    <string name="error_load_notes_crash_title">Could not load notes</string>
     <string name="error_load_notes_failed_description">The folder %s with notes data cannot be located.\nPlease select a new folder.</string>
     <string name="error_load_notes_failed_positive_action">Select</string>
     <string name="error_load_notes_failed_negative_action">Leave</string>
+    <string name="error_load_notes_failed_retry_action">Retry</string>
+    <string name="error_load_notes_crash_description">There\'s a crash while loading the folder %s.\nPlease retry or select a new folder.</string>
 
 </resources>

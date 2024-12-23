@@ -69,13 +69,13 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notesViewModel.init {}
 
         if (arguments != null) {
             requireArguments().getParcelableCompat(NOTE_KEY, TextNote::class.java)?.let {
                 note = it
             }
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
+            notesViewModel.init {}
         }
     }
 
