@@ -9,6 +9,7 @@ import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.GraphicNote
 import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.models.NoteType
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
 import dev.arkbuilders.arkmemo.models.VoiceNote
@@ -65,6 +66,25 @@ class NotesViewModel
                         notes.value = it.sortedByDescending { note -> note.resource?.modified }
                         onSuccess(notes.value)
                     }
+                }
+            }
+        }
+
+        fun findNote(
+            id: ResourceId,
+            type: NoteType,
+            onResult: (note: Note?) -> Unit,
+        ) {
+            viewModelScope.launch(iODispatcher) {
+                val noteRepo =
+                    when (type) {
+                        NoteType.TEXT -> textNotesRepo
+                        NoteType.VOICE -> voiceNotesRepo
+                        NoteType.GRAPHIC -> graphicNotesRepo
+                    }
+                val note = noteRepo.findNote(id)
+                withContext(Dispatchers.Main) {
+                    onResult.invoke(note)
                 }
             }
         }

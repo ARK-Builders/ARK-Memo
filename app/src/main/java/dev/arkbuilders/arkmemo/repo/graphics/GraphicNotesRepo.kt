@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.os.Environment
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.R
@@ -116,32 +117,19 @@ class GraphicNotesRepo
         private suspend fun readStorage() =
             withContext(iODispatcher) {
                 root.listFiles(SVG_EXT) { path ->
-                    val svg = SVG.parse(path)
-                    if (svg == null) {
-                        Log.w(GRAPHICS_REPO, "Skipping invalid SVG: " + path)
-                    }
-                    val size = path.fileSize()
-                    val id = computeId(size, path)
-                    val resource =
-                        Resource(
-                            id = id,
-                            name = path.fileName.name,
-                            extension = path.extension,
-                            modified = path.getLastModifiedTime(),
-                        )
-
-                    val userNoteProperties = helper.readProperties(id, "")
-                    val bitmap = exportBitmapFromSvg(fileName = id.toString(), svg = svg)
-
-                    GraphicNote(
-                        title = userNoteProperties.title,
-                        description = userNoteProperties.description,
-                        svg = svg,
-                        resource = resource,
-                        thumb = bitmap,
-                    )
+                    path.toGraphicNote(helper = helper)
                 }.filter { graphicNote -> graphicNote.svg != null }
             }
+
+        override suspend fun findNote(id: ResourceId): GraphicNote? {
+            return withContext(iODispatcher) {
+                root.listFiles(SVG_EXT) { path ->
+                    path.toGraphicNote(helper = helper)
+                }.firstOrNull { graphicNote ->
+                    graphicNote.svg != null && id == graphicNote.resource?.id
+                }
+            }
+        }
 
         private fun exportBitmapFromSvg(
             fileName: String,
@@ -203,6 +191,33 @@ class GraphicNotesRepo
                 e.printStackTrace()
                 return null
             }
+        }
+
+        private fun Path.toGraphicNote(helper: NotesRepoHelper): GraphicNote {
+            val svg = SVG.parse(this)
+            if (svg == null) {
+                Log.w(GRAPHICS_REPO, "Skipping invalid SVG: " + this)
+            }
+            val size = this.fileSize()
+            val id = computeId(size, this)
+            val resource =
+                Resource(
+                    id = id,
+                    name = this.fileName.name,
+                    extension = this.extension,
+                    modified = this.getLastModifiedTime(),
+                )
+
+            val userNoteProperties = helper.readProperties(id, "")
+            val bitmap = exportBitmapFromSvg(fileName = id.toString(), svg = svg)
+
+            return GraphicNote(
+                title = userNoteProperties.title,
+                description = userNoteProperties.description,
+                svg = svg,
+                resource = resource,
+                thumb = bitmap,
+            )
         }
     }
 

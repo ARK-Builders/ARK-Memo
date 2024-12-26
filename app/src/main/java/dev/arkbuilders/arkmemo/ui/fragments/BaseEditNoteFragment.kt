@@ -6,13 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentEditNotesBinding
 import dev.arkbuilders.arkmemo.models.Note
+import dev.arkbuilders.arkmemo.models.NoteType
 import dev.arkbuilders.arkmemo.ui.activities.MainActivity
 import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
+import dev.arkbuilders.arkmemo.utils.getParcelableCompat
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
 import java.util.Calendar
@@ -22,6 +25,10 @@ abstract class BaseEditNoteFragment : BaseFragment() {
     lateinit var binding: FragmentEditNotesBinding
     val notesViewModel: NotesViewModel by activityViewModels()
     val hostActivity by lazy { activity as MainActivity }
+
+    companion object {
+        const val BUNDLE_KEY_NOTE_ID = "bundle_key_note_id"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -174,6 +181,36 @@ abstract class BaseEditNoteFragment : BaseFragment() {
         handleBackPressed()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(BUNDLE_KEY_NOTE_ID, getCurrentNote().resource?.id)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        val noteId = savedInstanceState?.getParcelableCompat(BUNDLE_KEY_NOTE_ID, ResourceId::class.java)
+        noteId?.let {
+            hostActivity.permissionManager.askForWriteStorage { granted ->
+                if (granted) {
+                    notesViewModel.init {
+                        val noteType =
+                            when (this@BaseEditNoteFragment) {
+                                is EditGraphicNotesFragment -> NoteType.GRAPHIC
+                                is ArkRecorderFragment -> NoteType.VOICE
+                                is EditTextNotesFragment -> NoteType.TEXT
+                                else -> NoteType.TEXT
+                            }
+
+                        notesViewModel.findNote(id = noteId, type = noteType) { foundNote ->
+                            foundNote ?: return@findNote
+                            onViewRestoredWithNote(foundNote)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     abstract fun createNewNote(): Note
 
     abstract fun getCurrentNote(): Note
@@ -181,4 +218,6 @@ abstract class BaseEditNoteFragment : BaseFragment() {
     abstract fun isContentChanged(): Boolean
 
     abstract fun isContentEmpty(): Boolean
+
+    abstract fun onViewRestoredWithNote(note: Note)
 }

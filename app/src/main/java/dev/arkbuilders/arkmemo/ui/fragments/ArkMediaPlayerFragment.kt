@@ -59,6 +59,9 @@ class ArkMediaPlayerFragment : BaseEditNoteFragment() {
         return false
     }
 
+    override fun onViewRestoredWithNote(note: Note) {
+    }
+
     private fun initUI() {
         binding.toolbar.ivRightActionIcon.setOnClickListener {
             showDeleteNoteDialog(note)
