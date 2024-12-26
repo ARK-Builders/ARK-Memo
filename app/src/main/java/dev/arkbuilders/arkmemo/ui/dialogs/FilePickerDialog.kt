@@ -1,18 +1,13 @@
 package dev.arkbuilders.arkmemo.ui.dialogs
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import dagger.hilt.android.AndroidEntryPoint
-import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.utils.Permission
+import dev.arkbuilders.arkmemo.utils.PermissionManager
 import dev.arkbuilders.components.filepicker.ArkFilePickerConfig
 import dev.arkbuilders.components.filepicker.ArkFilePickerFragment
 import dev.arkbuilders.components.filepicker.ArkFilePickerMode
@@ -39,8 +34,7 @@ class FilePickerDialog : ArkFilePickerFragment() {
     companion object {
         private const val TAG = "file_picker"
         private lateinit var fragmentManager: FragmentManager
-        var readPermLauncher: ActivityResultLauncher<String>? = null
-        var readPermLauncherSdkR: ActivityResultLauncher<String>? = null
+        var permissionManager: PermissionManager? = null
 
         fun show() {
             newInstance(getFilePickerConfig()).show(fragmentManager, TAG)
@@ -51,10 +45,16 @@ class FilePickerDialog : ArkFilePickerFragment() {
             fragmentManager: FragmentManager,
         ) {
             Companion.fragmentManager = fragmentManager
-            if (isReadPermissionGranted(activity)) {
+            if (Permission.hasStoragePermission(activity)) {
                 show()
             } else {
-                askForReadPermissions()
+                permissionManager?.askForWriteStorage { granted ->
+                    if (granted) {
+                        show()
+                    } else {
+                        activity.finish()
+                    }
+                }
             }
         }
 
@@ -62,24 +62,6 @@ class FilePickerDialog : ArkFilePickerFragment() {
             FilePickerDialog().apply {
                 setConfig(config)
             }
-
-        private fun isReadPermissionGranted(activity: AppCompatActivity): Boolean {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Environment.isExternalStorageManager()
-            } else {
-                ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                    PackageManager.PERMISSION_GRANTED
-            }
-        }
-
-        private fun askForReadPermissions() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val packageUri = "package:" + BuildConfig.APPLICATION_ID
-                readPermLauncherSdkR?.launch(packageUri)
-            } else {
-                readPermLauncher?.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        }
 
         private fun getFilePickerConfig() =
             ArkFilePickerConfig(

@@ -168,12 +168,21 @@ class NotesFragment : BaseFragment() {
         initEmptyStateViews()
 
         binding.pbLoading.visible()
-        notesViewModel.apply {
-            setLastLaunchSuccess(false)
-            init {
-                readAllNotes {
-                    onNotesLoaded(it)
-                    setLastLaunchSuccess(true)
+        activity.permissionManager.askForWriteStorage { granted ->
+            if (!granted) {
+                if (isVisible) {
+                    activity.finish()
+                }
+                return@askForWriteStorage
+            } else {
+                notesViewModel.apply {
+                    setLastLaunchSuccess(false)
+                    init {
+                        readAllNotes {
+                            onNotesLoaded(it)
+                            setLastLaunchSuccess(true)
+                        }
+                    }
                 }
             }
         }
