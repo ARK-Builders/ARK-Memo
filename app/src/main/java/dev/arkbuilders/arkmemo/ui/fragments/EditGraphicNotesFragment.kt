@@ -172,6 +172,12 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
         return graphicNotesViewModel.svg().getPaths().isEmpty()
     }
 
+    override fun onViewRestoredWithNote(note: Note) {
+        this.note = note as GraphicNote
+        graphicNotesViewModel.onNoteOpened(note)
+        binding.notesCanvas.invalidate()
+    }
+
     private fun initBottomControls() {
         val tvBrushSize = binding.layoutGraphicsControl.tvBrushSize
         tvBrushSize.setOnClickListener {

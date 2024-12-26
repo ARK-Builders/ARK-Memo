@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -14,7 +13,6 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.R
-import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
 import dev.arkbuilders.arkmemo.models.RootNotFound
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
@@ -23,6 +21,7 @@ import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
 import dev.arkbuilders.arkmemo.ui.fragments.BaseFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
+import dev.arkbuilders.arkmemo.utils.PermissionManager
 import dev.arkbuilders.components.filepicker.onArkPathPicked
 import javax.inject.Inject
 import kotlin.io.path.exists
@@ -38,27 +37,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private val fragContainer = R.id.container
 
     var fragment: Fragment = NotesFragment()
+    val permissionManager = PermissionManager(activity = this)
 
     init {
-        FilePickerDialog.readPermLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                Log.d(ACTIVITY_TAG, "readPermLauncher isGranted: $isGranted")
-                if (isGranted) {
-                    FilePickerDialog.show()
-                } else {
-                    finish()
-                }
-            }
-
-        FilePickerDialog.readPermLauncherSdkR =
-            registerForActivityResult(PermissionContract()) { isGranted ->
-                Log.d(ACTIVITY_TAG, "readPermLauncherSdkR isGranted: $isGranted")
-                if (isGranted) {
-                    FilePickerDialog.show()
-                } else {
-                    finish()
-                }
-            }
+        FilePickerDialog.permissionManager = permissionManager
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,21 +58,27 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             showFragment(savedInstanceState)
         }
 
-        val storageFolderExisting = memoPreferences.getNotesStorage().exists()
-        if (memoPreferences.storageNotAvailable()) {
-            if (!storageFolderExisting) {
-                showNoNoteStorageDialog(RootNotFound(rootPath = memoPreferences.getPath()))
+        permissionManager.askForWriteStorage { granted ->
+            if (!granted) {
+                finish()
             } else {
-                FilePickerDialog.show(this, supportFragmentManager)
-            }
-        } else {
-            if (memoPreferences.isLastLaunchSuccess()) {
-                showFragment(savedInstanceState)
-            } else {
-                showRetrySelectRootDialog(
-                    rootPath = memoPreferences.getPath(),
-                    savedInstanceState = savedInstanceState,
-                )
+                val storageFolderExisting = memoPreferences.getNotesStorage().exists()
+                if (memoPreferences.storageNotAvailable()) {
+                    if (!storageFolderExisting) {
+                        showNoNoteStorageDialog(RootNotFound(rootPath = memoPreferences.getPath()))
+                    } else {
+                        FilePickerDialog.show(this, supportFragmentManager)
+                    }
+                } else {
+                    if (memoPreferences.isLastLaunchSuccess()) {
+                        showFragment(savedInstanceState)
+                    } else {
+                        showRetrySelectRootDialog(
+                            rootPath = memoPreferences.getPath(),
+                            savedInstanceState = savedInstanceState,
+                        )
+                    }
+                }
             }
         }
     }

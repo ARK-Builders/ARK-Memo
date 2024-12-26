@@ -47,8 +47,10 @@ class GraphicNotesViewModel
             Log.d(TAG, "onNoteOpened")
             viewModelScope.launch {
                 if (editPaths.isNotEmpty()) editPaths.clear()
-                editPaths.addAll(note.svg?.getPaths()!!)
-                svg = note.svg.copy()
+                note.svg?.getPaths()?.let { paths ->
+                    editPaths.addAll(paths)
+                    svg = note.svg.copy()
+                }
             }
         }
 

@@ -401,6 +401,11 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
         )
     }
 
+    override fun onViewRestoredWithNote(note: Note) {
+        setNote(note as VoiceNote)
+        initExistingNoteUI()
+    }
+
     private fun saveNote() {
         notesViewModel.onSaveClick(createNewNote(), parentNote = note) { show ->
             activity.showProgressBar(show)
