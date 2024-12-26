@@ -1,6 +1,7 @@
 package dev.arkbuilders.arkmemo.repo.voices
 
 import android.util.Log
+import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
@@ -38,6 +39,16 @@ class VoiceNotesRepo
             withContext(iODispatcher) {
                 readStorage()
             }
+
+        override suspend fun findNote(id: ResourceId): VoiceNote? {
+            return withContext(iODispatcher) {
+                root.listFiles(VOICE_EXT) { path ->
+                    path.toVoiceNote(helper = helper)
+                }.firstOrNull { voiceNote ->
+                    voiceNote.duration.isNotEmpty() && id == voiceNote.resource?.id
+                }
+            }
+        }
 
         override suspend fun delete(notes: List<VoiceNote>) {
             helper.deleteNotes(notes)
@@ -101,25 +112,29 @@ class VoiceNotesRepo
         private suspend fun readStorage(): List<VoiceNote> =
             withContext(iODispatcher) {
                 root.listFiles(VOICE_EXT) { path ->
-                    val id = computeId(path.fileSize(), path)
-                    val resource =
-                        Resource(
-                            id = id,
-                            name = path.name,
-                            extension = path.extension,
-                            modified = path.getLastModifiedTime(),
-                        )
-
-                    val userNoteProperties = helper.readProperties(id, "")
-                    VoiceNote(
-                        title = userNoteProperties.title,
-                        description = userNoteProperties.description,
-                        path = path,
-                        duration = extractDuration(path.pathString),
-                        resource = resource,
-                    )
+                    path.toVoiceNote(helper)
                 }.filter { voiceNote -> voiceNote.duration.isNotEmpty() }
             }
+
+        private fun Path.toVoiceNote(helper: NotesRepoHelper): VoiceNote {
+            val id = computeId(this.fileSize(), this)
+            val resource =
+                Resource(
+                    id = id,
+                    name = this.name,
+                    extension = this.extension,
+                    modified = this.getLastModifiedTime(),
+                )
+
+            val userNoteProperties = helper.readProperties(id, "")
+            return VoiceNote(
+                title = userNoteProperties.title,
+                description = userNoteProperties.description,
+                path = this,
+                duration = extractDuration(this.pathString),
+                resource = resource,
+            )
+        }
     }
 
 private const val VOICES_REPO = "VoiceNotesRepo"

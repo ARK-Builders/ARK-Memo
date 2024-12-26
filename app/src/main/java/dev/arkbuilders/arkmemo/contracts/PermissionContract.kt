@@ -14,7 +14,9 @@ class PermissionContract : ActivityResultContract<String, Boolean>() {
     override fun createIntent(
         context: Context,
         input: String,
-    ) = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse(input))
+    ) = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse(input)).apply {
+        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun parseResult(

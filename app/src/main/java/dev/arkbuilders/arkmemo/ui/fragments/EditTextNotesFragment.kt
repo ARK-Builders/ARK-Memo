@@ -75,7 +75,6 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
                 note = it
             }
             noteStr = requireArguments().getString(NOTE_STRING_KEY)
-            notesViewModel.init {}
         }
     }
 
@@ -165,6 +164,9 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
 
     override fun isContentEmpty(): Boolean {
         return binding.editNote.text.toString().trim().isEmpty()
+    }
+
+    override fun onViewRestoredWithNote(note: Note) {
     }
 
     override fun onDestroyView() {

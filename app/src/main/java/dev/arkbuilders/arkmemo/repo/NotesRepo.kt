@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.repo
 
+import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 
 interface NotesRepo<Note> {
@@ -15,4 +16,6 @@ interface NotesRepo<Note> {
     suspend fun delete(note: Note)
 
     suspend fun delete(notes: List<Note>)
+
+    suspend fun findNote(id: ResourceId): Note?
 }
