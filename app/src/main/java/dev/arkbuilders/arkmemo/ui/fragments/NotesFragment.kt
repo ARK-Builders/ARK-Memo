@@ -1,10 +1,15 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.content.res.ColorStateList
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -20,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentHomeBinding
+import dev.arkbuilders.arkmemo.graphics.ColorCode
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.models.RootNotFound
 import dev.arkbuilders.arkmemo.models.VoiceNote
@@ -31,6 +37,7 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerSideEffect
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.ui.viewmodels.NotesViewModel
 import dev.arkbuilders.arkmemo.ui.views.toast
+import dev.arkbuilders.arkmemo.utils.dpToPx
 import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.replaceFragment
@@ -92,6 +99,88 @@ class NotesFragment : BaseFragment() {
                 target: RecyclerView.ViewHolder,
             ): Boolean {
                 return false
+            }
+
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean,
+            ) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    val itemView = viewHolder.itemView
+                    val context = itemView.context
+                    val paint =
+                        Paint().apply {
+                            color = Color.RED
+                            isAntiAlias = true
+                        }
+
+                    val strokePaint =
+                        Paint().apply {
+                            style = Paint.Style.STROKE
+                            color = ColorCode.borderPrimary
+                            strokeWidth = 1.dpToPx().toFloat()
+                            isAntiAlias = true
+                        }
+
+                    val tvDelete =
+                        TextView(context).apply {
+                            // Size should be the same as R.dimen.text_size_delete
+                            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                        }
+
+                    val textPaint =
+                        Paint().apply {
+                            color = Color.WHITE
+                            textSize = tvDelete.textSize
+                            textAlign = Paint.Align.RIGHT
+                            typeface = tvDelete.typeface
+                            isAntiAlias = true
+                        }
+
+                    val cornerRadius = context.resources.getDimension(R.dimen.corner_radius_big)
+                    val endMargin = 16.dpToPx().toFloat()
+
+                    val x = itemView.right.toFloat() - endMargin
+                    val y =
+                        (itemView.top + itemView.bottom) / 2f +
+                            (textPaint.descent() - textPaint.ascent()) / 2f - textPaint.descent()
+
+                    c.drawRoundRect(
+                        itemView.left.toFloat(),
+                        itemView.top.toFloat(),
+                        itemView.right.toFloat(),
+                        itemView.bottom.toFloat(),
+                        cornerRadius,
+                        cornerRadius,
+                        paint,
+                    )
+
+                    c.drawRoundRect(
+                        itemView.left.toFloat(),
+                        itemView.top.toFloat(),
+                        itemView.right.toFloat(),
+                        itemView.bottom.toFloat(),
+                        cornerRadius,
+                        cornerRadius,
+                        strokePaint,
+                    )
+
+                    c.drawText(context.getString(R.string.action_delete), x, y, textPaint)
+                }
+                super.onChildDraw(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive,
+                )
             }
 
             override fun onSwiped(
