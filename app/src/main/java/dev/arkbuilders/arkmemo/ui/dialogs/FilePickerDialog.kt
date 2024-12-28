@@ -86,6 +86,7 @@ class FilePickerDialog : ArkFilePickerFragment() {
                 mode = ArkFilePickerMode.FOLDER,
                 titleStringId = R.string.file_picker_title,
                 pickButtonStringId = R.string.select,
+                themeId = android.R.style.ThemeOverlay_Material_Dialog_Alert,
             )
     }
 }
