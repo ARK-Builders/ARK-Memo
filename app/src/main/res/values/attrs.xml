@@ -3,6 +3,7 @@
 
     <declare-styleable name="SettingTextView">
         <attr name="stv_switch_on" format="reference|boolean"/>
+        <attr name="stv_switch_checked" format="reference|boolean"/>
         <attr name="stv_text" format="reference|string"/>
         <attr name="stv_icon" format="reference|integer"/>
     </declare-styleable>
