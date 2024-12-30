@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import dev.arkbuilders.arkmemo.BuildConfig
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.databinding.FragmentHomeBinding
 import dev.arkbuilders.arkmemo.models.Note
@@ -156,13 +157,25 @@ class NotesFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         activity.title = getString(R.string.app_name)
         activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        binding.ivSettings.setOnClickListener {
+        binding.ivAbout.setOnClickListener {
             if (!checkForStorageExistence()) {
                 return@setOnClickListener
             }
+            activity.fragment = AboutFragment()
+            activity.replaceFragment(activity.fragment, AboutFragment::class.java.name)
+        }
+
+        if (BuildConfig.FLAVOR == "github") {
+            binding.ivSettings.visible()
+        } else {
+            binding.ivSettings.gone()
+        }
+
+        binding.ivSettings.setOnClickListener {
             activity.fragment = SettingsFragment()
             activity.replaceFragment(activity.fragment, SettingsFragment::class.java.name)
         }
+
         showingFloatingButtons = false
         initBottomControlViews()
         initEmptyStateViews()
@@ -450,14 +463,14 @@ class NotesFragment : BaseFragment() {
             binding.groupActionModeTexts.gone()
             binding.layoutBottomControl.visible()
             binding.edtSearch.visible()
-            binding.ivSettings.visible()
+            binding.ivAbout.visible()
             notesAdapter?.toggleSelectAllItems(false)
         } else {
             binding.groupActionModeTexts.visible()
             updateSelectStateTexts(selectedCountForDelete)
             binding.layoutBottomControl.gone()
             binding.edtSearch.gone()
-            binding.ivSettings.gone()
+            binding.ivAbout.gone()
             binding.tvActionModeCancel.setOnClickListener {
                 toggleActionMode()
             }
