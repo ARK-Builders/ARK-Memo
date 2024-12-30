@@ -125,4 +125,7 @@
     <string name="error_load_notes_failed_retry_action">Retry</string>
     <string name="error_load_notes_crash_description">There\'s a crash while loading the folder %s.\nPlease retry or select a new folder.</string>
 
+    <!-- Settings -->
+    <string name="settings_crash_reporting">Crash reporting</string>
+
 </resources>
