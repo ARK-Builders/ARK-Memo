@@ -122,4 +122,7 @@
     <string name="error_load_notes_failed_positive_action">Select</string>
     <string name="error_load_notes_failed_negative_action">Leave</string>
 
+    <!-- Settings -->
+    <string name="settings_crash_reporting">Crash reporting</string>
+
 </resources>

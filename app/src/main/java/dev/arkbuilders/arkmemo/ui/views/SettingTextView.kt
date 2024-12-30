@@ -14,14 +14,18 @@ class SettingTextView
     @JvmOverloads
     constructor(context: Context, attrs: AttributeSet? = null) :
     ConstraintLayout(context, attrs) {
+        private var binding: LayoutSettingTextBinding
+        var onSwitchCheckChanged: ((isChecked: Boolean) -> Unit)? = null
+
         init {
-            val binding = LayoutSettingTextBinding.inflate(LayoutInflater.from(context), this, true)
+            binding = LayoutSettingTextBinding.inflate(LayoutInflater.from(context), this, true)
             val typedArray: TypedArray =
                 context.obtainStyledAttributes(attrs, R.styleable.SettingTextView)
             val textResId = typedArray.getText(R.styleable.SettingTextView_stv_text)
             val iconResId = typedArray.getResourceId(R.styleable.SettingTextView_stv_icon, 0)
             val enableSwitch =
                 typedArray.getBoolean(R.styleable.SettingTextView_stv_switch_on, false)
+            val switchChecked = typedArray.getBoolean(R.styleable.SettingTextView_stv_switch_checked, false)
             textResId?.let {
                 binding.tvText.text = textResId
             }
@@ -32,6 +36,22 @@ class SettingTextView
                 binding.switchRight.gone()
             }
 
+            binding.switchRight.isChecked = switchChecked
+            binding.switchRight.setOnCheckedChangeListener(
+                object : SwitchButton.OnCheckedChangeListener {
+                    override fun onCheckedChanged(
+                        view: SwitchButton?,
+                        isChecked: Boolean,
+                    ) {
+                        onSwitchCheckChanged?.invoke(isChecked)
+                    }
+                },
+            )
+
             typedArray.recycle()
+        }
+
+        fun setSwitchChecked(checked: Boolean) {
+            binding.switchRight.isChecked = checked
         }
     }
