@@ -67,32 +67,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        fun showFragment() {
-            val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
-            if (textDataFromIntent != null) {
-                fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
-                supportFragmentManager.beginTransaction().apply {
-                    replace(fragContainer, fragment, EditTextNotesFragment.TAG)
-                    commit()
-                }
-            } else {
-                if (savedInstanceState == null) {
-                    supportFragmentManager.beginTransaction().apply {
-                        add(fragContainer, fragment, NotesFragment.TAG)
-                        commit()
-                    }
-                } else {
-                    supportFragmentManager.apply {
-                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
-                        findFragmentByTag(tag)?.let {
-                            fragment = it
-                            if (!fragment.isInLayout) {
-                                resumeFragment(fragment)
-                            }
-                        }
-                    }
-                }
-            }
+        supportFragmentManager.onArkPathPicked(this) {
+            memoPreferences.storePath(it.toString())
+            showFragment(savedInstanceState)
         }
 
         val storageFolderExisting = memoPreferences.getNotesStorage().exists()
@@ -102,13 +79,43 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             } else {
                 FilePickerDialog.show(this, supportFragmentManager)
             }
+        } else {
+            if (memoPreferences.isLastLaunchSuccess()) {
+                showFragment(savedInstanceState)
+            } else {
+                showRetrySelectRootDialog(
+                    rootPath = memoPreferences.getPath(),
+                    savedInstanceState = savedInstanceState,
+                )
+            }
+        }
+    }
 
-            supportFragmentManager.onArkPathPicked(this) {
-                memoPreferences.storePath(it.toString())
-                showFragment()
+    private fun showFragment(savedInstanceState: Bundle?) {
+        val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
+        if (textDataFromIntent != null) {
+            fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
+            supportFragmentManager.beginTransaction().apply {
+                replace(fragContainer, fragment, EditTextNotesFragment.TAG)
+                commit()
             }
         } else {
-            showFragment()
+            if (savedInstanceState == null) {
+                supportFragmentManager.beginTransaction().apply {
+                    add(fragContainer, fragment, NotesFragment.TAG)
+                    commit()
+                }
+            } else {
+                supportFragmentManager.apply {
+                    val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
+                    findFragmentByTag(tag)?.let {
+                        fragment = it
+                        if (!fragment.isInLayout) {
+                            resumeFragment(fragment)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -125,6 +132,35 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 },
                 onNegativeClicked = {
                     finish()
+                },
+                onCloseClicked = {
+                    finish()
+                },
+            )
+        loadFailDialog.show(supportFragmentManager, CommonActionDialog.TAG)
+    }
+
+    private fun showRetrySelectRootDialog(
+        rootPath: String,
+        savedInstanceState: Bundle?,
+    ) {
+        val loadFailDialog =
+            CommonActionDialog(
+                title = getString(R.string.error_load_notes_crash_title),
+                message = getString(R.string.error_load_notes_crash_description, rootPath),
+                positiveText = R.string.error_load_notes_failed_retry_action,
+                negativeText = R.string.error_load_notes_failed_negative_action,
+                neutralText = R.string.error_load_notes_failed_positive_action,
+                isAlert = false,
+                enableNeutralOption = true,
+                onPositiveClick = {
+                    showFragment(savedInstanceState)
+                },
+                onNegativeClicked = {
+                    finish()
+                },
+                onNeutralClicked = {
+                    FilePickerDialog.show(this, supportFragmentManager)
                 },
                 onCloseClicked = {
                     finish()

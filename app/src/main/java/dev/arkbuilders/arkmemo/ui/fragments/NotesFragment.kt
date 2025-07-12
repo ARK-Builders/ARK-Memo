@@ -169,9 +169,11 @@ class NotesFragment : BaseFragment() {
 
         binding.pbLoading.visible()
         notesViewModel.apply {
+            setLastLaunchSuccess(false)
             init {
                 readAllNotes {
                     onNotesLoaded(it)
+                    setLastLaunchSuccess(true)
                 }
             }
         }

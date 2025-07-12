@@ -3,7 +3,7 @@ package dev.arkbuilders.arkmemo.repo
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 
 interface NotesRepo<Note> {
-    suspend fun init()
+    suspend fun init(root: String)
 
     suspend fun save(
         note: Note,

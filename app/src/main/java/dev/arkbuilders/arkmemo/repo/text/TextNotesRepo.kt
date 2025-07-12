@@ -6,7 +6,6 @@ import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.models.TextNote
-import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
@@ -27,16 +26,14 @@ import kotlin.io.path.writeLines
 class TextNotesRepo
     @Inject
     constructor(
-        private val memoPreferences: MemoPreferences,
         @Named(IO_DISPATCHER)
         private val iODispatcher: CoroutineDispatcher,
         private val helper: NotesRepoHelper,
     ) : NotesRepo<TextNote> {
-        private lateinit var root: Path
+        private val root: Path by lazy { helper.root }
 
-        override suspend fun init() {
-            root = memoPreferences.getNotesStorage()
-            helper.init()
+        override suspend fun init(root: String) {
+            helper.init(root)
         }
 
         override suspend fun save(

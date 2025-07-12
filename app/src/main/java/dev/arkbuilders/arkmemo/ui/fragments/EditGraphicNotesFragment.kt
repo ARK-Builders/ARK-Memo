@@ -66,7 +66,6 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        notesViewModel.init {}
         arguments?.getParcelableCompat(GRAPHICAL_NOTE_KEY, GraphicNote::class.java)?.let {
             note = it
             graphicNotesViewModel.onNoteOpened(note)
