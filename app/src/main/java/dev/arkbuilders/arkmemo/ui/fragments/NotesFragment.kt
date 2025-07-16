@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -315,6 +316,7 @@ class NotesFragment : BaseFragment() {
     }
 
     private fun onNotesLoaded(notes: List<Note>) {
+        Log.d(TAG, "onNotesLoaded notes.size: ${notes.size}")
         binding.pbLoading.gone()
         if (notesAdapter == null) {
             notesAdapter =
