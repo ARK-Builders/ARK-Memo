@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,6 +39,10 @@ class ArkRecorderViewModel
     constructor(
         private val arkAudioRecorder: ArkAudioRecorder,
     ) : ViewModel() {
+        companion object {
+            private const val TAG = "ArkRecorderViewModel"
+        }
+
         private val recorderSideEffect = MutableStateFlow<RecorderSideEffect?>(null)
         private val recorderState = MutableStateFlow<RecorderState?>(null)
         private val isRecording = MutableStateFlow(false)
@@ -51,6 +56,7 @@ class ArkRecorderViewModel
         private var recordTimerTask: TimerTask? = null
 
         fun onStartStopClick() {
+            Log.d(TAG, "onStartStopClick")
             if (isRecording.value) {
                 onStopRecordingClick()
             } else {
@@ -59,6 +65,7 @@ class ArkRecorderViewModel
         }
 
         fun onPauseResumeClick() {
+            Log.d(TAG, "onPauseResumeClick")
             if (isPaused.value) {
                 onResumeRecordingClick()
             } else {
@@ -67,6 +74,7 @@ class ArkRecorderViewModel
         }
 
         fun onStartOverClick() {
+            Log.d(TAG, "onStartOverClick")
             onStartOverRecordingClick()
         }
 
@@ -100,6 +108,7 @@ class ArkRecorderViewModel
         }
 
         private fun onStartRecordingClick() {
+            Log.d(TAG, "onStartRecordingClick")
             viewModelScope.launch {
                 arkAudioRecorder.init()
                 arkAudioRecorder.start()
@@ -125,6 +134,7 @@ class ArkRecorderViewModel
         }
 
         private fun onStartOverRecordingClick() {
+            Log.d(TAG, "onStartOverRecordingClick")
             viewModelScope.launch {
                 arkAudioRecorder.stop()
                 duration = 0

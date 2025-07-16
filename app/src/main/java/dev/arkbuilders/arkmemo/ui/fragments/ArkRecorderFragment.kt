@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -315,6 +316,7 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
     }
 
     private fun handlePlaySideEffect(effect: ArkMediaPlayerSideEffect) {
+        Log.d(TAG, "handlePlaySideEffect: $effect")
         when (effect) {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
