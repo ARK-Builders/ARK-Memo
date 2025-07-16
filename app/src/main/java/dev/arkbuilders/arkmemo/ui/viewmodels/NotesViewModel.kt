@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -43,7 +44,10 @@ class NotesViewModel
         @set:Inject
         internal lateinit var memoPreferences: MemoPreferences
 
+        private val tag = "NotesViewModel"
+
         fun init(extraBlock: () -> Unit) {
+            Log.d(tag, "init")
             val root = memoPreferences.getPath()
             val initJob =
                 viewModelScope.launch(iODispatcher) {
@@ -58,6 +62,7 @@ class NotesViewModel
         }
 
         fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
+            Log.d(tag, "readAllNotes")
             viewModelScope.launch(iODispatcher) {
                 notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
                 notes.value.let {
@@ -73,6 +78,7 @@ class NotesViewModel
             keyword: String,
             onSuccess: (notes: List<Note>) -> Unit,
         ) {
+            Log.d(tag, "searchNote")
             searchJob?.cancel()
             searchJob =
                 viewModelScope.launch(iODispatcher) {
@@ -106,6 +112,7 @@ class NotesViewModel
                 }
 
                 fun handleResult(result: SaveNoteResult) {
+                    Log.d(tag, "handleResult: ${result.name}")
                     if (result == SaveNoteResult.SUCCESS_NEW ||
                         result == SaveNoteResult.SUCCESS_UPDATED
                     ) {
@@ -164,6 +171,7 @@ class NotesViewModel
             note: Note,
             parentResId: ResourceId? = null,
         ) {
+            Log.d(tag, "add note: $note")
             val notes = this.notes.value.toMutableList()
             note.resource?.let {
                 notes.removeIf { it.resource?.id == parentResId ?: note.resource?.id }
