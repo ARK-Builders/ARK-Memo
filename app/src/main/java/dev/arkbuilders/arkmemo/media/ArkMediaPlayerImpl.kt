@@ -14,12 +14,14 @@ class ArkMediaPlayerImpl
         private var onPreparedHandler: () -> Unit = {}
 
         private var maxAmplitude = 0
+        private val tag = "ArkMediaPlayerImpl"
 
         override fun init(
             path: String,
             onCompletion: () -> Unit,
             onPrepared: () -> Unit,
         ) {
+            Log.d(tag, "init")
             if (player?.isPlaying == true) {
                 player?.stop()
                 onCompletionHandler()
@@ -43,16 +45,18 @@ class ArkMediaPlayerImpl
                         setDataSource(path)
                         prepare()
                     } catch (e: Exception) {
-                        Log.e("ArkMediaPlayerImpl", "init exception: ${e.message}")
+                        Log.e(tag, "init exception: ${e.message}")
                     }
                 }
         }
 
         override fun play() {
+            Log.d(tag, "play")
             player?.start()
         }
 
         override fun stop() {
+            Log.d(tag, "stop")
             player?.let {
                 it.stop()
                 it.release()
@@ -61,10 +65,12 @@ class ArkMediaPlayerImpl
         }
 
         override fun pause() {
+            Log.d(tag, "pause")
             player?.pause()
         }
 
         override fun seekTo(position: Int) {
+            Log.d(tag, "seekTo position: $position")
             player?.seekTo(position)
         }
 

@@ -33,6 +33,7 @@ class NotesRepoHelper
         @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     ) {
         lateinit var root: Path
+        private val tag = "NotesRepoHelper"
 
         private lateinit var propertiesStorage: PropertiesStorage
         private val lazyPropertiesStorage by lazy {
@@ -43,6 +44,7 @@ class NotesRepoHelper
         }
 
         suspend fun init(root: String) {
+            Log.d(tag, "init")
             this.root = Path(root)
             propertiesStorage = lazyPropertiesStorage.await()
         }
@@ -53,6 +55,7 @@ class NotesRepoHelper
             description: String? = null,
         ): Boolean {
             with(propertiesStorage) {
+                Log.d(tag, "persistNoteProperties for resource: $resourceId title: $noteTitle")
                 val properties =
                     Properties(
                         setOf(noteTitle),
@@ -85,13 +88,14 @@ class NotesRepoHelper
                     extension = resourcePath.extension,
                     modified = resourcePath.getLastModifiedTime(),
                 )
-            Log.d("notes-repo", "resource renamed to ${resourcePath.name} successfully")
+            Log.d(tag, "resource renamed to ${resourcePath.name} successfully")
         }
 
         fun readProperties(
             id: ResourceId,
             defaultTitle: String,
         ): UserNoteProperties {
+            Log.d(tag, "readProperties for resource id: $id")
             val title =
                 propertiesStorage.getProperties(id).titles.let {
                     if (it.isNotEmpty()) it.elementAt(0) else defaultTitle
@@ -112,6 +116,7 @@ class NotesRepoHelper
 
         suspend fun deleteNote(note: Note): Unit =
             withContext(Dispatchers.IO) {
+                Log.d(tag, "deleteNote: ${note.title}")
                 val id = note.resource?.id
 
                 val path = root.resolve("${note.resource?.name}")
@@ -120,13 +125,13 @@ class NotesRepoHelper
                     try {
                         propertiesStorage.remove(resourceId)
                     } catch (ex: NullPointerException) {
-                        Log.e("NotesRepoHelper", "deleteNote exception: " + ex.message)
+                        Log.e(tag, "deleteNote exception: " + ex.message)
                     }
                 }
 
                 propertiesStorage.persist()
                 note.resource?.name?.let { name ->
-                    Log.d("NotesRepoHelper", "$name has been deleted. id: " + id)
+                    Log.d(tag, "$name has been deleted. id: " + id)
                 }
             }
     }

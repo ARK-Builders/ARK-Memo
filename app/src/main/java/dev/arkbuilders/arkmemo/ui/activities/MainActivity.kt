@@ -2,6 +2,7 @@ package dev.arkbuilders.arkmemo.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     init {
         FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                Log.d(ACTIVITY_TAG, "readPermLauncher isGranted: $isGranted")
                 if (isGranted) {
                     FilePickerDialog.show()
                 } else {
@@ -50,6 +52,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         FilePickerDialog.readPermLauncherSdkR =
             registerForActivityResult(PermissionContract()) { isGranted ->
+                Log.d(ACTIVITY_TAG, "readPermLauncherSdkR isGranted: $isGranted")
                 if (isGranted) {
                     FilePickerDialog.show()
                 } else {
@@ -68,6 +71,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
 
         supportFragmentManager.onArkPathPicked(this) {
+            Log.d(ACTIVITY_TAG, "onArkPathPicked path: $it")
             memoPreferences.storePath(it.toString())
             showFragment(savedInstanceState)
         }
@@ -202,6 +206,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     companion object {
         private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
+        private const val ACTIVITY_TAG = "MainActivity"
     }
 }
 

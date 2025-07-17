@@ -60,6 +60,7 @@ class TextNotesRepo
             note: TextNote,
             callback: (SaveNoteResult) -> Unit,
         ) = withContext(iODispatcher) {
+            Log.d(TEXT_REPO, "write note: $note")
             val tempPath = createTempFile()
             val lines = note.text.split('\n')
             tempPath.writeLines(lines)
@@ -96,6 +97,7 @@ class TextNotesRepo
 
         private suspend fun readStorage(): List<TextNote> =
             withContext(iODispatcher) {
+                Log.d(TEXT_REPO, "readStorage")
                 root.listFiles(NOTE_EXT) { path ->
                     val size = path.fileSize()
                     val id = computeId(size, path)
@@ -123,6 +125,7 @@ class TextNotesRepo
                             )
                         }
                     } catch (e: Exception) {
+                        Log.e(TEXT_REPO, "readStorage exception: $e")
                         e.printStackTrace()
                         TextNote(
                             text = "",

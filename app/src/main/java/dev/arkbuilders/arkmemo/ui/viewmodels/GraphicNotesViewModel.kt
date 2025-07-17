@@ -2,6 +2,7 @@ package dev.arkbuilders.arkmemo.ui.viewmodels
 
 import android.graphics.Paint
 import android.graphics.Path
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,8 @@ class GraphicNotesViewModel
         private var lastPaintColor = paintColor
         private var strokeWidth = Size.TINY.value
 
+        private val tag = "GraphicNotesViewModel"
+
         val paint get() =
             Paint().also {
                 it.color = paintColor
@@ -39,6 +42,7 @@ class GraphicNotesViewModel
         val observableSvgLiveData = svgLiveData as LiveData<SVG>
 
         fun onNoteOpened(note: GraphicNote) {
+            Log.d(tag, "onNoteOpened")
             viewModelScope.launch {
                 if (editPaths.isNotEmpty()) editPaths.clear()
                 editPaths.addAll(note.svg?.getPaths()!!)
