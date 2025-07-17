@@ -1,6 +1,7 @@
 package dev.arkbuilders.arkmemo.repo.text
 
 import android.util.Log
+import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
@@ -55,6 +56,10 @@ class TextNotesRepo
             withContext(iODispatcher) {
                 readStorage()
             }
+
+        override suspend fun findNote(id: ResourceId): TextNote? {
+            return null
+        }
 
         private suspend fun write(
             note: TextNote,
