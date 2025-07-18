@@ -27,7 +27,7 @@ googleHiltAndroid = "2.48"
 googleHiltCompiler = "2.48"
 googleFirebaseBom = "33.3.0"
 androidxHiltCompiler = "1.0.0"
-airbnbLottie = "6.4.0"
+airbnbLottie = "6.6.7"
 qrgenerator = "1.0.1"
 
 [libraries]
