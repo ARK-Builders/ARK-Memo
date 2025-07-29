@@ -1,7 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
@@ -18,6 +17,7 @@ import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerState
 import dev.arkbuilders.arkmemo.ui.viewmodels.ArkMediaPlayerViewModel
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
@@ -100,7 +100,7 @@ class ArkMediaPlayerFragment : BaseEditNoteFragment() {
     }
 
     private fun handleSideEffect(effect: ArkMediaPlayerSideEffect) {
-        Log.d(TAG, "handleSideEffect: $effect")
+        ALog.d(TAG, "handleSideEffect: $effect")
         when (effect) {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 showPauseIcon()

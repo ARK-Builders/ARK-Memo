@@ -3,7 +3,6 @@ package dev.arkbuilders.arkmemo.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver.OnWindowFocusChangeListener
 import android.widget.Toast
@@ -20,7 +19,7 @@ import dev.arkbuilders.arkmemo.utils.getTextFromClipBoard
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.insertStringAtPosition
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
-import java.lang.StringBuilder
+import dev.arkbuilders.logging.ALog
 
 @AndroidEntryPoint
 class EditTextNotesFragment : BaseEditNoteFragment() {
@@ -44,7 +43,7 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
                     try {
                         newTextBuilder.append(noteContent.insertStringAtPosition(clipBoardText, cursorPos))
                     } catch (e: IndexOutOfBoundsException) {
-                        Log.e(TAG, "pasteNoteClickListener exception: ${e.message}")
+                        ALog.e(TAG, "pasteNoteClickListener exception: ${e.message}")
                         newTextBuilder.append(noteContent).append(clipBoardText)
                     }
 

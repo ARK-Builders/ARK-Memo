@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import dev.arkbuilders.logging.ALog
 
 fun Context.openLink(url: String) {
     try {
@@ -13,7 +13,7 @@ fun Context.openLink(url: String) {
             Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)),
         )
     } catch (e: Exception) {
-        Log.e("openLink", " exception: " + e.message)
+        ALog.e("openLink", " exception: " + e.message)
     }
 }
 
@@ -30,6 +30,6 @@ fun Context.openAppSettings(activityLauncher: ActivityResultLauncher<Intent>? = 
             this.startActivity(settingIntent)
         }
     } catch (e: Exception) {
-        Log.e("openAppSettings", " exception: " + e.message)
+        ALog.e("openAppSettings", " exception: " + e.message)
     }
 }

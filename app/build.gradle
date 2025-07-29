@@ -118,6 +118,9 @@ dependencies {
     implementation(platform(libraries.google.firebase.bom))
     implementation(libraries.google.firebase.crashlytics)
     implementation(libraries.google.firebase.analytics)
+
+    implementation project(':logging')
+
 }
 
 tasks.preBuild.dependsOn ktlintCheck

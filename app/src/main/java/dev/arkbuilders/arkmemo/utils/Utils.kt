@@ -5,7 +5,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.os.Build
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,6 +12,7 @@ import androidx.lifecycle.LiveData
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.models.SaveNoteResult
 import dev.arkbuilders.arkmemo.ui.views.toast
+import dev.arkbuilders.logging.ALog
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -135,7 +135,7 @@ fun extractDuration(path: String): String {
             )?.toLong() ?: 0L
         millisToString(duration)
     } catch (e: Exception) {
-        Log.e("ExtractDuration", "extractDuration exception: " + e.message)
+        ALog.e("ExtractDuration", "extractDuration exception: " + e.message)
         ""
     }
 }

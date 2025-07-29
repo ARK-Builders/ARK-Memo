@@ -18,4 +18,8 @@ interface MemoPreferences {
     fun isLastLaunchSuccess(): Boolean
 
     fun setLastLaunchSuccess(success: Boolean)
+
+    fun setEnableDebugLog(enabled: Boolean)
+
+    fun isEnableDebugLog(): Boolean
 }

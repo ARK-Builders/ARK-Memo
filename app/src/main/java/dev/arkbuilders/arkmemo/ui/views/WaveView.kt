@@ -6,8 +6,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
+import dev.arkbuilders.logging.ALog
 
 class WaveView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     var waveColor = Color.WHITE
@@ -48,7 +48,7 @@ class WaveView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     }
 
     private fun computeWave(amplitude: Int) {
-        Log.d(TAG, "computeWave amplitude: $amplitude height: $height")
+        ALog.d(TAG, "computeWave amplitude: $amplitude height: $height")
         if (height <= 0) return
         if (bars.isNotEmpty()) {
             bars.forEachIndexed { index, rect ->

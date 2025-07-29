@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.repo.text
 
-import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
@@ -10,6 +9,7 @@ import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.listFiles
 import dev.arkbuilders.arkmemo.utils.readLines
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
@@ -60,13 +60,13 @@ class TextNotesRepo
             note: TextNote,
             callback: (SaveNoteResult) -> Unit,
         ) = withContext(iODispatcher) {
-            Log.d(TEXT_REPO, "write note: $note")
+            ALog.d(TEXT_REPO, "write note: $note")
             val tempPath = createTempFile()
             val lines = note.text.split('\n')
             tempPath.writeLines(lines)
             val size = tempPath.fileSize()
             val id = computeId(size, tempPath)
-            Log.d(TEXT_REPO, "initial resource name is ${tempPath.name}")
+            ALog.d(TEXT_REPO, "initial resource name is ${tempPath.name}")
             val isPropertiesChanged =
                 helper.persistNoteProperties(
                     resourceId = id,
@@ -79,7 +79,7 @@ class TextNotesRepo
                 if (isPropertiesChanged) {
                     callback(SaveNoteResult.SUCCESS_UPDATED)
                 } else {
-                    Log.d(TEXT_REPO, "resource with similar content already exists")
+                    ALog.d(TEXT_REPO, "resource with similar content already exists")
                     callback(SaveNoteResult.ERROR_EXISTING)
                 }
                 return@withContext
@@ -91,13 +91,13 @@ class TextNotesRepo
                 resourcePath = resourcePath,
                 resourceId = id,
             )
-            Log.d(TEXT_REPO, "resource renamed to $resourcePath successfully")
+            ALog.d(TEXT_REPO, "resource renamed to $resourcePath successfully")
             callback(SaveNoteResult.SUCCESS_NEW)
         }
 
         private suspend fun readStorage(): List<TextNote> =
             withContext(iODispatcher) {
-                Log.d(TEXT_REPO, "readStorage")
+                ALog.d(TEXT_REPO, "readStorage")
                 root.listFiles(NOTE_EXT) { path ->
                     val size = path.fileSize()
                     val id = computeId(size, path)
@@ -125,7 +125,7 @@ class TextNotesRepo
                             )
                         }
                     } catch (e: Exception) {
-                        Log.e(TEXT_REPO, "readStorage exception: $e")
+                        ALog.e(TEXT_REPO, "readStorage exception: $e")
                         e.printStackTrace()
                         TextNote(
                             text = "",

@@ -2,7 +2,6 @@ package dev.arkbuilders.arkmemo.ui.viewmodels
 
 import android.graphics.Paint
 import android.graphics.Path
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +11,7 @@ import dev.arkbuilders.arkmemo.graphics.Color
 import dev.arkbuilders.arkmemo.graphics.SVG
 import dev.arkbuilders.arkmemo.graphics.Size
 import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ class GraphicNotesViewModel
         val observableSvgLiveData = svgLiveData as LiveData<SVG>
 
         fun onNoteOpened(note: GraphicNote) {
-            Log.d(TAG, "onNoteOpened")
+            ALog.d(TAG, "onNoteOpened")
             viewModelScope.launch {
                 if (editPaths.isNotEmpty()) editPaths.clear()
                 editPaths.addAll(note.svg?.getPaths()!!)

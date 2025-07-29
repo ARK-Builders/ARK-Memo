@@ -3,7 +3,6 @@ package dev.arkbuilders.arkmemo.ui.fragments
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -36,6 +35,7 @@ import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.setDrawableColor
 import dev.arkbuilders.arkmemo.utils.visible
+import dev.arkbuilders.logging.ALog
 
 @AndroidEntryPoint
 class EditGraphicNotesFragment : BaseEditNoteFragment() {
@@ -236,7 +236,7 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
                         }
                     },
                 onItemClick = { attribute, pos ->
-                    Log.v(TAG, "onSizeSelected: " + attribute)
+                    ALog.v(TAG, "onSizeSelected: " + attribute)
                     graphicNotesViewModel.setBrushSize((attribute as BrushSize).getBrushSize())
                     graphicNotesViewModel.setEraseMode(isEraseMode)
                 },
@@ -272,7 +272,7 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
                         }
                     },
                 onItemClick = { attribute, pos ->
-                    Log.v(TAG, "onColorSelected: " + attribute)
+                    ALog.v(TAG, "onColorSelected: " + attribute)
                     (attribute as BrushColor).getColorCode().let { colorCode ->
                         graphicNotesViewModel.setPaintColor(colorCode)
                         binding.layoutGraphicsControl.tvBrushColor.setDrawableColor(colorCode)

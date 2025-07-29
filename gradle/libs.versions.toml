@@ -66,6 +66,7 @@ qr-generator = { group = "com.github.androidmads", name = "QRGenerator", version
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin"}
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinAndroidPlugin"}
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroidPlugin"}
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServicesPlugin"}

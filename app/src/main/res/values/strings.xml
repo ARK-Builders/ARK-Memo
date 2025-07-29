@@ -127,5 +127,6 @@
 
     <!-- Settings -->
     <string name="settings_crash_reporting">Crash reporting</string>
+    <string name="settings_enable_debug_log">Enable debug log</string>
 
 </resources>

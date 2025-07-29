@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.repo.voices
 
-import android.util.Log
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
@@ -10,6 +9,7 @@ import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.extractDuration
 import dev.arkbuilders.arkmemo.utils.listFiles
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
@@ -58,7 +58,7 @@ class VoiceNotesRepo
             note: VoiceNote,
             callback: (SaveNoteResult) -> Unit,
         ) = withContext(iODispatcher) {
-            Log.d(VOICES_REPO, "write")
+            ALog.d(VOICES_REPO, "write")
             val tempPath = note.path
             val size = tempPath.fileSize()
             val id = computeId(size, tempPath)
@@ -70,13 +70,13 @@ class VoiceNotesRepo
                     description = note.description,
                 )
 
-            Log.d(VOICES_REPO, "initial resource name is ${tempPath.name}")
+            ALog.d(VOICES_REPO, "initial resource name is ${tempPath.name}")
 
             helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
 
             val resourcePath = root.resolve("$id.$VOICE_EXT")
             if (resourcePath.exists()) {
-                Log.d(
+                ALog.d(
                     VOICES_REPO,
                     "resource with similar content already exists",
                 )
@@ -95,13 +95,13 @@ class VoiceNotesRepo
                 id,
             )
             note.path = resourcePath
-            Log.d(VOICES_REPO, "resource renamed to $resourcePath successfully")
+            ALog.d(VOICES_REPO, "resource renamed to $resourcePath successfully")
             callback(SaveNoteResult.SUCCESS_NEW)
         }
 
         private suspend fun readStorage(): List<VoiceNote> =
             withContext(iODispatcher) {
-                Log.d(VOICES_REPO, "readStorage")
+                ALog.d(VOICES_REPO, "readStorage")
                 root.listFiles(VOICE_EXT) { path ->
                     val id = computeId(path.fileSize(), path)
                     val resource =

@@ -5,7 +5,6 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -40,6 +39,7 @@ import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.observeSaveResult
 import dev.arkbuilders.arkmemo.utils.openAppSettings
 import dev.arkbuilders.arkmemo.utils.visible
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.File
@@ -316,7 +316,7 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
     }
 
     private fun handlePlaySideEffect(effect: ArkMediaPlayerSideEffect) {
-        Log.d(TAG, "handlePlaySideEffect: $effect")
+        ALog.d(TAG, "handlePlaySideEffect: $effect")
         when (effect) {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)

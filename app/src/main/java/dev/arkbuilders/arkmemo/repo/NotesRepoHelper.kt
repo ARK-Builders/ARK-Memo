@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.repo
 
-import android.util.Log
 import dev.arkbuilders.arklib.ResourceId
 import dev.arkbuilders.arklib.data.index.Resource
 import dev.arkbuilders.arklib.data.index.RootIndex
@@ -10,6 +9,7 @@ import dev.arkbuilders.arklib.user.properties.PropertiesStorageRepo
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.models.Note
 import dev.arkbuilders.arkmemo.utils.isEqual
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +47,7 @@ class NotesRepoHelper
         }
 
         suspend fun init(root: String) {
-            Log.d(TAG, "init")
+            ALog.d(TAG, "init")
             this.root = Path(root)
             propertiesStorage = lazyPropertiesStorage.await()
         }
@@ -58,7 +58,7 @@ class NotesRepoHelper
             description: String? = null,
         ): Boolean {
             with(propertiesStorage) {
-                Log.d(TAG, "persistNoteProperties for resource: $resourceId title: $noteTitle")
+                ALog.d(TAG, "persistNoteProperties for resource: $resourceId title: $noteTitle")
                 val properties =
                     Properties(
                         setOf(noteTitle),
@@ -91,14 +91,14 @@ class NotesRepoHelper
                     extension = resourcePath.extension,
                     modified = resourcePath.getLastModifiedTime(),
                 )
-            Log.d(TAG, "resource renamed to ${resourcePath.name} successfully")
+            ALog.d(TAG, "resource renamed to ${resourcePath.name} successfully")
         }
 
         fun readProperties(
             id: ResourceId,
             defaultTitle: String,
         ): UserNoteProperties {
-            Log.d(TAG, "readProperties for resource id: $id")
+            ALog.d(TAG, "readProperties for resource id: $id")
             val title =
                 propertiesStorage.getProperties(id).titles.let {
                     if (it.isNotEmpty()) it.elementAt(0) else defaultTitle
@@ -119,7 +119,7 @@ class NotesRepoHelper
 
         suspend fun deleteNote(note: Note): Unit =
             withContext(Dispatchers.IO) {
-                Log.d(TAG, "deleteNote: ${note.title}")
+                ALog.d(TAG, "deleteNote: ${note.title}")
                 val id = note.resource?.id
 
                 val path = root.resolve("${note.resource?.name}")
@@ -128,13 +128,13 @@ class NotesRepoHelper
                     try {
                         propertiesStorage.remove(resourceId)
                     } catch (ex: NullPointerException) {
-                        Log.e(TAG, "deleteNote exception: " + ex.message)
+                        ALog.e(TAG, "deleteNote exception: " + ex.message)
                     }
                 }
 
                 propertiesStorage.persist()
                 note.resource?.name?.let { name ->
-                    Log.d(TAG, "$name has been deleted. id: " + id)
+                    ALog.d(TAG, "$name has been deleted. id: " + id)
                 }
             }
     }

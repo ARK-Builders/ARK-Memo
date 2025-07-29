@@ -3,7 +3,6 @@ package dev.arkbuilders.arkmemo.ui.viewmodels
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.util.Log
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidmads.library.qrgenearator.QRGSaver
@@ -13,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.arkbuilders.arkmemo.di.IO_DISPATCHER
 import dev.arkbuilders.arkmemo.utils.dpToPx
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ class QRViewModel
             text: String,
             onSuccess: (bitmap: Bitmap) -> Unit,
         ) {
-            Log.d(TAG, "generateQRCode")
+            ALog.d(TAG, "generateQRCode")
             viewModelScope.launch(iODispatcher) {
                 // Initializing the QR Encoder with your value to be encoded, type you required and Dimension
                 val qrgEncoder = QRGEncoder(text, null, QRGContents.Type.TEXT, 300.dpToPx())
@@ -53,7 +53,7 @@ class QRViewModel
             bitmap: Bitmap,
             onSuccess: (path: String) -> Unit,
         ) {
-            Log.d(TAG, "saveQRCodeImage")
+            ALog.d(TAG, "saveQRCodeImage")
             viewModelScope.launch {
                 // Save with location, value, bitmap returned and type of Image(JPG/PNG).
                 val qrgSaver = QRGSaver()
