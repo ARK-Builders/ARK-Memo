@@ -1,12 +1,12 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.arkbuilders.arkmemo.media.ArkAudioRecorder
 import dev.arkbuilders.arkmemo.utils.millisToString
 import dev.arkbuilders.arkmemo.utils.tenthSecondsToString
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -56,7 +56,7 @@ class ArkRecorderViewModel
         private var recordTimerTask: TimerTask? = null
 
         fun onStartStopClick() {
-            Log.d(TAG, "onStartStopClick")
+            ALog.d(TAG, "onStartStopClick")
             if (isRecording.value) {
                 onStopRecordingClick()
             } else {
@@ -65,7 +65,7 @@ class ArkRecorderViewModel
         }
 
         fun onPauseResumeClick() {
-            Log.d(TAG, "onPauseResumeClick")
+            ALog.d(TAG, "onPauseResumeClick")
             if (isPaused.value) {
                 onResumeRecordingClick()
             } else {
@@ -74,7 +74,7 @@ class ArkRecorderViewModel
         }
 
         fun onStartOverClick() {
-            Log.d(TAG, "onStartOverClick")
+            ALog.d(TAG, "onStartOverClick")
             onStartOverRecordingClick()
         }
 
@@ -108,7 +108,7 @@ class ArkRecorderViewModel
         }
 
         private fun onStartRecordingClick() {
-            Log.d(TAG, "onStartRecordingClick")
+            ALog.d(TAG, "onStartRecordingClick")
             viewModelScope.launch {
                 arkAudioRecorder.init()
                 arkAudioRecorder.start()
@@ -134,7 +134,7 @@ class ArkRecorderViewModel
         }
 
         private fun onStartOverRecordingClick() {
-            Log.d(TAG, "onStartOverRecordingClick")
+            ALog.d(TAG, "onStartOverRecordingClick")
             viewModelScope.launch {
                 arkAudioRecorder.stop()
                 duration = 0

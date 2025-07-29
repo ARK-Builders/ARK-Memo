@@ -1,11 +1,11 @@
 package dev.arkbuilders.arkmemo.graphics
 
 import android.graphics.Paint
-import android.util.Log
 import android.util.Xml
 import dev.arkbuilders.arkmemo.ui.viewmodels.DrawPath
 import dev.arkbuilders.arkmemo.utils.getColorCode
 import dev.arkbuilders.arkmemo.utils.getStrokeSize
+import dev.arkbuilders.logging.ALog
 import org.xmlpull.v1.XmlPullParser
 import java.nio.file.Path
 import kotlin.io.path.reader
@@ -136,7 +136,7 @@ class SVG {
                                         }
                                     }
                                     if (pathCount > 1) {
-                                        Log.d("svg", "found more than 1 path in file")
+                                        ALog.d("svg", "found more than 1 path in file")
                                         break
                                     }
                                 }

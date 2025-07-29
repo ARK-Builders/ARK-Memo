@@ -1,6 +1,5 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -16,6 +15,7 @@ import dev.arkbuilders.arkmemo.models.VoiceNote
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
 import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.utils.extractDuration
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,7 +49,7 @@ class NotesViewModel
         }
 
         fun init(extraBlock: () -> Unit) {
-            Log.d(TAG, "init")
+            ALog.d(TAG, "init")
             val root = memoPreferences.getPath()
             val initJob =
                 viewModelScope.launch(iODispatcher) {
@@ -64,7 +64,7 @@ class NotesViewModel
         }
 
         fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
-            Log.d(TAG, "readAllNotes")
+            ALog.d(TAG, "readAllNotes")
             viewModelScope.launch(iODispatcher) {
                 notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
                 notes.value.let {
@@ -80,7 +80,7 @@ class NotesViewModel
             keyword: String,
             onSuccess: (notes: List<Note>) -> Unit,
         ) {
-            Log.d(TAG, "searchNote")
+            ALog.d(TAG, "searchNote")
             searchJob?.cancel()
             searchJob =
                 viewModelScope.launch(iODispatcher) {
@@ -114,7 +114,7 @@ class NotesViewModel
                 }
 
                 fun handleResult(result: SaveNoteResult) {
-                    Log.d(TAG, "handleResult: ${result.name}")
+                    ALog.d(TAG, "handleResult: ${result.name}")
                     if (result == SaveNoteResult.SUCCESS_NEW ||
                         result == SaveNoteResult.SUCCESS_UPDATED
                     ) {
@@ -175,7 +175,7 @@ class NotesViewModel
             note: Note,
             parentResId: ResourceId? = null,
         ) {
-            Log.d(
+            ALog.d(
                 TAG,
                 "add note with title: ${note.title} resId: ${note.resource?.id} resName: ${note.resource?.name}",
             )

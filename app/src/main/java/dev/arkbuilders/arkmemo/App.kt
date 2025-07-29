@@ -5,6 +5,7 @@ import dagger.hilt.android.HiltAndroidApp
 import dev.arkbuilders.arklib.data.folders.FoldersRepo
 import dev.arkbuilders.arklib.initArkLib
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.logging.ALog
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -17,5 +18,6 @@ class App : Application() {
         System.loadLibrary("arklib")
         initArkLib()
         FoldersRepo.init(this)
+        ALog.init(isEnabled = memoPreferences.isEnableDebugLog())
     }
 }

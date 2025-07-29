@@ -2,7 +2,7 @@ package dev.arkbuilders.arkmemo.media
 
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import android.util.Log
+import dev.arkbuilders.logging.ALog
 import javax.inject.Inject
 
 class ArkMediaPlayerImpl
@@ -24,7 +24,7 @@ class ArkMediaPlayerImpl
             onCompletion: () -> Unit,
             onPrepared: () -> Unit,
         ) {
-            Log.d(TAG, "init")
+            ALog.d(TAG, "init")
             if (player?.isPlaying == true) {
                 player?.stop()
                 onCompletionHandler()
@@ -48,18 +48,18 @@ class ArkMediaPlayerImpl
                         setDataSource(path)
                         prepare()
                     } catch (e: Exception) {
-                        Log.e(TAG, "init exception: ${e.message}")
+                        ALog.e(TAG, "init exception: ${e.message}")
                     }
                 }
         }
 
         override fun play() {
-            Log.d(TAG, "play")
+            ALog.d(TAG, "play")
             player?.start()
         }
 
         override fun stop() {
-            Log.d(TAG, "stop")
+            ALog.d(TAG, "stop")
             player?.let {
                 it.stop()
                 it.release()
@@ -68,12 +68,12 @@ class ArkMediaPlayerImpl
         }
 
         override fun pause() {
-            Log.d(TAG, "pause")
+            ALog.d(TAG, "pause")
             player?.pause()
         }
 
         override fun seekTo(position: Int) {
-            Log.d(TAG, "seekTo position: $position")
+            ALog.d(TAG, "seekTo position: $position")
             player?.seekTo(position)
         }
 

@@ -12,6 +12,7 @@ import dev.arkbuilders.arkmemo.databinding.FragmentSettingsBinding
 import dev.arkbuilders.arkmemo.ui.viewmodels.SettingsViewModel
 import dev.arkbuilders.arkmemo.utils.gone
 import dev.arkbuilders.arkmemo.utils.visible
+import dev.arkbuilders.logging.ALog
 
 @AndroidEntryPoint
 open class SettingsFragment : Fragment(R.layout.fragment_settings) {
@@ -41,6 +42,12 @@ open class SettingsFragment : Fragment(R.layout.fragment_settings) {
         binding.tvCrashReport.onSwitchCheckChanged = { isChecked ->
             FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = isChecked
             settingsViewModel.storeCrashReportEnabled(isChecked)
+        }
+
+        binding.tvEnableDebugLog.setSwitchChecked(settingsViewModel.isEnableDebugLog())
+        binding.tvEnableDebugLog.onSwitchCheckChanged = { isChecked ->
+            ALog.isEnableLog = isChecked
+            settingsViewModel.setEnableDebugLog(isChecked)
         }
     }
 }

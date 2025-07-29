@@ -21,4 +21,16 @@
         android:id="@+id/tv_crash_report"
         android:layout_marginTop="@dimen/common_padding"/>
 
+    <dev.arkbuilders.arkmemo.ui.views.SettingTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/tv_crash_report"
+        app:layout_constraintTop_toBottomOf="@+id/tv_crash_report"
+        app:stv_switch_on="true"
+        app:stv_switch_checked="false"
+        app:stv_text="@string/settings_enable_debug_log"
+        app:stv_icon="@drawable/ic_debug_log"
+        android:id="@+id/tv_enable_debug_log"
+        android:layout_marginTop="@dimen/common_padding"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

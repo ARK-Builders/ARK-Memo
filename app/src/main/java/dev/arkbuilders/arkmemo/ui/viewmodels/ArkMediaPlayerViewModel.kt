@@ -1,7 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
 import android.media.audiofx.Visualizer
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +9,7 @@ import dev.arkbuilders.arkmemo.ui.views.WaveView
 import dev.arkbuilders.arkmemo.utils.extractDuration
 import dev.arkbuilders.arkmemo.utils.launchPeriodicAsync
 import dev.arkbuilders.arkmemo.utils.millisToString
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +76,7 @@ class ArkMediaPlayerViewModel
         }
 
         private fun setupVisualizer() {
-            Log.d(TAG, "setupVisualizer")
+            ALog.d(TAG, "setupVisualizer")
             // Attach a Visualizer to the MediaPlayer
             // Inspired from this thread: https://stackoverflow.com/a/30384717
             visualizer =
@@ -118,7 +118,7 @@ class ArkMediaPlayerViewModel
          * Inspiration is from: https://developer.android.com/reference/android/media/audiofx/Visualizer#getFft(byte[])
          */
         private fun computeFftMagnitude(fft: ByteArray?): Float {
-            Log.d(TAG, "computeFftMagnitude")
+            ALog.d(TAG, "computeFftMagnitude")
             if (fft == null) return 0f
 
             // Compute magnitude from FFT data
@@ -172,7 +172,7 @@ class ArkMediaPlayerViewModel
         }
 
         private fun startProgressMonitor() {
-            Log.d(TAG, "startProgressMonitor")
+            ALog.d(TAG, "startProgressMonitor")
             if (progressJob?.isActive == true) return
             val duration = millisToString(arkMediaPlayer.duration().toLong())
 

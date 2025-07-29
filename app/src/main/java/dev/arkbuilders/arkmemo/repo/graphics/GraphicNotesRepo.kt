@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Environment
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.arkbuilders.arklib.computeId
 import dev.arkbuilders.arklib.data.index.Resource
@@ -20,6 +19,7 @@ import dev.arkbuilders.arkmemo.repo.NotesRepo
 import dev.arkbuilders.arkmemo.repo.NotesRepoHelper
 import dev.arkbuilders.arkmemo.utils.dpToPx
 import dev.arkbuilders.arkmemo.utils.listFiles
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -80,12 +80,12 @@ class GraphicNotesRepo
             note: GraphicNote,
             callback: (SaveNoteResult) -> Unit,
         ) = withContext(iODispatcher) {
-            Log.d(GRAPHICS_REPO, "write")
+            ALog.d(GRAPHICS_REPO, "write")
             val tempPath = createTempFile()
             note.svg?.generate(tempPath)
             val size = tempPath.fileSize()
             val id = computeId(size, tempPath)
-            Log.d(GRAPHICS_REPO, "initial resource name is ${tempPath.name}")
+            ALog.d(GRAPHICS_REPO, "initial resource name is ${tempPath.name}")
             val isPropertiesChanged =
                 helper.persistNoteProperties(
                     resourceId = id,
@@ -98,7 +98,7 @@ class GraphicNotesRepo
                 if (isPropertiesChanged) {
                     callback(SaveNoteResult.SUCCESS_UPDATED)
                 } else {
-                    Log.d(GRAPHICS_REPO, "resource with similar content already exists")
+                    ALog.d(GRAPHICS_REPO, "resource with similar content already exists")
                     callback(SaveNoteResult.ERROR_EXISTING)
                 }
                 return@withContext
@@ -110,17 +110,17 @@ class GraphicNotesRepo
                 resourcePath,
                 id,
             )
-            Log.d(GRAPHICS_REPO, "resource renamed to $resourcePath successfully")
+            ALog.d(GRAPHICS_REPO, "resource renamed to $resourcePath successfully")
             callback(SaveNoteResult.SUCCESS_NEW)
         }
 
         private suspend fun readStorage() =
             withContext(iODispatcher) {
-                Log.d(GRAPHICS_REPO, "readStorage")
+                ALog.d(GRAPHICS_REPO, "readStorage")
                 root.listFiles(SVG_EXT) { path ->
                     val svg = SVG.parse(path)
                     if (svg == null) {
-                        Log.w(GRAPHICS_REPO, "Skipping invalid SVG: " + path)
+                        ALog.w(GRAPHICS_REPO, "Skipping invalid SVG: " + path)
                     }
                     val size = path.fileSize()
                     val id = computeId(size, path)
@@ -149,7 +149,7 @@ class GraphicNotesRepo
             fileName: String,
             svg: SVG?,
         ): Bitmap? {
-            Log.d(GRAPHICS_REPO, "exportBitmapFromSvg")
+            ALog.d(GRAPHICS_REPO, "exportBitmapFromSvg")
             // Check if thumb bitmap already exists
             val file = File(thumbDirectory, "$fileName.png")
             try {
@@ -192,7 +192,7 @@ class GraphicNotesRepo
                 canvas.drawPath(path.path, path.paint)
                 canvas.restore()
             } ?: let {
-                Log.w(GRAPHICS_REPO, "exportBitmapFromSvg either SVG or its paths are null!")
+                ALog.w(GRAPHICS_REPO, "exportBitmapFromSvg either SVG or its paths are null!")
                 return null
             }
 
