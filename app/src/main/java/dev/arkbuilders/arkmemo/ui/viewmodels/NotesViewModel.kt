@@ -177,7 +177,7 @@ constructor(
     ) {
         Log.d(
             TAG,
-            "add note with title: ${note.title} resId: ${note.resource?.id} resName: ${note.resource?.name}"
+            "add note with title: ${note.title} resId: ${note.resource?.id} resName: ${note.resource?.name}",
         )
         val notes = this.notes.value.toMutableList()
         note.resource?.let {
