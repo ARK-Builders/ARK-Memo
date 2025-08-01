@@ -88,6 +88,7 @@ class GraphicNotesRepo
             note: GraphicNote,
             callback: (SaveNoteResult) -> Unit,
         ) = withContext(iODispatcher) {
+            Log.d(GRAPHICS_REPO, "write")
             val tempPath = createTempFile()
             note.svg?.generate(tempPath)
             val size = tempPath.fileSize()
@@ -123,6 +124,7 @@ class GraphicNotesRepo
 
         private suspend fun readStorage() =
             withContext(iODispatcher) {
+                Log.d(GRAPHICS_REPO, "readStorage")
                 root.listFiles(SVG_EXT) { path ->
                     val svg = SVG.parse(path)
                     if (svg == null) {
@@ -155,6 +157,7 @@ class GraphicNotesRepo
             fileName: String,
             svg: SVG?,
         ): Bitmap? {
+            Log.d(GRAPHICS_REPO, "exportBitmapFromSvg")
             // Check if thumb bitmap already exists
             val file = File(thumbDirectory, "$fileName.png")
             try {
@@ -197,6 +200,7 @@ class GraphicNotesRepo
                 canvas.drawPath(path.path, path.paint)
                 canvas.restore()
             } ?: let {
+                Log.w(GRAPHICS_REPO, "exportBitmapFromSvg either SVG or its paths are null!")
                 return null
             }
 

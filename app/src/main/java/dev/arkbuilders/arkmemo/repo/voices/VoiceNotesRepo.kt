@@ -58,6 +58,7 @@ class VoiceNotesRepo
             note: VoiceNote,
             callback: (SaveNoteResult) -> Unit,
         ) = withContext(iODispatcher) {
+            Log.d(VOICES_REPO, "write")
             val tempPath = note.path
             val size = tempPath.fileSize()
             val id = computeId(size, tempPath)
@@ -100,6 +101,7 @@ class VoiceNotesRepo
 
         private suspend fun readStorage(): List<VoiceNote> =
             withContext(iODispatcher) {
+                Log.d(VOICES_REPO, "readStorage")
                 root.listFiles(VOICE_EXT) { path ->
                     val id = computeId(path.fileSize(), path)
                     val resource =

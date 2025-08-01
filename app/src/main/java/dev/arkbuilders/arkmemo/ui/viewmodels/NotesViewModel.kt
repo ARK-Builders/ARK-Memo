@@ -1,5 +1,6 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -43,7 +44,12 @@ constructor(
     @set:Inject
     internal lateinit var memoPreferences: MemoPreferences
 
-    fun init(extraBlock: () -> Unit) {
+    companion object {
+            private const val TAG = "NotesViewModel"
+        }
+
+        fun init(extraBlock: () -> Unit) {
+            Log.d(TAG, "init")
         val root = memoPreferences.getPath()
         val initJob =
             viewModelScope.launch(iODispatcher) {
@@ -58,7 +64,7 @@ constructor(
     }
 
     fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
-        viewModelScope.launch(iODispatcher) {
+        Log.d(TAG, "readAllNotes")viewModelScope.launch(iODispatcher) {
             notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
             notes.value.let {
                 withContext(Dispatchers.Main) {
@@ -73,7 +79,7 @@ constructor(
         keyword: String,
         onSuccess: (notes: List<Note>) -> Unit,
     ) {
-        searchJob?.cancel()
+        Log.d(TAG, "searchNote")searchJob?.cancel()
         searchJob =
             viewModelScope.launch(iODispatcher) {
                 // Add a delay to restart the search job if there are 2 consecutive search
@@ -106,7 +112,7 @@ constructor(
             }
 
             fun handleResult(result: SaveNoteResult) {
-                if (result == SaveNoteResult.SUCCESS_NEW ||
+                Log.d(TAG, "handleResult: ${result.name}")if (result == SaveNoteResult.SUCCESS_NEW ||
                     result == SaveNoteResult.SUCCESS_UPDATED
                 ) {
                     if (result == SaveNoteResult.SUCCESS_NEW) {
@@ -166,9 +172,12 @@ constructor(
         note: Note,
         parentResId: ResourceId? = null,
     ) {
-        val notes = this.notes.value.toMutableList()
+        Log.d(
+                TAG,
+                "add note with title: ${note.title} resId: ${note.resource?.id} resName: ${note.resource?.name}",
+            )val notes = this.notes.value.toMutableList()
         note.resource?.let {
-            notes.removeIf { it.resource?.id == parentResId ?: note.resource?.id }
+            notes.removeIf { it.resource?.id == (parentResId ?: note.resource?.id) }
         }
         if (note is VoiceNote) {
             note.duration = extractDuration(note.path.pathString)

@@ -36,18 +36,22 @@ class ArkAudioRecorderImpl
         }
 
         override fun start() {
+            Log.d(tag, "start")
             recorder?.start()
         }
 
         override fun pause() {
+            Log.d(tag, "pause")
             recorder?.pause()
         }
 
         override fun resume() {
+            Log.d(tag, "resume")
             recorder?.resume()
         }
 
         override fun reset() {
+            Log.d(tag, "reset")
             recorder?.reset()
         }
 
@@ -68,6 +72,7 @@ class ArkAudioRecorderImpl
             return try {
                 recorder?.maxAmplitude ?: 0
             } catch (e: Exception) {
+                Log.e(tag, "maxAmplitude exception: $e")
                 0
             }
         }
@@ -76,6 +81,7 @@ class ArkAudioRecorderImpl
 
         override suspend fun deleteTempFile(): Boolean {
             return try {
+                Log.d(tag, "deleteTempFile")
                 tempFile.delete()
             } catch (e: Exception) {
                 Log.e(tag, "deleteTempFile exception: " + e.message)
