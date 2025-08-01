@@ -34,7 +34,11 @@ class MemoPreferencesImpl
             prefEditor.putBoolean(CRASH_REPORT_ENABLE, enabled).apply()
         }
 
-        override fun getCrashReportEnabled(): Boolean = sharedPreferences.getBoolean(CRASH_REPORT_ENABLE, true)
+        override fun getCrashReportEnabled(): Boolean =
+            sharedPreferences.getBoolean(
+                CRASH_REPORT_ENABLE,
+                true,
+            )
 
         override fun storageNotAvailable(): Boolean {
             return getPath().isEmpty() || !getNotesStorage().exists()

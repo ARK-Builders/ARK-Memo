@@ -20,7 +20,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class FilePickerDialog : ArkFilePickerFragment() {
-    @Inject lateinit var memoPreferences: MemoPreferences
+    @Inject
+    lateinit var memoPreferences: MemoPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +68,10 @@ class FilePickerDialog : ArkFilePickerFragment() {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 Environment.isExternalStorageManager()
             } else {
-                ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                ContextCompat.checkSelfPermission(
+                    activity,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                ) ==
                     PackageManager.PERMISSION_GRANTED
             }
         }

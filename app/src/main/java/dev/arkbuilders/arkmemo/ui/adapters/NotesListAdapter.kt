@@ -35,7 +35,11 @@ import dev.arkbuilders.arkmemo.utils.visible
 
 class NotesListAdapter(
     private var notes: MutableList<Note>,
-    private val onPlayPauseClick: (path: String, pos: Int?, stopCallback: ((pos: Int) -> Unit)?) -> Unit,
+    private val onPlayPauseClick: (
+        path: String,
+        pos: Int?,
+        stopCallback: ((pos: Int) -> Unit)?,
+    ) -> Unit,
 ) : RecyclerView.Adapter<NotesListAdapter.NoteViewHolder>() {
     private lateinit var activity: MainActivity
     private var mActionMode = false
@@ -66,7 +70,12 @@ class NotesListAdapter(
         parent: ViewGroup,
         viewType: Int,
     ): NoteViewHolder {
-        val binding = AdapterTextNoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            AdapterTextNoteBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            )
         binding.root.clipToOutline = true
         return NoteViewHolder(binding.root)
     }
@@ -178,13 +187,16 @@ class NotesListAdapter(
             is ArkMediaPlayerSideEffect.StartPlaying -> {
                 showPlayingState(holder)
             }
+
             is ArkMediaPlayerSideEffect.PausePlaying -> {
                 showPlaybackIdleState(holder, isPaused = true)
             }
+
             is ArkMediaPlayerSideEffect.StopPlaying -> {
                 showPlaybackIdleState(holder)
                 holder.tvPlayingPosition.gone()
             }
+
             is ArkMediaPlayerSideEffect.ResumePlaying -> {
                 showPlayingState(holder)
             }
@@ -296,7 +308,10 @@ class NotesListAdapter(
 
         private val clickNoteToEditListener =
             View.OnClickListener {
-                val storageFolderExist = (activity.fragment as? NotesFragment)?.checkForStorageExistence() ?: true
+                val storageFolderExist =
+                    (
+                        activity.fragment as? NotesFragment
+                    )?.checkForStorageExistence() ?: true
                 if (!storageFolderExist) {
                     return@OnClickListener
                 }
@@ -308,11 +323,16 @@ class NotesListAdapter(
                 }
                 var tag = EditTextNotesFragment.TAG
                 when (val selectedNote = notes[bindingAdapterPosition]) {
-                    is TextNote -> activity.fragment = EditTextNotesFragment.newInstance(selectedNote)
+                    is TextNote ->
+                        activity.fragment =
+                            EditTextNotesFragment
+                                .newInstance(selectedNote)
+
                     is GraphicNote -> {
                         activity.fragment = EditGraphicNotesFragment.newInstance(selectedNote)
                         tag = EditGraphicNotesFragment.TAG
                     }
+
                     is VoiceNote -> {
                         activity.fragment = ArkRecorderFragment.newInstance(selectedNote)
                         tag = ArkRecorderFragment.TAG

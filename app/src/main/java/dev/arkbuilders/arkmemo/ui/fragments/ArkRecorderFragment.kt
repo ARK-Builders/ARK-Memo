@@ -154,7 +154,8 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
                     start: Int,
                     count: Int,
                     after: Int,
-                ) {}
+                ) {
+                }
 
                 override fun onTextChanged(
                     s: CharSequence?,
@@ -271,6 +272,7 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
                 binding.layoutAudioView.root.gone()
                 binding.layoutAudioRecord.tvRecordGuide.gone()
             }
+
             is RecorderSideEffect.StopRecording -> {
                 val recordIcon =
                     ResourcesCompat.getDrawable(
@@ -297,6 +299,7 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
                     getString(R.string.audio_record_guide_text_replace)
                 binding.layoutAudioRecord.tvDuration.setText(R.string.ark_memo_duration_default)
             }
+
             RecorderSideEffect.PauseRecording -> {
                 val resumeIcon =
                     ResourcesCompat.getDrawable(
@@ -307,6 +310,7 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
                 ivPauseResume.setImageDrawable(resumeIcon)
                 pauseOrResumeRecordingAnimation(false)
             }
+
             RecorderSideEffect.ResumeRecording -> {
                 showPauseIcon()
                 pauseOrResumeRecordingAnimation(true)
@@ -320,6 +324,7 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
                 binding.layoutAudioView.animAudioPlaying.background = null
             }
+
             ArkMediaPlayerSideEffect.StopPlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
                 mediaPlayViewModel.getDurationString { duration ->
@@ -328,11 +333,17 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
                 binding.layoutAudioView.tvPlayingPosition.gone()
                 binding.layoutAudioView.animAudioPlaying.resetWave()
                 binding.layoutAudioView.animAudioPlaying.invalidateWave(0)
-                binding.layoutAudioView.animAudioPlaying.background = ContextCompat.getDrawable(activity, R.drawable.audio_wave_thumb)
+                binding.layoutAudioView.animAudioPlaying.background =
+                    ContextCompat.getDrawable(
+                        activity,
+                        R.drawable.audio_wave_thumb,
+                    )
             }
+
             ArkMediaPlayerSideEffect.PausePlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_play_circle)
             }
+
             ArkMediaPlayerSideEffect.ResumePlaying -> {
                 binding.layoutAudioView.ivPlayAudio.setImageResource(R.drawable.ic_pause_circle)
             }

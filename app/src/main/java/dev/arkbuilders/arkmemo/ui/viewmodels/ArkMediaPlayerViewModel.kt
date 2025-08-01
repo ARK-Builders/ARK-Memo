@@ -94,7 +94,9 @@ class ArkMediaPlayerViewModel
                                 viewModelScope.launch(Dispatchers.IO) {
                                     val intensity = computeFftMagnitude(fft)
                                     withContext(Dispatchers.Main) {
-                                        arkMediaPlayer.setMaxAmplitude((intensity * WaveView.MAX_AMPLITUDE).toInt())
+                                        arkMediaPlayer.setMaxAmplitude(
+                                            (intensity * WaveView.MAX_AMPLITUDE).toInt(),
+                                        )
                                     }
                                 }
                             }
@@ -169,7 +171,10 @@ class ArkMediaPlayerViewModel
             val duration = millisToString(arkMediaPlayer.duration().toLong())
 
             progressJob =
-                viewModelScope.launchPeriodicAsync(repeatMillis = 100L, repeatCondition = isPlaying()) {
+                viewModelScope.launchPeriodicAsync(
+                    repeatMillis = 100L,
+                    repeatCondition = isPlaying(),
+                ) {
                     val curPosInMillis = arkMediaPlayer.currentPosition()
                     val curPos = curPosInMillis / 1000
 
