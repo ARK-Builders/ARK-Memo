@@ -84,8 +84,8 @@ class NotesViewModel
             searchJob?.cancel()
             searchJob =
                 viewModelScope.launch(iODispatcher) {
-                    // Add a delay to restart the search job if there are 2 consecutive search events
-                    // triggered within 0.5 second window.
+                    // Add a delay to restart the search job if there are 2 consecutive search
+                    // events triggered within 0.5 second window.
                     delay(500)
                     notes.collectLatest {
                         val filteredNotes =
@@ -177,7 +177,8 @@ class NotesViewModel
         ) {
             ALog.d(
                 TAG,
-                "add note with title: ${note.title} resId: ${note.resource?.id} resName: ${note.resource?.name}",
+                "add note with title: ${note.title} resId: ${note.resource?.id} " +
+                    "resName: ${note.resource?.name}",
             )
             val notes = this.notes.value.toMutableList()
             note.resource?.let {

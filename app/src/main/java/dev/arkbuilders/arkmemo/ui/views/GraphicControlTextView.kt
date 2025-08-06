@@ -24,7 +24,11 @@ class GraphicControlTextView
                 typedArray.getResourceId(R.styleable.GraphicControlTextView_gct_drawable, 0)
             val isSelected =
                 typedArray.getBoolean(R.styleable.GraphicControlTextView_gct_selected, false)
-            iconTintColor = typedArray.getColor(R.styleable.GraphicControlTextView_gct_icon_tint, -1)
+            iconTintColor =
+                typedArray.getColor(
+                    R.styleable.GraphicControlTextView_gct_icon_tint,
+                    -1,
+                )
 
             drawableResId.let {
                 this.setCompoundDrawablesWithIntrinsicBounds(drawableResId, 0, 0, 0)

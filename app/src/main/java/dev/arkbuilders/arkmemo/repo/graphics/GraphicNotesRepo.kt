@@ -47,9 +47,17 @@ class GraphicNotesRepo
         private val displayMetrics by lazy { Resources.getSystem().displayMetrics }
         private val screenWidth by lazy { displayMetrics.widthPixels }
         private val screenHeight by lazy { displayMetrics.heightPixels - 150.dpToPx() }
-        private val thumbViewWidth by lazy { context.resources.getDimension(R.dimen.graphic_thumb_width) }
+        private val thumbViewWidth by lazy {
+            context.resources.getDimension(
+                R.dimen.graphic_thumb_width,
+            )
+        }
 
-        private val thumbDirectory by lazy { context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) }
+        private val thumbDirectory by lazy {
+            context.getExternalFilesDir(
+                Environment.DIRECTORY_PICTURES,
+            )
+        }
 
         override suspend fun init(root: String) {
             helper.init(root)

@@ -128,9 +128,14 @@ class SVG {
                                                     getAttributeValue("", Attributes.VIEW_BOX),
                                                 )
                                         }
+
                                         PATH_TAG -> {
                                             pathCount += 1
-                                            strokeColor = getAttributeValue("", Attributes.Path.STROKE)
+                                            strokeColor =
+                                                getAttributeValue(
+                                                    "",
+                                                    Attributes.Path.STROKE,
+                                                )
                                             fill = getAttributeValue("", Attributes.Path.FILL)
                                             pathData = getAttributeValue("", Attributes.Path.DATA)
                                         }
@@ -164,6 +169,7 @@ class SVG {
                                         },
                                     )
                                 }
+
                                 SVGCommand.AbsLineTo.CODE -> {
                                     if (commandElements.size > 3) {
                                         strokeColor = commandElements[3]
@@ -178,6 +184,7 @@ class SVG {
                                         },
                                     )
                                 }
+
                                 SVGCommand.AbsQuadTo.CODE -> {
                                     if (commandElements.size > 5) {
                                         strokeColor = commandElements[5]
@@ -192,6 +199,7 @@ class SVG {
                                         },
                                     )
                                 }
+
                                 else -> {}
                             }
                         }
