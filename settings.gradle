@@ -4,7 +4,7 @@ pluginManagement {
     repositories {
         google()
         mavenCentral()
-        maven{url 'https://jitpack.io'}
+        maven { url 'https://jitpack.io' }
         maven { url "https://plugins.gradle.org/m2/" }
         gradlePluginPortal()
     }
@@ -13,9 +13,11 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        def localProps = getLocalProps()
+
         google()
         mavenCentral()
-        maven{url 'https://jitpack.io'}
+        maven { url 'https://jitpack.io' }
         maven { url "https://plugins.gradle.org/m2/" }
         gradlePluginPortal()
         maven {
@@ -23,7 +25,15 @@ dependencyResolutionManagement {
             url = "https://maven.pkg.github.com/ARK-Builders/arklib-android"
             credentials {
                 username = "token"
-                password = "\u0037\u0066\u0066\u0036\u0030\u0039\u0033\u0066\u0032\u0037\u0033\u0036\u0033\u0037\u0064\u0036\u0037\u0066\u0038\u0030\u0034\u0039\u0062\u0030\u0039\u0038\u0039\u0038\u0066\u0034\u0066\u0034\u0031\u0064\u0062\u0033\u0064\u0033\u0038\u0065"
+                password = localProps.getProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/ARK-Builders/ark-android"
+            credentials {
+                username = "token"
+                password = localProps.getProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }
@@ -31,3 +41,16 @@ dependencyResolutionManagement {
 
 rootProject.name = "ARK Memo"
 include ':app'
+
+Properties getLocalProps() {
+    def props = new Properties()
+    def localPropsFile = new File(rootDir, "local.properties")
+
+    if (localPropsFile.exists()) {
+        localPropsFile.withInputStream() { stream ->
+            props.load(stream)
+        }
+    }
+
+    return props
+}

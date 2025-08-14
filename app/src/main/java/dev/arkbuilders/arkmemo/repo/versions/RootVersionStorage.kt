@@ -12,7 +12,7 @@ import java.nio.file.Path
 import java.nio.file.attribute.FileTime
 import kotlin.io.path.writeLines
 
-class RootVersionStorage(private val root: Path): VersionStorage {
+class RootVersionStorage(private val root: Path) : VersionStorage {
 
     private val storageFile = root.arkFolder().arkVersions()
     private var lastModified = FileTime.fromMillis(0L)
@@ -173,11 +173,26 @@ class RootVersionStorage(private val root: Path): VersionStorage {
             )
         }
 
+    override fun getValue(id: ResourceId): Version2 {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun persist() =
         withContext(Dispatchers.IO) {
             writeToStorage()
             return@withContext
         }
+
+    override fun remove(id: ResourceId) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setValue(
+        id: ResourceId,
+        value: Version2
+    ) {
+        TODO("Not yet implemented")
+    }
 
     companion object {
         private const val VERSIONS_STORAGE = "versions"
