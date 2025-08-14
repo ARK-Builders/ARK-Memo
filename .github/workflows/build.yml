@@ -10,6 +10,7 @@ jobs:
       ACRA_LOGIN: ${{ secrets.ACRARIUM_BASIC_AUTH_LOGIN }}
       ACRA_PASS: ${{ secrets.ACRARIUM_BASIC_AUTH_PASSWORD }}
       ACRA_URI: ${{ secrets.ACRARIUM_URI }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
