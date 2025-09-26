@@ -17,70 +17,70 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GraphicNotesViewModel
-@Inject
-constructor() : ViewModel() {
-    private var paintColor = Color.BLACK.code
-    private var lastPaintColor = paintColor
-    private var strokeWidth = Size.TINY.value
+    @Inject
+    constructor() : ViewModel() {
+        private var paintColor = Color.BLACK.code
+        private var lastPaintColor = paintColor
+        private var strokeWidth = Size.TINY.value
 
-    companion object {
-        private const val TAG = "GraphicNotesViewModel"
-    }
+        companion object {
+            private const val TAG = "GraphicNotesViewModel"
+        }
 
-    val paint
-        get() =
-            Paint().also {
-                it.color = paintColor
-                it.style = Paint.Style.STROKE
-                it.strokeWidth = strokeWidth
-                it.strokeCap = Paint.Cap.ROUND
-                it.strokeJoin = Paint.Join.ROUND
-                it.isAntiAlias = true
+        val paint
+            get() =
+                Paint().also {
+                    it.color = paintColor
+                    it.style = Paint.Style.STROKE
+                    it.strokeWidth = strokeWidth
+                    it.strokeCap = Paint.Cap.ROUND
+                    it.strokeJoin = Paint.Join.ROUND
+                    it.isAntiAlias = true
+                }
+
+        private val editPaths = ArrayDeque<DrawPath>()
+
+        private var svg = SVG()
+        private val svgLiveData = MutableLiveData<SVG>()
+        val observableSvgLiveData = svgLiveData as LiveData<SVG>
+
+        fun onNoteOpened(note: GraphicNote) {
+            ALog.d(TAG, "onNoteOpened")
+            viewModelScope.launch {
+                if (editPaths.isNotEmpty()) editPaths.clear()
+                editPaths.addAll(note.svg?.getPaths()!!)
+                svg = note.svg.copy()
             }
+        }
 
-    private val editPaths = ArrayDeque<DrawPath>()
+        fun onDrawPath(path: DrawPath) {
+            editPaths.addLast(path)
+            svg.addPath(path)
+            svgLiveData.postValue(svg)
+        }
 
-    private var svg = SVG()
-    private val svgLiveData = MutableLiveData<SVG>()
-    val observableSvgLiveData = svgLiveData as LiveData<SVG>
+        fun paths(): Collection<DrawPath> = editPaths
 
-    fun onNoteOpened(note: GraphicNote) {
-        ALog.d(TAG, "onNoteOpened")
-        viewModelScope.launch {
-            if (editPaths.isNotEmpty()) editPaths.clear()
-            editPaths.addAll(note.svg?.getPaths()!!)
-            svg = note.svg.copy()
+        fun svg(): SVG = svg
+
+        fun setPaintColor(color: Int) {
+            paintColor = color
+            lastPaintColor = paintColor
+        }
+
+        fun setBrushSize(size: Float) {
+            strokeWidth = size
+        }
+
+        fun setEraseMode(eraseMode: Boolean) {
+            paintColor =
+                if (eraseMode) {
+                    Color.WHITE.code
+                } else {
+                    lastPaintColor
+                }
         }
     }
-
-    fun onDrawPath(path: DrawPath) {
-        editPaths.addLast(path)
-        svg.addPath(path)
-        svgLiveData.postValue(svg)
-    }
-
-    fun paths(): Collection<DrawPath> = editPaths
-
-    fun svg(): SVG = svg
-
-    fun setPaintColor(color: Int) {
-        paintColor = color
-        lastPaintColor = paintColor
-    }
-
-    fun setBrushSize(size: Float) {
-        strokeWidth = size
-    }
-
-    fun setEraseMode(eraseMode: Boolean) {
-        paintColor =
-            if (eraseMode) {
-                Color.WHITE.code
-            } else {
-                lastPaintColor
-            }
-    }
-}
 
 data class DrawPath(
     val path: Path,

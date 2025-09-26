@@ -149,7 +149,7 @@ class NotesFragment : BaseFragment() {
                     val x = itemView.right.toFloat() - endMargin
                     val y =
                         (itemView.top + itemView.bottom) / 2f +
-                                (textPaint.descent() - textPaint.ascent()) / 2f - textPaint.descent()
+                            (textPaint.descent() - textPaint.ascent()) / 2f - textPaint.descent()
 
                     c.drawRoundRect(
                         itemView.left.toFloat(),
@@ -441,8 +441,10 @@ class NotesFragment : BaseFragment() {
         if (arkMediaPlayerViewModel.isPlaying()) {
             playingAudioPath?.let {
                 arkMediaPlayerViewModel.onPlayOrPauseClick(it)
-                (notesAdapter?.getNotes()
-                    ?.getOrNull(playingAudioPosition) as? VoiceNote)?.isPlaying = false
+                (
+                    notesAdapter?.getNotes()
+                        ?.getOrNull(playingAudioPosition) as? VoiceNote
+                )?.isPlaying = false
                 notesAdapter?.notifyItemChanged(playingAudioPosition)
             }
         }
@@ -589,10 +591,11 @@ class NotesFragment : BaseFragment() {
                     selectedCountForDelete,
                     selectedCountForDelete,
                 ),
-            message = resources.getQuantityString(
-                R.plurals.delete_batch_note_message,
-                selectedCountForDelete
-            ),
+            message =
+                resources.getQuantityString(
+                    R.plurals.delete_batch_note_message,
+                    selectedCountForDelete,
+                ),
             positiveText = R.string.action_delete,
             negativeText = R.string.ark_memo_cancel,
             isAlert = true,

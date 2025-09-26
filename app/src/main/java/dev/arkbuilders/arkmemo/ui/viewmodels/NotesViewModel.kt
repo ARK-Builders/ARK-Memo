@@ -30,185 +30,185 @@ import kotlin.io.path.pathString
 
 @HiltViewModel
 class NotesViewModel
-@Inject
-constructor(
-    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
-    private val textNotesRepo: NotesRepo<TextNote>,
-    private val graphicNotesRepo: NotesRepo<GraphicNote>,
-    private val voiceNotesRepo: NotesRepo<VoiceNote>,
-) : ViewModel() {
-    private val notes = MutableStateFlow(listOf<Note>())
-    private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
-    private var searchJob: Job? = null
+    @Inject
+    constructor(
+        @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
+        private val textNotesRepo: NotesRepo<TextNote>,
+        private val graphicNotesRepo: NotesRepo<GraphicNote>,
+        private val voiceNotesRepo: NotesRepo<VoiceNote>,
+    ) : ViewModel() {
+        private val notes = MutableStateFlow(listOf<Note>())
+        private val mSaveNoteResultLiveData = MutableLiveData<SaveNoteResult>()
+        private var searchJob: Job? = null
 
-    @set:Inject
-    internal lateinit var memoPreferences: MemoPreferences
+        @set:Inject
+        internal lateinit var memoPreferences: MemoPreferences
 
-    companion object {
-        private const val TAG = "NotesViewModel"
-    }
-
-    fun init(extraBlock: () -> Unit) {
-        ALog.d(TAG, "init")
-        val root = memoPreferences.getPath()
-        val initJob =
-            viewModelScope.launch(iODispatcher) {
-                textNotesRepo.init(root)
-                graphicNotesRepo.init(root)
-                voiceNotesRepo.init(root)
-            }
-        viewModelScope.launch {
-            initJob.join()
-            extraBlock()
+        companion object {
+            private const val TAG = "NotesViewModel"
         }
-    }
 
-    fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
-        ALog.d(TAG, "readAllNotes")
-        viewModelScope.launch(iODispatcher) {
-            notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
-            notes.value.let {
-                withContext(Dispatchers.Main) {
-                    notes.value = it.sortedByDescending { note -> note.resource?.modified }
-                    onSuccess(notes.value)
+        fun init(extraBlock: () -> Unit) {
+            ALog.d(TAG, "init")
+            val root = memoPreferences.getPath()
+            val initJob =
+                viewModelScope.launch(iODispatcher) {
+                    textNotesRepo.init(root)
+                    graphicNotesRepo.init(root)
+                    voiceNotesRepo.init(root)
                 }
+            viewModelScope.launch {
+                initJob.join()
+                extraBlock()
             }
         }
-    }
 
-    fun searchNote(
-        keyword: String,
-        onSuccess: (notes: List<Note>) -> Unit,
-    ) {
-        ALog.d(TAG, "searchNote")
-        searchJob?.cancel()
-        searchJob =
+        fun readAllNotes(onSuccess: (notes: List<Note>) -> Unit) {
+            ALog.d(TAG, "readAllNotes")
             viewModelScope.launch(iODispatcher) {
-                // Add a delay to restart the search job if there are 2 consecutive search events
-                // triggered within 0.5 second window.
-                delay(500)
-                notes.collectLatest {
-                    val filteredNotes =
-                        it
-                            .filter { note ->
-                                note.title.contains(keyword, true)
-                            }
-                            // Keep the search result ordered chronologically
-                            .sortedByDescending { note -> note.resource?.modified }
+                notes.value = textNotesRepo.read() + graphicNotesRepo.read() + voiceNotesRepo.read()
+                notes.value.let {
                     withContext(Dispatchers.Main) {
-                        onSuccess(filteredNotes)
+                        notes.value = it.sortedByDescending { note -> note.resource?.modified }
+                        onSuccess(notes.value)
                     }
                 }
-            }
-    }
-
-    fun onSaveClick(
-        note: Note,
-        parentNote: Note? = null,
-        showProgress: (Boolean) -> Unit,
-    ) {
-        val noteResId = note.resource?.id
-        viewModelScope.launch(iODispatcher) {
-            withContext(Dispatchers.Main) {
-                showProgress(true)
-            }
-
-            fun handleResult(result: SaveNoteResult) {
-                ALog.d(TAG, "handleResult: ${result.name}")
-                if (result == SaveNoteResult.SUCCESS_NEW ||
-                    result == SaveNoteResult.SUCCESS_UPDATED
-                ) {
-                    if (result == SaveNoteResult.SUCCESS_NEW) {
-                        parentNote?.let { onDeleteConfirmed(listOf(parentNote)) {} }
-                    }
-                    add(note, noteResId)
-                }
-                mSaveNoteResultLiveData.postValue(result)
-            }
-            when (note) {
-                is TextNote -> {
-                    textNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
-                }
-
-                is GraphicNote -> {
-                    graphicNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
-                }
-
-                is VoiceNote -> {
-                    voiceNotesRepo.save(note) { result ->
-                        handleResult(result)
-                    }
-                }
-            }
-            withContext(Dispatchers.Main) {
-                showProgress(false)
             }
         }
-    }
 
-    fun onDeleteConfirmed(
-        notes: List<Note>,
-        onSuccess: () -> Unit,
-    ) {
-        viewModelScope.launch(iODispatcher) {
-            notes.forEach { note ->
+        fun searchNote(
+            keyword: String,
+            onSuccess: (notes: List<Note>) -> Unit,
+        ) {
+            ALog.d(TAG, "searchNote")
+            searchJob?.cancel()
+            searchJob =
+                viewModelScope.launch(iODispatcher) {
+                    // Add a delay to restart the search job if there are 2 consecutive search events
+                    // triggered within 0.5 second window.
+                    delay(500)
+                    notes.collectLatest {
+                        val filteredNotes =
+                            it
+                                .filter { note ->
+                                    note.title.contains(keyword, true)
+                                }
+                                // Keep the search result ordered chronologically
+                                .sortedByDescending { note -> note.resource?.modified }
+                        withContext(Dispatchers.Main) {
+                            onSuccess(filteredNotes)
+                        }
+                    }
+                }
+        }
+
+        fun onSaveClick(
+            note: Note,
+            parentNote: Note? = null,
+            showProgress: (Boolean) -> Unit,
+        ) {
+            val noteResId = note.resource?.id
+            viewModelScope.launch(iODispatcher) {
+                withContext(Dispatchers.Main) {
+                    showProgress(true)
+                }
+
+                fun handleResult(result: SaveNoteResult) {
+                    ALog.d(TAG, "handleResult: ${result.name}")
+                    if (result == SaveNoteResult.SUCCESS_NEW ||
+                        result == SaveNoteResult.SUCCESS_UPDATED
+                    ) {
+                        if (result == SaveNoteResult.SUCCESS_NEW) {
+                            parentNote?.let { onDeleteConfirmed(listOf(parentNote)) {} }
+                        }
+                        add(note, noteResId)
+                    }
+                    mSaveNoteResultLiveData.postValue(result)
+                }
                 when (note) {
-                    is TextNote -> textNotesRepo.delete(note)
-                    is GraphicNote -> graphicNotesRepo.delete(note)
-                    is VoiceNote -> voiceNotesRepo.delete(note)
+                    is TextNote -> {
+                        textNotesRepo.save(note) { result ->
+                            handleResult(result)
+                        }
+                    }
+
+                    is GraphicNote -> {
+                        graphicNotesRepo.save(note) { result ->
+                            handleResult(result)
+                        }
+                    }
+
+                    is VoiceNote -> {
+                        voiceNotesRepo.save(note) { result ->
+                            handleResult(result)
+                        }
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    showProgress(false)
                 }
             }
-            this@NotesViewModel.notes.value =
-                this@NotesViewModel.notes.value.toMutableList()
-                    .apply { removeAll(notes) }
-            withContext(Dispatchers.Main) {
-                onSuccess.invoke()
+        }
+
+        fun onDeleteConfirmed(
+            notes: List<Note>,
+            onSuccess: () -> Unit,
+        ) {
+            viewModelScope.launch(iODispatcher) {
+                notes.forEach { note ->
+                    when (note) {
+                        is TextNote -> textNotesRepo.delete(note)
+                        is GraphicNote -> graphicNotesRepo.delete(note)
+                        is VoiceNote -> voiceNotesRepo.delete(note)
+                    }
+                }
+                this@NotesViewModel.notes.value =
+                    this@NotesViewModel.notes.value.toMutableList()
+                        .apply { removeAll(notes) }
+                withContext(Dispatchers.Main) {
+                    onSuccess.invoke()
+                }
             }
         }
-    }
 
-    private fun add(
-        note: Note,
-        parentResId: ResourceId? = null,
-    ) {
-        ALog.d(
-            TAG,
-            "add note with title: ${note.title} resId: ${note.resource?.id} resName: ${note.resource?.name}",
-        )
-        val notes = this.notes.value.toMutableList()
-        note.resource?.let {
-            notes.removeIf { it.resource?.id == (parentResId ?: note.resource?.id) }
+        private fun add(
+            note: Note,
+            parentResId: ResourceId? = null,
+        ) {
+            ALog.d(
+                TAG,
+                "add note with title: ${note.title} resId: ${note.resource?.id} resName: ${note.resource?.name}",
+            )
+            val notes = this.notes.value.toMutableList()
+            note.resource?.let {
+                notes.removeIf { it.resource?.id == (parentResId ?: note.resource?.id) }
+            }
+            if (note is VoiceNote) {
+                note.duration = extractDuration(note.path.pathString)
+            }
+            notes.add(note)
+            this.notes.value = notes
         }
-        if (note is VoiceNote) {
-            note.duration = extractDuration(note.path.pathString)
+
+        private fun remove(note: Note) {
+            val notes = this.notes.value.toMutableList()
+            notes.remove(note)
+            this.notes.value = notes
         }
-        notes.add(note)
-        this.notes.value = notes
-    }
 
-    private fun remove(note: Note) {
-        val notes = this.notes.value.toMutableList()
-        notes.remove(note)
-        this.notes.value = notes
-    }
+        fun getSaveNoteResultLiveData(): LiveData<SaveNoteResult> {
+            return mSaveNoteResultLiveData
+        }
 
-    fun getSaveNoteResultLiveData(): LiveData<SaveNoteResult> {
-        return mSaveNoteResultLiveData
-    }
+        fun storageFolderNotAvailable(): Boolean {
+            return memoPreferences.storageNotAvailable()
+        }
 
-    fun storageFolderNotAvailable(): Boolean {
-        return memoPreferences.storageNotAvailable()
-    }
+        fun getStorageFolderPath(): String {
+            return memoPreferences.getPath()
+        }
 
-    fun getStorageFolderPath(): String {
-        return memoPreferences.getPath()
+        fun setLastLaunchSuccess(success: Boolean) {
+            memoPreferences.setLastLaunchSuccess(success)
+        }
     }
-
-    fun setLastLaunchSuccess(success: Boolean) {
-        memoPreferences.setLastLaunchSuccess(success)
-    }
-}

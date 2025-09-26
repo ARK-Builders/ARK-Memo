@@ -6,5 +6,5 @@ typealias Version2 = ResourceId
 
 data class Version(
     val parent: ResourceId,
-    val child: ResourceId
+    val child: ResourceId,
 )

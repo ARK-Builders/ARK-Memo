@@ -391,22 +391,22 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
             val currentRecordingSize = arkRecorderViewModel.getRecordingPath().toFile().length()
 
             (
-                    !originalTitle.equals(binding.edtTitle.text.toString()) ||
-                            (originalRecordingSize != currentRecordingSize && currentRecordingSize > 0)
-                    )
+                !originalTitle.equals(binding.edtTitle.text.toString()) ||
+                    (originalRecordingSize != currentRecordingSize && currentRecordingSize > 0)
+            )
         } else {
             (
-                    binding.edtTitle.text.toString().isNotEmpty() ||
-                            arkRecorderViewModel.isRecordExisting()
-                    )
+                binding.edtTitle.text.toString().isNotEmpty() ||
+                    arkRecorderViewModel.isRecordExisting()
+            )
         }
     }
 
     override fun isContentEmpty(): Boolean {
         return (
-                !arkRecorderViewModel.isRecordExisting() &&
-                        ((note?.path?.toFile()?.length() ?: 0L) == 0L)
-                )
+            !arkRecorderViewModel.isRecordExisting() &&
+                ((note?.path?.toFile()?.length() ?: 0L) == 0L)
+        )
     }
 
     private fun saveNote() {
@@ -526,9 +526,9 @@ class ArkRecorderFragment : BaseEditNoteFragment() {
     private fun onRecordButtonClick() {
         if (!arkRecorderViewModel.isRecording() &&
             (
-                    arkRecorderViewModel.isRecordExisting() ||
-                            File(getCurrentRecordingPath()).length() > 0L
-                    )
+                arkRecorderViewModel.isRecordExisting() ||
+                    File(getCurrentRecordingPath()).length() > 0L
+            )
         ) {
             CommonActionDialog(
                 title = getString(R.string.dialog_replace_recording_title),

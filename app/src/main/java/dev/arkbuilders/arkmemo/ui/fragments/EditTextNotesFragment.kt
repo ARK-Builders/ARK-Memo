@@ -44,8 +44,8 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
                         newTextBuilder.append(
                             noteContent.insertStringAtPosition(
                                 clipBoardText,
-                                cursorPos
-                            )
+                                cursorPos,
+                            ),
                         )
                     } catch (e: IndexOutOfBoundsException) {
                         ALog.e(TAG, "pasteNoteClickListener exception: ${e.message}")
@@ -165,7 +165,7 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
 
     override fun isContentChanged(): Boolean {
         return note.title != binding.edtTitle.text.toString() ||
-                note.text != binding.editNote.text.toString()
+            note.text != binding.editNote.text.toString()
     }
 
     override fun isContentEmpty(): Boolean {

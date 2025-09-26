@@ -27,117 +27,117 @@ import kotlin.io.path.moveTo
 import kotlin.io.path.name
 
 class NotesRepoHelper
-@Inject
-constructor(
-    private val propertiesStorageRepo: PropertiesStorageRepo,
-    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
-) {
-    lateinit var root: Path
-
-    companion object {
-        private const val TAG = "NotesRepoHelper"
-    }
-
-    private lateinit var propertiesStorage: PropertiesStorage
-    private val lazyPropertiesStorage by lazy {
-        CoroutineScope(iODispatcher).async {
-            val propertyStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
-            propertyStorage
-        }
-    }
-
-    suspend fun init(root: String) {
-        ALog.d(TAG, "init")
-        this.root = Path(root)
-        propertiesStorage = lazyPropertiesStorage.await()
-    }
-
-    suspend fun persistNoteProperties(
-        resourceId: ResourceId,
-        noteTitle: String,
-        description: String? = null,
-    ): Boolean {
-        with(propertiesStorage) {
-            ALog.d(TAG, "persistNoteProperties for resource: $resourceId title: $noteTitle")
-            val properties =
-                Properties(
-                    setOf(noteTitle),
-                    mutableSetOf<String>().apply {
-                        description?.let { this.add(description) }
-                    },
-                )
-            val currentProperties = getProperties(resourceId)
-            if (currentProperties.isEqual(properties)) {
-                return false
-            } else {
-                setProperties(resourceId, properties)
-                persist()
-                return true
-            }
-        }
-    }
-
-    fun renameResource(
-        note: Note,
-        tempPath: Path,
-        resourcePath: Path,
-        resourceId: ResourceId,
+    @Inject
+    constructor(
+        private val propertiesStorageRepo: PropertiesStorageRepo,
+        @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
     ) {
-        tempPath.moveTo(resourcePath)
-        note.resource =
-            Resource(
-                id = resourceId,
-                name = resourcePath.fileName.name,
-                extension = resourcePath.extension,
-                modified = resourcePath.getLastModifiedTime(),
-            )
-        ALog.d(TAG, "resource renamed to ${resourcePath.name} successfully")
-    }
+        lateinit var root: Path
 
-    fun readProperties(
-        id: ResourceId,
-        defaultTitle: String,
-    ): UserNoteProperties {
-        ALog.d(TAG, "readProperties for resource id: $id")
-        val title =
-            propertiesStorage.getProperties(id).titles.let {
-                if (it.isNotEmpty()) it.elementAt(0) else defaultTitle
-            }
-        val description =
-            propertiesStorage.getProperties(id).descriptions.let {
-                if (it.isNotEmpty()) it.elementAt(0) else ""
-            }
-        return UserNoteProperties(title, description)
-    }
+        companion object {
+            private const val TAG = "NotesRepoHelper"
+        }
 
-    suspend fun deleteNotes(notes: List<Note>): Unit =
-        withContext(Dispatchers.IO) {
-            notes.forEach { note ->
-                deleteNote(note)
+        private lateinit var propertiesStorage: PropertiesStorage
+        private val lazyPropertiesStorage by lazy {
+            CoroutineScope(iODispatcher).async {
+                val propertyStorage = propertiesStorageRepo.provide(RootIndex.provide(root))
+                propertyStorage
             }
         }
 
-    suspend fun deleteNote(note: Note): Unit =
-        withContext(Dispatchers.IO) {
-            ALog.d(TAG, "deleteNote: ${note.title}")
-            val id = note.resource?.id
+        suspend fun init(root: String) {
+            ALog.d(TAG, "init")
+            this.root = Path(root)
+            propertiesStorage = lazyPropertiesStorage.await()
+        }
 
-            val path = root.resolve("${note.resource?.name}")
-            path.deleteIfExists()
-            note.resource?.id?.let { resourceId ->
-                try {
-                    propertiesStorage.remove(resourceId)
-                } catch (ex: NullPointerException) {
-                    ALog.e(TAG, "deleteNote exception: " + ex.message)
+        suspend fun persistNoteProperties(
+            resourceId: ResourceId,
+            noteTitle: String,
+            description: String? = null,
+        ): Boolean {
+            with(propertiesStorage) {
+                ALog.d(TAG, "persistNoteProperties for resource: $resourceId title: $noteTitle")
+                val properties =
+                    Properties(
+                        setOf(noteTitle),
+                        mutableSetOf<String>().apply {
+                            description?.let { this.add(description) }
+                        },
+                    )
+                val currentProperties = getProperties(resourceId)
+                if (currentProperties.isEqual(properties)) {
+                    return false
+                } else {
+                    setProperties(resourceId, properties)
+                    persist()
+                    return true
+                }
+            }
+        }
+
+        fun renameResource(
+            note: Note,
+            tempPath: Path,
+            resourcePath: Path,
+            resourceId: ResourceId,
+        ) {
+            tempPath.moveTo(resourcePath)
+            note.resource =
+                Resource(
+                    id = resourceId,
+                    name = resourcePath.fileName.name,
+                    extension = resourcePath.extension,
+                    modified = resourcePath.getLastModifiedTime(),
+                )
+            ALog.d(TAG, "resource renamed to ${resourcePath.name} successfully")
+        }
+
+        fun readProperties(
+            id: ResourceId,
+            defaultTitle: String,
+        ): UserNoteProperties {
+            ALog.d(TAG, "readProperties for resource id: $id")
+            val title =
+                propertiesStorage.getProperties(id).titles.let {
+                    if (it.isNotEmpty()) it.elementAt(0) else defaultTitle
+                }
+            val description =
+                propertiesStorage.getProperties(id).descriptions.let {
+                    if (it.isNotEmpty()) it.elementAt(0) else ""
+                }
+            return UserNoteProperties(title, description)
+        }
+
+        suspend fun deleteNotes(notes: List<Note>): Unit =
+            withContext(Dispatchers.IO) {
+                notes.forEach { note ->
+                    deleteNote(note)
                 }
             }
 
-            propertiesStorage.persist()
-            note.resource?.name?.let { name ->
-                ALog.d(TAG, "$name has been deleted. id: " + id)
+        suspend fun deleteNote(note: Note): Unit =
+            withContext(Dispatchers.IO) {
+                ALog.d(TAG, "deleteNote: ${note.title}")
+                val id = note.resource?.id
+
+                val path = root.resolve("${note.resource?.name}")
+                path.deleteIfExists()
+                note.resource?.id?.let { resourceId ->
+                    try {
+                        propertiesStorage.remove(resourceId)
+                    } catch (ex: NullPointerException) {
+                        ALog.e(TAG, "deleteNote exception: " + ex.message)
+                    }
+                }
+
+                propertiesStorage.persist()
+                note.resource?.name?.let { name ->
+                    ALog.d(TAG, "$name has been deleted. id: " + id)
+                }
             }
-        }
-}
+    }
 
 data class UserNoteProperties(
     val title: String,

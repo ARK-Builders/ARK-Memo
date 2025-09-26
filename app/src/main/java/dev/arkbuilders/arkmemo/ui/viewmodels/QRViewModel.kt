@@ -23,57 +23,57 @@ import javax.inject.Named
 
 @HiltViewModel
 class QRViewModel
-@Inject
-constructor(
-    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
-    @ApplicationContext private val appContext: Context,
-) : ViewModel() {
-    companion object {
-        private const val TAG = "QRViewModel"
-    }
-
-    fun generateQRCode(
-        text: String,
-        onSuccess: (bitmap: Bitmap) -> Unit,
-    ) {
-        ALog.d(TAG, "generateQRCode")
-        viewModelScope.launch(iODispatcher) {
-            // Initializing the QR Encoder with your value to be encoded, type you required and Dimension
-            val qrgEncoder = QRGEncoder(text, null, QRGContents.Type.TEXT, 300.dpToPx())
-            qrgEncoder.colorBlack = Color.BLACK
-            qrgEncoder.colorWhite = Color.WHITE
-            withContext(Dispatchers.Main) {
-                onSuccess.invoke(qrgEncoder.getBitmap(0))
-            }
+    @Inject
+    constructor(
+        @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
+        @ApplicationContext private val appContext: Context,
+    ) : ViewModel() {
+        companion object {
+            private const val TAG = "QRViewModel"
         }
-    }
 
-    fun saveQRCodeImage(
-        text: String,
-        bitmap: Bitmap,
-        onSuccess: (path: String) -> Unit,
-    ) {
-        ALog.d(TAG, "saveQRCodeImage")
-        viewModelScope.launch {
-            // Save with location, value, bitmap returned and type of Image(JPG/PNG).
-            val qrgSaver = QRGSaver()
-
-            val savePath =
-                (appContext.getExternalFilesDir(null)?.path + "/images/").apply {
-                    File(this).mkdirs()
+        fun generateQRCode(
+            text: String,
+            onSuccess: (bitmap: Bitmap) -> Unit,
+        ) {
+            ALog.d(TAG, "generateQRCode")
+            viewModelScope.launch(iODispatcher) {
+                // Initializing the QR Encoder with your value to be encoded, type you required and Dimension
+                val qrgEncoder = QRGEncoder(text, null, QRGContents.Type.TEXT, 300.dpToPx())
+                qrgEncoder.colorBlack = Color.BLACK
+                qrgEncoder.colorWhite = Color.WHITE
+                withContext(Dispatchers.Main) {
+                    onSuccess.invoke(qrgEncoder.getBitmap(0))
                 }
+            }
+        }
 
-            val isSuccess =
-                qrgSaver.save(
-                    savePath,
-                    text,
-                    bitmap,
-                    QRGContents.ImageType.IMAGE_JPEG,
-                )
+        fun saveQRCodeImage(
+            text: String,
+            bitmap: Bitmap,
+            onSuccess: (path: String) -> Unit,
+        ) {
+            ALog.d(TAG, "saveQRCodeImage")
+            viewModelScope.launch {
+                // Save with location, value, bitmap returned and type of Image(JPG/PNG).
+                val qrgSaver = QRGSaver()
 
-            if (isSuccess) {
-                onSuccess.invoke(savePath)
+                val savePath =
+                    (appContext.getExternalFilesDir(null)?.path + "/images/").apply {
+                        File(this).mkdirs()
+                    }
+
+                val isSuccess =
+                    qrgSaver.save(
+                        savePath,
+                        text,
+                        bitmap,
+                        QRGContents.ImageType.IMAGE_JPEG,
+                    )
+
+                if (isSuccess) {
+                    onSuccess.invoke(savePath)
+                }
             }
         }
     }
-}

@@ -36,179 +36,179 @@ import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.name
 
 class GraphicNotesRepo
-@Inject
-constructor(
-    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
-    private val helper: NotesRepoHelper,
-    @ApplicationContext private val context: Context,
-) : NotesRepo<GraphicNote> {
-    private val root: Path by lazy { helper.root }
+    @Inject
+    constructor(
+        @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
+        private val helper: NotesRepoHelper,
+        @ApplicationContext private val context: Context,
+    ) : NotesRepo<GraphicNote> {
+        private val root: Path by lazy { helper.root }
 
-    private val displayMetrics by lazy { Resources.getSystem().displayMetrics }
-    private val screenWidth by lazy { displayMetrics.widthPixels }
-    private val screenHeight by lazy { displayMetrics.heightPixels - 150.dpToPx() }
-    private val thumbViewWidth by lazy { context.resources.getDimension(R.dimen.graphic_thumb_width) }
+        private val displayMetrics by lazy { Resources.getSystem().displayMetrics }
+        private val screenWidth by lazy { displayMetrics.widthPixels }
+        private val screenHeight by lazy { displayMetrics.heightPixels - 150.dpToPx() }
+        private val thumbViewWidth by lazy { context.resources.getDimension(R.dimen.graphic_thumb_width) }
 
-    private val thumbDirectory by lazy { context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) }
+        private val thumbDirectory by lazy { context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) }
 
-    override suspend fun init(root: String) {
-        helper.init(root)
-    }
-
-    override suspend fun save(
-        note: GraphicNote,
-        callback: (SaveNoteResult) -> Unit,
-    ) = withContext(iODispatcher) {
-        write(note) { callback(it) }
-    }
-
-    override suspend fun delete(note: GraphicNote) =
-        withContext(iODispatcher) {
-            helper.deleteNote(note)
+        override suspend fun init(root: String) {
+            helper.init(root)
         }
 
-    override suspend fun delete(notes: List<GraphicNote>) {
-        helper.deleteNotes(notes)
-    }
-
-    override suspend fun read(): List<GraphicNote> =
-        withContext(iODispatcher) {
-            readStorage()
+        override suspend fun save(
+            note: GraphicNote,
+            callback: (SaveNoteResult) -> Unit,
+        ) = withContext(iODispatcher) {
+            write(note) { callback(it) }
         }
 
-    private suspend fun write(
-        note: GraphicNote,
-        callback: (SaveNoteResult) -> Unit,
-    ) = withContext(iODispatcher) {
-        ALog.d(GRAPHICS_REPO, "write")
-        val tempPath = createTempFile()
-        note.svg?.generate(tempPath)
-        val size = tempPath.fileSize()
-        val id = computeId(size, tempPath)
-        ALog.d(GRAPHICS_REPO, "initial resource name is ${tempPath.name}")
-        val isPropertiesChanged =
-            helper.persistNoteProperties(
-                resourceId = id,
-                noteTitle = note.title,
-                description = note.description,
-            )
-
-        val resourcePath = root.resolve("$id.$SVG_EXT")
-        if (resourcePath.exists()) {
-            if (isPropertiesChanged) {
-                callback(SaveNoteResult.SUCCESS_UPDATED)
-            } else {
-                ALog.d(GRAPHICS_REPO, "resource with similar content already exists")
-                callback(SaveNoteResult.ERROR_EXISTING)
+        override suspend fun delete(note: GraphicNote) =
+            withContext(iODispatcher) {
+                helper.deleteNote(note)
             }
-            return@withContext
+
+        override suspend fun delete(notes: List<GraphicNote>) {
+            helper.deleteNotes(notes)
         }
 
-        helper.renameResource(
-            note,
-            tempPath,
-            resourcePath,
-            id,
-        )
-        ALog.d(GRAPHICS_REPO, "resource renamed to $resourcePath successfully")
-        callback(SaveNoteResult.SUCCESS_NEW)
-    }
+        override suspend fun read(): List<GraphicNote> =
+            withContext(iODispatcher) {
+                readStorage()
+            }
 
-    private suspend fun readStorage() =
-        withContext(iODispatcher) {
-            ALog.d(GRAPHICS_REPO, "readStorage")
-            root.listFiles(SVG_EXT) { path ->
-                val svg = SVG.parse(path)
-                if (svg == null) {
-                    ALog.w(GRAPHICS_REPO, "Skipping invalid SVG: " + path)
-                }
-                val size = path.fileSize()
-                val id = computeId(size, path)
-                val resource =
-                    Resource(
-                        id = id,
-                        name = path.fileName.name,
-                        extension = path.extension,
-                        modified = path.getLastModifiedTime(),
-                    )
-
-                val userNoteProperties = helper.readProperties(id, "")
-                val bitmap = exportBitmapFromSvg(fileName = id.toString(), svg = svg)
-
-                GraphicNote(
-                    title = userNoteProperties.title,
-                    description = userNoteProperties.description,
-                    svg = svg,
-                    resource = resource,
-                    thumb = bitmap,
+        private suspend fun write(
+            note: GraphicNote,
+            callback: (SaveNoteResult) -> Unit,
+        ) = withContext(iODispatcher) {
+            ALog.d(GRAPHICS_REPO, "write")
+            val tempPath = createTempFile()
+            note.svg?.generate(tempPath)
+            val size = tempPath.fileSize()
+            val id = computeId(size, tempPath)
+            ALog.d(GRAPHICS_REPO, "initial resource name is ${tempPath.name}")
+            val isPropertiesChanged =
+                helper.persistNoteProperties(
+                    resourceId = id,
+                    noteTitle = note.title,
+                    description = note.description,
                 )
-            }.filter { graphicNote -> graphicNote.svg != null }
-        }
 
-    private fun exportBitmapFromSvg(
-        fileName: String,
-        svg: SVG?,
-    ): Bitmap? {
-        ALog.d(GRAPHICS_REPO, "exportBitmapFromSvg")
-        // Check if thumb bitmap already exists
-        val file = File(thumbDirectory, "$fileName.png")
-        try {
-            if (file.exists()) {
-                return BitmapFactory.decodeFile(file.absolutePath)
+            val resourcePath = root.resolve("$id.$SVG_EXT")
+            if (resourcePath.exists()) {
+                if (isPropertiesChanged) {
+                    callback(SaveNoteResult.SUCCESS_UPDATED)
+                } else {
+                    ALog.d(GRAPHICS_REPO, "resource with similar content already exists")
+                    callback(SaveNoteResult.ERROR_EXISTING)
+                }
+                return@withContext
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
 
-        // If thumb doesn't exist, create a bitmap and a canvas for offscreen drawing
-        val bitmap =
-            Bitmap.createBitmap(
-                thumbViewWidth.toInt(),
-                thumbViewWidth.toInt(),
-                Bitmap.Config.ARGB_8888,
+            helper.renameResource(
+                note,
+                tempPath,
+                resourcePath,
+                id,
             )
-        val canvas = Canvas(bitmap)
-
-        canvas.drawColor(ColorCode.lightYellow)
-        svg?.getPaths()?.forEach { path ->
-
-            canvas.save()
-
-            // Scale factor to fit the SVG path into the view
-            val scaleX = thumbViewWidth / screenWidth
-            val scaleY = thumbViewWidth / screenHeight
-
-            // Find the smallest scale to maintain the aspect ratio
-            val scale = minOf(scaleX, scaleY)
-
-            // Center the path in the view
-            val dx = (thumbViewWidth - screenWidth * scale) / 2f
-            val dy = (thumbViewWidth - screenHeight * scale) / 2f
-
-            // Apply scaling and translation to center the path
-            canvas.translate(dx, dy)
-            canvas.scale(scale, scale)
-
-            canvas.drawPath(path.path, path.paint)
-            canvas.restore()
-        } ?: let {
-            ALog.w(GRAPHICS_REPO, "exportBitmapFromSvg either SVG or its paths are null!")
-            return null
+            ALog.d(GRAPHICS_REPO, "resource renamed to $resourcePath successfully")
+            callback(SaveNoteResult.SUCCESS_NEW)
         }
 
-        // Save the bitmap to a file
-        try {
-            // Open an output stream and write the bitmap to the file
-            FileOutputStream(file).use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream) // Save as PNG
+        private suspend fun readStorage() =
+            withContext(iODispatcher) {
+                ALog.d(GRAPHICS_REPO, "readStorage")
+                root.listFiles(SVG_EXT) { path ->
+                    val svg = SVG.parse(path)
+                    if (svg == null) {
+                        ALog.w(GRAPHICS_REPO, "Skipping invalid SVG: " + path)
+                    }
+                    val size = path.fileSize()
+                    val id = computeId(size, path)
+                    val resource =
+                        Resource(
+                            id = id,
+                            name = path.fileName.name,
+                            extension = path.extension,
+                            modified = path.getLastModifiedTime(),
+                        )
+
+                    val userNoteProperties = helper.readProperties(id, "")
+                    val bitmap = exportBitmapFromSvg(fileName = id.toString(), svg = svg)
+
+                    GraphicNote(
+                        title = userNoteProperties.title,
+                        description = userNoteProperties.description,
+                        svg = svg,
+                        resource = resource,
+                        thumb = bitmap,
+                    )
+                }.filter { graphicNote -> graphicNote.svg != null }
             }
-            return bitmap
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return null
+
+        private fun exportBitmapFromSvg(
+            fileName: String,
+            svg: SVG?,
+        ): Bitmap? {
+            ALog.d(GRAPHICS_REPO, "exportBitmapFromSvg")
+            // Check if thumb bitmap already exists
+            val file = File(thumbDirectory, "$fileName.png")
+            try {
+                if (file.exists()) {
+                    return BitmapFactory.decodeFile(file.absolutePath)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            // If thumb doesn't exist, create a bitmap and a canvas for offscreen drawing
+            val bitmap =
+                Bitmap.createBitmap(
+                    thumbViewWidth.toInt(),
+                    thumbViewWidth.toInt(),
+                    Bitmap.Config.ARGB_8888,
+                )
+            val canvas = Canvas(bitmap)
+
+            canvas.drawColor(ColorCode.lightYellow)
+            svg?.getPaths()?.forEach { path ->
+
+                canvas.save()
+
+                // Scale factor to fit the SVG path into the view
+                val scaleX = thumbViewWidth / screenWidth
+                val scaleY = thumbViewWidth / screenHeight
+
+                // Find the smallest scale to maintain the aspect ratio
+                val scale = minOf(scaleX, scaleY)
+
+                // Center the path in the view
+                val dx = (thumbViewWidth - screenWidth * scale) / 2f
+                val dy = (thumbViewWidth - screenHeight * scale) / 2f
+
+                // Apply scaling and translation to center the path
+                canvas.translate(dx, dy)
+                canvas.scale(scale, scale)
+
+                canvas.drawPath(path.path, path.paint)
+                canvas.restore()
+            } ?: let {
+                ALog.w(GRAPHICS_REPO, "exportBitmapFromSvg either SVG or its paths are null!")
+                return null
+            }
+
+            // Save the bitmap to a file
+            try {
+                // Open an output stream and write the bitmap to the file
+                FileOutputStream(file).use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 80, outputStream) // Save as PNG
+                }
+                return bitmap
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return null
+            }
         }
     }
-}
 
 private const val GRAPHICS_REPO = "GraphicNotesRepo"
 private const val SVG_EXT = "svg"

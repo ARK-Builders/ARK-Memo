@@ -166,7 +166,7 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
         val newPaths = graphicNotesViewModel.svg().getPaths()
 
         return note.title != binding.edtTitle.text.toString() ||
-                ((newPaths.size != originalPaths.size) || (!newPaths.containsAll(originalPaths)))
+            ((newPaths.size != originalPaths.size) || (!newPaths.containsAll(originalPaths)))
     }
 
     override fun isContentEmpty(): Boolean {

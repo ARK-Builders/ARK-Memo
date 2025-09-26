@@ -1,15 +1,14 @@
 package dev.arkbuilders.arkmemo
 
 import dev.arkbuilders.arklib.ResourceId
-import dev.arkbuilders.arkmemo.repo.versions.Version
 import dev.arkbuilders.arkmemo.repo.versions.RootVersionStorage
+import dev.arkbuilders.arkmemo.repo.versions.Version
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.junit.Test
-import org.junit.Assert.*
 import java.io.File
-
 
 class VersionStorageTest {
     private val path = File(ROOT_PATH).toPath()
@@ -34,17 +33,20 @@ class VersionStorageTest {
             versionStorage.add(version3)
             versionStorage.add(version5)
             versionStorage.add(version4)
-            val map1 = versionStorage.parentsTreeByChild(
-                child1
-            )
+            val map1 =
+                versionStorage.parentsTreeByChild(
+                    child1,
+                )
             assertEquals(parentsTree1, map1)
-            val map2 = versionStorage.parentsTreeByChild(
-                parent1
-            )
+            val map2 =
+                versionStorage.parentsTreeByChild(
+                    parent1,
+                )
             assertEquals(parentsTree2, map2)
-            val map3 = versionStorage.parentsTreeByChild(
-                parent2
-            )
+            val map3 =
+                versionStorage.parentsTreeByChild(
+                    parent2,
+                )
             assertEquals(parentsTree3, map3)
         }
     }
@@ -56,11 +58,12 @@ class VersionStorageTest {
             versionStorage.add(version2)
             versionStorage.add(version3)
             versionStorage.add(version4)
-            val versionList = listOf(
-                version1,
-                version2,
-                Version(version4.parent, version3.child),
-            )
+            val versionList =
+                listOf(
+                    version1,
+                    version2,
+                    Version(version4.parent, version3.child),
+                )
             val versions = versionStorage.versions()
             assertEquals(4, versions.size)
             versionStorage.forget(parent3)
@@ -69,7 +72,6 @@ class VersionStorageTest {
     }
 
     companion object TestData {
-
         private const val ROOT_PATH = "./"
 
         private val child1 = ResourceId(1L, 1L)
@@ -89,26 +91,32 @@ class VersionStorageTest {
         private val version4 = Version(parent4, parent3)
         private val version5 = Version(parent5, child5)
 
-        private val parentsTree1 = mapOf(
-            child1 to listOf(
-                parent1,
-                parent2,
-                parent3,
-                parent4
+        private val parentsTree1 =
+            mapOf(
+                child1 to
+                    listOf(
+                        parent1,
+                        parent2,
+                        parent3,
+                        parent4,
+                    ),
             )
-        )
-        private val parentsTree2 = mapOf(
-            parent1 to listOf(
-                parent2,
-                parent3,
-                parent4
+        private val parentsTree2 =
+            mapOf(
+                parent1 to
+                    listOf(
+                        parent2,
+                        parent3,
+                        parent4,
+                    ),
             )
-        )
-        private val parentsTree3 = mapOf(
-            parent2 to listOf(
-                parent3,
-                parent4
+        private val parentsTree3 =
+            mapOf(
+                parent2 to
+                    listOf(
+                        parent3,
+                        parent4,
+                    ),
             )
-        )
     }
 }

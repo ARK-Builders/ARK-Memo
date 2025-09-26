@@ -548,18 +548,18 @@ class SwitchButton : View, Checkable {
                     var fraction = eventX / getWidth()
                     fraction = 0f.coerceAtLeast(1f.coerceAtMost(fraction))
                     viewState.buttonX = (
-                            buttonMinX +
-                                    (buttonMaxX - buttonMinX) *
-                                    fraction
-                            )
+                        buttonMinX +
+                            (buttonMaxX - buttonMinX) *
+                            fraction
+                    )
                 } else if (isDragState) {
                     var fraction = eventX / getWidth()
                     fraction = 0f.coerceAtLeast(1f.coerceAtMost(fraction))
                     viewState.buttonX = (
-                            buttonMinX +
-                                    (buttonMaxX - buttonMinX) *
-                                    fraction
-                            )
+                        buttonMinX +
+                            (buttonMaxX - buttonMinX) *
+                            fraction
+                    )
                     viewState.checkStateColor =
                         argbEvaluator.evaluate(
                             fraction,
@@ -608,9 +608,9 @@ class SwitchButton : View, Checkable {
         get() = animateState != ANIMATE_STATE_NONE
     private val isPendingDragState: Boolean
         get() = (
-                animateState == ANIMATE_STATE_PENDING_DRAG ||
-                        animateState == ANIMATE_STATE_PENDING_RESET
-                )
+            animateState == ANIMATE_STATE_PENDING_DRAG ||
+                animateState == ANIMATE_STATE_PENDING_RESET
+        )
     private val isDragState: Boolean
         get() = animateState == ANIMATE_STATE_DRAGGING
 
@@ -785,14 +785,14 @@ class SwitchButton : View, Checkable {
                                     afterState.checkedLineColor,
                                 ) as Int
                             viewState.radius = (
-                                    beforeState.radius +
-                                            (afterState.radius - beforeState.radius) * value
-                                    )
+                                beforeState.radius +
+                                    (afterState.radius - beforeState.radius) * value
+                            )
                             if (animateState != ANIMATE_STATE_PENDING_DRAG) {
                                 viewState.buttonX = (
-                                        beforeState.buttonX +
-                                                (afterState.buttonX - beforeState.buttonX) * value
-                                        )
+                                    beforeState.buttonX +
+                                        (afterState.buttonX - beforeState.buttonX) * value
+                                )
                             }
                             viewState.checkStateColor =
                                 argbEvaluator.evaluate(
@@ -812,14 +812,14 @@ class SwitchButton : View, Checkable {
                                     afterState.checkedLineColor,
                                 ) as Int
                             viewState.radius = (
-                                    beforeState.radius +
-                                            (afterState.radius - beforeState.radius) * value
-                                    )
+                                beforeState.radius +
+                                    (afterState.radius - beforeState.radius) * value
+                            )
                             if (animateState != ANIMATE_STATE_PENDING_DRAG) {
                                 viewState.buttonX = (
-                                        beforeState.buttonX +
-                                                (afterState.buttonX - beforeState.buttonX) * value
-                                        )
+                                    beforeState.buttonX +
+                                        (afterState.buttonX - beforeState.buttonX) * value
+                                )
                             }
                             viewState.checkStateColor =
                                 argbEvaluator.evaluate(
@@ -838,14 +838,14 @@ class SwitchButton : View, Checkable {
                                 afterState.checkedLineColor,
                             ) as Int
                         viewState.radius = (
-                                beforeState.radius +
-                                        (afterState.radius - beforeState.radius) * value
-                                )
+                            beforeState.radius +
+                                (afterState.radius - beforeState.radius) * value
+                        )
                         if (animateState != ANIMATE_STATE_PENDING_DRAG) {
                             viewState.buttonX = (
-                                    beforeState.buttonX +
-                                            (afterState.buttonX - beforeState.buttonX) * value
-                                    )
+                                beforeState.buttonX +
+                                    (afterState.buttonX - beforeState.buttonX) * value
+                            )
                         }
                         viewState.checkStateColor =
                             argbEvaluator.evaluate(
@@ -857,9 +857,9 @@ class SwitchButton : View, Checkable {
 
                     ANIMATE_STATE_SWITCH -> {
                         viewState.buttonX = (
-                                beforeState.buttonX +
-                                        (afterState.buttonX - beforeState.buttonX) * value
-                                )
+                            beforeState.buttonX +
+                                (afterState.buttonX - beforeState.buttonX) * value
+                        )
                         val fraction = (viewState.buttonX - buttonMinX) / (buttonMaxX - buttonMinX)
                         viewState.checkStateColor =
                             argbEvaluator.evaluate(

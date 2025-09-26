@@ -9,26 +9,26 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel
-@Inject
-constructor(private val memoPreferences: MemoPreferences) :
+    @Inject
+    constructor(private val memoPreferences: MemoPreferences) :
     ViewModel() {
-    fun storeCrashReportEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            memoPreferences.storeCrashReportEnabled(enabled)
+        fun storeCrashReportEnabled(enabled: Boolean) {
+            viewModelScope.launch {
+                memoPreferences.storeCrashReportEnabled(enabled)
+            }
+        }
+
+        fun getCrashReportEnabled(): Boolean {
+            return memoPreferences.getCrashReportEnabled()
+        }
+
+        fun setEnableDebugLog(enabled: Boolean) {
+            viewModelScope.launch {
+                memoPreferences.setEnableDebugLog(enabled)
+            }
+        }
+
+        fun isEnableDebugLog(): Boolean {
+            return memoPreferences.isEnableDebugLog()
         }
     }
-
-    fun getCrashReportEnabled(): Boolean {
-        return memoPreferences.getCrashReportEnabled()
-    }
-
-    fun setEnableDebugLog(enabled: Boolean) {
-        viewModelScope.launch {
-            memoPreferences.setEnableDebugLog(enabled)
-        }
-    }
-
-    fun isEnableDebugLog(): Boolean {
-        return memoPreferences.isEnableDebugLog()
-    }
-}

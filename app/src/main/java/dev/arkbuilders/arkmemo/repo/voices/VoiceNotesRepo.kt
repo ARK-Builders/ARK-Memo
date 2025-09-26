@@ -23,106 +23,106 @@ import kotlin.io.path.name
 import kotlin.io.path.pathString
 
 class VoiceNotesRepo
-@Inject
-constructor(
-    @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
-    private val helper: NotesRepoHelper,
-) : NotesRepo<VoiceNote> {
-    private val root: Path by lazy { helper.root }
+    @Inject
+    constructor(
+        @Named(IO_DISPATCHER) private val iODispatcher: CoroutineDispatcher,
+        private val helper: NotesRepoHelper,
+    ) : NotesRepo<VoiceNote> {
+        private val root: Path by lazy { helper.root }
 
-    override suspend fun init(root: String) {
-        helper.init(root)
-    }
-
-    override suspend fun read(): List<VoiceNote> =
-        withContext(iODispatcher) {
-            readStorage()
+        override suspend fun init(root: String) {
+            helper.init(root)
         }
 
-    override suspend fun delete(notes: List<VoiceNote>) {
-        helper.deleteNotes(notes)
-    }
-
-    override suspend fun delete(note: VoiceNote) {
-        helper.deleteNote(note)
-    }
-
-    override suspend fun save(
-        note: VoiceNote,
-        callback: (SaveNoteResult) -> Unit,
-    ) {
-        write(note) { callback(it) }
-    }
-
-    private suspend fun write(
-        note: VoiceNote,
-        callback: (SaveNoteResult) -> Unit,
-    ) = withContext(iODispatcher) {
-        ALog.d(VOICES_REPO, "write")
-        val tempPath = note.path
-        val size = tempPath.fileSize()
-        val id = computeId(size, tempPath)
-
-        val isPropertiesChanged =
-            helper.persistNoteProperties(
-                resourceId = id,
-                noteTitle = note.title,
-                description = note.description,
-            )
-
-        ALog.d(VOICES_REPO, "initial resource name is ${tempPath.name}")
-
-        helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
-
-        val resourcePath = root.resolve("$id.$VOICE_EXT")
-        if (resourcePath.exists()) {
-            ALog.d(
-                VOICES_REPO,
-                "resource with similar content already exists",
-            )
-            if (isPropertiesChanged) {
-                callback(SaveNoteResult.SUCCESS_UPDATED)
-            } else {
-                callback(SaveNoteResult.ERROR_EXISTING)
+        override suspend fun read(): List<VoiceNote> =
+            withContext(iODispatcher) {
+                readStorage()
             }
-            return@withContext
+
+        override suspend fun delete(notes: List<VoiceNote>) {
+            helper.deleteNotes(notes)
         }
 
-        helper.renameResource(
-            note,
-            tempPath,
-            resourcePath,
-            id,
-        )
-        note.path = resourcePath
-        ALog.d(VOICES_REPO, "resource renamed to $resourcePath successfully")
-        callback(SaveNoteResult.SUCCESS_NEW)
-    }
+        override suspend fun delete(note: VoiceNote) {
+            helper.deleteNote(note)
+        }
 
-    private suspend fun readStorage(): List<VoiceNote> =
-        withContext(iODispatcher) {
-            ALog.d(VOICES_REPO, "readStorage")
-            root.listFiles(VOICE_EXT) { path ->
-                val id = computeId(path.fileSize(), path)
-                val resource =
-                    Resource(
-                        id = id,
-                        name = path.name,
-                        extension = path.extension,
-                        modified = path.getLastModifiedTime(),
-                    )
+        override suspend fun save(
+            note: VoiceNote,
+            callback: (SaveNoteResult) -> Unit,
+        ) {
+            write(note) { callback(it) }
+        }
 
-                val userNoteProperties = helper.readProperties(id, "")
-                VoiceNote(
-                    title = userNoteProperties.title,
-                    description = userNoteProperties.description,
-                    path = path,
-                    duration = extractDuration(path.pathString),
-                    resource = resource,
+        private suspend fun write(
+            note: VoiceNote,
+            callback: (SaveNoteResult) -> Unit,
+        ) = withContext(iODispatcher) {
+            ALog.d(VOICES_REPO, "write")
+            val tempPath = note.path
+            val size = tempPath.fileSize()
+            val id = computeId(size, tempPath)
+
+            val isPropertiesChanged =
+                helper.persistNoteProperties(
+                    resourceId = id,
+                    noteTitle = note.title,
+                    description = note.description,
                 )
-            }.filter { voiceNote -> voiceNote.duration.isNotEmpty() }
+
+            ALog.d(VOICES_REPO, "initial resource name is ${tempPath.name}")
+
+            helper.persistNoteProperties(resourceId = id, noteTitle = note.title)
+
+            val resourcePath = root.resolve("$id.$VOICE_EXT")
+            if (resourcePath.exists()) {
+                ALog.d(
+                    VOICES_REPO,
+                    "resource with similar content already exists",
+                )
+                if (isPropertiesChanged) {
+                    callback(SaveNoteResult.SUCCESS_UPDATED)
+                } else {
+                    callback(SaveNoteResult.ERROR_EXISTING)
+                }
+                return@withContext
+            }
+
+            helper.renameResource(
+                note,
+                tempPath,
+                resourcePath,
+                id,
+            )
+            note.path = resourcePath
+            ALog.d(VOICES_REPO, "resource renamed to $resourcePath successfully")
+            callback(SaveNoteResult.SUCCESS_NEW)
         }
-}
+
+        private suspend fun readStorage(): List<VoiceNote> =
+            withContext(iODispatcher) {
+                ALog.d(VOICES_REPO, "readStorage")
+                root.listFiles(VOICE_EXT) { path ->
+                    val id = computeId(path.fileSize(), path)
+                    val resource =
+                        Resource(
+                            id = id,
+                            name = path.name,
+                            extension = path.extension,
+                            modified = path.getLastModifiedTime(),
+                        )
+
+                    val userNoteProperties = helper.readProperties(id, "")
+                    VoiceNote(
+                        title = userNoteProperties.title,
+                        description = userNoteProperties.description,
+                        path = path,
+                        duration = extractDuration(path.pathString),
+                        resource = resource,
+                    )
+                }.filter { voiceNote -> voiceNote.duration.isNotEmpty() }
+            }
+    }
 
 private const val VOICES_REPO = "VoiceNotesRepo"
 private const val VOICE_EXT = "3gp"

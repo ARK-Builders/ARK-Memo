@@ -313,8 +313,9 @@ class NotesListAdapter(
                 }
                 var tag = EditTextNotesFragment.TAG
                 when (val selectedNote = notes[bindingAdapterPosition]) {
-                    is TextNote -> activity.fragment =
-                        EditTextNotesFragment.newInstance(selectedNote)
+                    is TextNote ->
+                        activity.fragment =
+                            EditTextNotesFragment.newInstance(selectedNote)
 
                     is GraphicNote -> {
                         activity.fragment = EditGraphicNotesFragment.newInstance(selectedNote)

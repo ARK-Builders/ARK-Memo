@@ -9,11 +9,10 @@ import java.nio.file.Path
 
 class RootVersionsStorage(
     private val scope: CoroutineScope,
-    private val root: Path
-):
+    private val root: Path,
+) :
     FileStorage<Versions>("versions", scope, root.arkFolder().arkVersions(), VersionsMonoid),
-    VersionsStorage {
-
+        VersionsStorage {
     override fun valueFromString(raw: String): Versions =
         raw.split(",").filter { it.isNotEmpty() }.map {
             ResourceId.fromString(it)
