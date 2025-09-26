@@ -1,42 +1,51 @@
 package dev.arkbuilders.arkmemo.ui.viewmodels
 
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.arkmemo.graphics.Color
 import dev.arkbuilders.arkmemo.graphics.SVG
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import dev.arkbuilders.arkmemo.graphics.Size
+import dev.arkbuilders.arkmemo.models.GraphicNote
+import dev.arkbuilders.logging.ALog
 import kotlinx.coroutines.launch
-import java.util.Stack
 import javax.inject.Inject
 
 @HiltViewModel
-class GraphicNotesViewModel @Inject constructor(): ViewModel() {
+class GraphicNotesViewModel
+@Inject
+constructor() : ViewModel() {
+    private var paintColor = Color.BLACK.code
+    private var lastPaintColor = paintColor
+    private var strokeWidth = Size.TINY.value
 
-    private val _notes = MutableStateFlow(listOf<GraphicNote>())
-    val notes: StateFlow<List<GraphicNote>> = _notes
-    private var paintColor = Color.BLACK
-
-    private var strokeWidth = 10f
-
-    val paint get() = Paint().also {
-        it.color = paintColor
-        it.style = Paint.Style.STROKE
-        it.strokeWidth = strokeWidth
-        it.strokeCap = Paint.Cap.ROUND
-        it.strokeJoin = Paint.Join.ROUND
-        it.isAntiAlias = true
+    companion object {
+        private const val TAG = "GraphicNotesViewModel"
     }
+
+    val paint
+        get() =
+            Paint().also {
+                it.color = paintColor
+                it.style = Paint.Style.STROKE
+                it.strokeWidth = strokeWidth
+                it.strokeCap = Paint.Cap.ROUND
+                it.strokeJoin = Paint.Join.ROUND
+                it.isAntiAlias = true
+            }
 
     private val editPaths = ArrayDeque<DrawPath>()
 
     private var svg = SVG()
+    private val svgLiveData = MutableLiveData<SVG>()
+    val observableSvgLiveData = svgLiveData as LiveData<SVG>
 
     fun onNoteOpened(note: GraphicNote) {
+        ALog.d(TAG, "onNoteOpened")
         viewModelScope.launch {
             if (editPaths.isNotEmpty()) editPaths.clear()
             editPaths.addAll(note.svg?.getPaths()!!)
@@ -47,22 +56,33 @@ class GraphicNotesViewModel @Inject constructor(): ViewModel() {
     fun onDrawPath(path: DrawPath) {
         editPaths.addLast(path)
         svg.addPath(path)
-    }
-
-    fun onChangeColor(color: Int) {
-        paintColor = color
-    }
-
-    fun onChangeStrokeWidth(width: Float) {
-        strokeWidth = width
+        svgLiveData.postValue(svg)
     }
 
     fun paths(): Collection<DrawPath> = editPaths
 
     fun svg(): SVG = svg
+
+    fun setPaintColor(color: Int) {
+        paintColor = color
+        lastPaintColor = paintColor
+    }
+
+    fun setBrushSize(size: Float) {
+        strokeWidth = size
+    }
+
+    fun setEraseMode(eraseMode: Boolean) {
+        paintColor =
+            if (eraseMode) {
+                Color.WHITE.code
+            } else {
+                lastPaintColor
+            }
+    }
 }
 
 data class DrawPath(
     val path: Path,
-    val paint: Paint
+    val paint: Paint,
 )

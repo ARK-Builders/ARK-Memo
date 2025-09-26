@@ -13,18 +13,17 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object PropertiesStorageModule {
-
     @Singleton
     @Provides
     @Named(STORAGE_SCOPE)
     fun storageScope(
-        @Named(IO_DISPATCHER) dispatcher: CoroutineDispatcher
+        @Named(IO_DISPATCHER) dispatcher: CoroutineDispatcher,
     ): CoroutineScope = CoroutineScope(dispatcher)
 
     @Singleton
     @Provides
     fun propertiesStorageRepo(
-        @Named(STORAGE_SCOPE) storageScope: CoroutineScope
+        @Named(STORAGE_SCOPE) storageScope: CoroutineScope,
     ): PropertiesStorageRepo {
         return PropertiesStorageRepo(storageScope)
     }

@@ -8,4 +8,18 @@ interface MemoPreferences {
     fun getPath(): String
 
     fun getNotesStorage(): Path
+
+    fun storeCrashReportEnabled(enabled: Boolean)
+
+    fun getCrashReportEnabled(): Boolean
+
+    fun storageNotAvailable(): Boolean
+
+    fun isLastLaunchSuccess(): Boolean
+
+    fun setLastLaunchSuccess(success: Boolean)
+
+    fun setEnableDebugLog(enabled: Boolean)
+
+    fun isEnableDebugLog(): Boolean
 }

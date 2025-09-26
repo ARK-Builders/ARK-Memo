@@ -2,32 +2,33 @@ package dev.arkbuilders.arkmemo.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import dev.arkbuilders.arkfilepicker.presentation.onArkPathPicked
 import dev.arkbuilders.arkmemo.R
 import dev.arkbuilders.arkmemo.contracts.PermissionContract
 import dev.arkbuilders.arkmemo.databinding.ActivityMainBinding
-import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
+import dev.arkbuilders.arkmemo.models.RootNotFound
 import dev.arkbuilders.arkmemo.preferences.MemoPreferences
+import dev.arkbuilders.arkmemo.ui.dialogs.CommonActionDialog
+import dev.arkbuilders.arkmemo.ui.dialogs.FilePickerDialog
+import dev.arkbuilders.arkmemo.ui.fragments.BaseFragment
 import dev.arkbuilders.arkmemo.ui.fragments.EditTextNotesFragment
-import dev.arkbuilders.arkmemo.ui.fragments.SettingsFragment
 import dev.arkbuilders.arkmemo.ui.fragments.NotesFragment
-import dev.arkbuilders.arkmemo.utils.replaceFragment
-import dev.arkbuilders.arkmemo.utils.resumeFragment
-import dev.arkbuilders.arkmemo.ui.fragments.VersionsFragment
+import dev.arkbuilders.components.filepicker.onArkPathPicked
+import dev.arkbuilders.logging.ALog
 import javax.inject.Inject
+import kotlin.io.path.exists
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
-
     private val binding by viewBinding(ActivityMainBinding::bind)
 
     @Inject
@@ -36,100 +37,145 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     @IdRes
     private val fragContainer = R.id.container
 
-    private var menu: Menu? = null
-
     var fragment: Fragment = NotesFragment()
 
     init {
         FilePickerDialog.readPermLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) FilePickerDialog.show()
-                else finish()
+                ALog.d(ACTIVITY_TAG, "readPermLauncher isGranted: $isGranted")
+                if (isGranted) {
+                    FilePickerDialog.show()
+                } else {
+                    finish()
+                }
             }
 
-        FilePickerDialog.readPermLauncher_SDK_R =
+        FilePickerDialog.readPermLauncherSdkR =
             registerForActivityResult(PermissionContract()) { isGranted ->
-                if (isGranted) FilePickerDialog.show()
-                else finish()
+                ALog.d(ACTIVITY_TAG, "readPermLauncherSdkR isGranted: $isGranted")
+                if (isGranted) {
+                    FilePickerDialog.show()
+                } else {
+                    finish()
+                }
             }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setStatusBarColor(ContextCompat.getColor(this, R.color.white), true)
         setSupportActionBar(binding.toolbar)
         binding.toolbar.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        fun showFragment() {
-            val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
-            if (textDataFromIntent != null) {
-                fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
+        supportFragmentManager.onArkPathPicked(this) {
+            ALog.d(ACTIVITY_TAG, "onArkPathPicked path: $it")
+            memoPreferences.storePath(it.toString())
+            showFragment(savedInstanceState)
+        }
+
+        val storageFolderExisting = memoPreferences.getNotesStorage().exists()
+        if (memoPreferences.storageNotAvailable()) {
+            if (!storageFolderExisting) {
+                showNoNoteStorageDialog(RootNotFound(rootPath = memoPreferences.getPath()))
+            } else {
+                FilePickerDialog.show(this, supportFragmentManager)
+            }
+        } else {
+            if (memoPreferences.isLastLaunchSuccess()) {
+                showFragment(savedInstanceState)
+            } else {
+                showRetrySelectRootDialog(
+                    rootPath = memoPreferences.getPath(),
+                    savedInstanceState = savedInstanceState,
+                )
+            }
+        }
+    }
+
+    private fun showFragment(savedInstanceState: Bundle?) {
+        val textDataFromIntent = intent?.getStringExtra(Intent.EXTRA_TEXT)
+        if (textDataFromIntent != null) {
+            fragment = EditTextNotesFragment.newInstance(textDataFromIntent)
+            supportFragmentManager.beginTransaction().apply {
+                replace(fragContainer, fragment, EditTextNotesFragment.TAG)
+                commit()
+            }
+        } else {
+            if (savedInstanceState == null) {
                 supportFragmentManager.beginTransaction().apply {
-                    replace(fragContainer, fragment, EditTextNotesFragment.TAG)
+                    add(fragContainer, fragment, NotesFragment.TAG)
                     commit()
                 }
             } else {
-                if (savedInstanceState == null)
-                    supportFragmentManager.beginTransaction().apply {
-                        add(fragContainer, fragment, NotesFragment.TAG)
-                        commit()
-                    }
-                else {
-                    supportFragmentManager.apply {
-                        val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)!!
-                        fragment = findFragmentByTag(tag)!!
-                        if (!fragment.isInLayout)
+                supportFragmentManager.apply {
+                    val tag = savedInstanceState.getString(CURRENT_FRAGMENT_TAG)
+                    findFragmentByTag(tag)?.let {
+                        fragment = it
+                        if (!fragment.isInLayout) {
                             resumeFragment(fragment)
+                        }
                     }
                 }
             }
         }
-
-        if (memoPreferences.getPath().isEmpty()) {
-            FilePickerDialog.show(this, supportFragmentManager)
-
-            supportFragmentManager.onArkPathPicked(this) {
-                memoPreferences.storePath(it.toString())
-                showFragment()
-            }
-        }
-        else showFragment()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        this.menu = menu
-        if(
-            fragment.tag == NotesFragment.TAG ||
-            fragment.tag == VersionsFragment.TAG
-        )
-            showSettingsButton(true)
-        else showSettingsButton(false)
-        return true
+    private fun showNoNoteStorageDialog(error: RootNotFound) {
+        val loadFailDialog =
+            CommonActionDialog(
+                title = getString(R.string.error_load_notes_failed_title),
+                message = getString(R.string.error_load_notes_failed_description, error.rootPath),
+                positiveText = R.string.error_load_notes_failed_positive_action,
+                negativeText = R.string.error_load_notes_failed_negative_action,
+                isAlert = false,
+                onPositiveClick = {
+                    FilePickerDialog.show(this, supportFragmentManager)
+                },
+                onNegativeClicked = {
+                    finish()
+                },
+                onCloseClicked = {
+                    finish()
+                },
+            )
+        loadFailDialog.show(supportFragmentManager, CommonActionDialog.TAG)
+    }
+
+    private fun showRetrySelectRootDialog(
+        rootPath: String,
+        savedInstanceState: Bundle?,
+    ) {
+        val loadFailDialog =
+            CommonActionDialog(
+                title = getString(R.string.error_load_notes_crash_title),
+                message = getString(R.string.error_load_notes_crash_description, rootPath),
+                positiveText = R.string.error_load_notes_failed_retry_action,
+                negativeText = R.string.error_load_notes_failed_negative_action,
+                neutralText = R.string.error_load_notes_failed_positive_action,
+                isAlert = false,
+                enableNeutralOption = true,
+                onPositiveClick = {
+                    showFragment(savedInstanceState)
+                },
+                onNegativeClicked = {
+                    finish()
+                },
+                onNeutralClicked = {
+                    FilePickerDialog.show(this, supportFragmentManager)
+                },
+                onCloseClicked = {
+                    finish()
+                },
+            )
+        loadFailDialog.show(supportFragmentManager, CommonActionDialog.TAG)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(CURRENT_FRAGMENT_TAG, fragment.tag)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.settings -> {
-                fragment = SettingsFragment()
-                replaceFragment(fragment, SettingsFragment.TAG)
-            }
-        }
-        return true
-    }
-
-    fun showSettingsButton(show: Boolean = true){
-        if(menu != null) {
-            val settingsItem = menu?.findItem(R.id.settings)
-            settingsItem?.isVisible = show
-        }
     }
 
     fun showProgressBar(show: Boolean) {
@@ -139,10 +185,34 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     fun initEditUI() {
         title = getString(R.string.edit_note)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        showSettingsButton(false)
     }
 
-    companion object{
-        private const val CURRENT_FRAGMENT_TAG = "current fragment tag"
+    private fun setStatusBarColor(
+        color: Int,
+        isLight: Boolean,
+    ) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = color
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
+    }
+
+    override fun onBackPressed() {
+        if (fragment is BaseFragment) {
+            (fragment as BaseFragment).onBackPressed()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    companion object {
+        private const val CURRENT_FRAGMENT_TAG = "current_fragment"
+        private const val ACTIVITY_TAG = "MainActivity"
+    }
+}
+
+fun AppCompatActivity.resumeFragment(fragment: Fragment) {
+    supportFragmentManager.beginTransaction().apply {
+        show(fragment)
+        commit()
     }
 }

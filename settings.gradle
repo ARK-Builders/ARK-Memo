@@ -13,22 +13,21 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        def localProps = getLocalProps()
-
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
         maven { url "https://plugins.gradle.org/m2/" }
         gradlePluginPortal()
         maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/ARK-Builders/arklib-android"
-            credentials {
-                username = "token"
-                password = localProps.getProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-        maven {
+            // Important note:
+            // To authenticate with GitHub Packages, you need to generate a fine-grained personal access token
+            // The token needs access only to [Public repositories]
+            // Add it as gpr.token=$token in local.properties file in the root of the project
+            // For more details, refer to the documentation:
+            // https://github.com/settings/personal-access-tokens/new
+            // https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#authenticating-with-a-personal-access-token
+
+            def localProps = getLocalProps()
             name = "GitHubPackages"
             url = "https://maven.pkg.github.com/ARK-Builders/ark-android"
             credentials {
@@ -37,20 +36,28 @@ dependencyResolutionManagement {
             }
         }
     }
+
+    versionCatalogs {
+        create("libraries") {
+            from(files("./gradle/libs.versions.toml"))
+        }
+    }
 }
 
 rootProject.name = "ARK Memo"
 include ':app'
 
-Properties getLocalProps() {
+def getLocalProps() {
     def props = new Properties()
     def localPropsFile = new File(rootDir, "local.properties")
 
     if (localPropsFile.exists()) {
-        localPropsFile.withInputStream() { stream ->
+        localPropsFile.withInputStream { stream ->
             props.load(stream)
         }
     }
 
     return props
 }
+
+include ':logging'

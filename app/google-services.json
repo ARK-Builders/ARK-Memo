@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "807329598009",
+    "project_id": "ark-memo-test",
+    "storage_bucket": "ark-memo-test.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807329598009:android:9bebe591976d872f539be8",
+        "android_client_info": {
+          "package_name": "dev.arkbuilders.arkmemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOvuCXKdHNOtY0k7PM-ii7i_c7eRsu7SI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
