@@ -23,4 +23,5 @@ class VoiceNote(
     var currentPlayingPos: Int = 0,
     var currentMaxAmplitude: Int = 0,
     override var selected: Boolean = false,
+    override var isForked: Boolean = false,
 ) : Note, Parcelable

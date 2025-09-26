@@ -25,7 +25,8 @@ class SettingTextView
             val iconResId = typedArray.getResourceId(R.styleable.SettingTextView_stv_icon, 0)
             val enableSwitch =
                 typedArray.getBoolean(R.styleable.SettingTextView_stv_switch_on, false)
-            val switchChecked = typedArray.getBoolean(R.styleable.SettingTextView_stv_switch_checked, false)
+            val switchChecked =
+                typedArray.getBoolean(R.styleable.SettingTextView_stv_switch_checked, false)
             textResId?.let {
                 binding.tvText.text = textResId
             }

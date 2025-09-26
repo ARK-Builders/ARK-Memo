@@ -5,10 +5,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <include layout="@layout/toolbar"
+    <include
+        layout="@layout/toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:id="@+id/toolbar_custom"/>
+        android:id="@+id/toolbar_custom" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -28,7 +29,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="64dp"
-                android:id="@+id/iv_app_logo"/>
+                android:id="@+id/iv_app_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -39,7 +40,7 @@
                 android:text="@string/app_name"
                 style="@style/TextXLarge"
                 android:layout_marginTop="20dp"
-                android:id="@+id/tv_app_name"/>
+                android:id="@+id/tv_app_name" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -51,7 +52,7 @@
                 tools:text="Version 1.0.0.1"
                 style="@style/TextSmall"
                 android:layout_marginTop="4dp"
-                android:id="@+id/tv_app_version"/>
+                android:id="@+id/tv_app_version" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -63,7 +64,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/iv_divider"
                 android:text="@string/app_author"
                 style="@style/TextSmall"
-                android:id="@+id/tv_app_author"/>
+                android:id="@+id/tv_app_author" />
 
             <ImageView
                 android:id="@+id/iv_divider"
@@ -88,7 +89,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/iv_divider"
                 android:text="@string/app_copyright"
                 style="@style/TextSmall"
-                android:id="@+id/tv_app_copyright"/>
+                android:id="@+id/tv_app_copyright" />
 
             <dev.arkbuilders.arkmemo.ui.views.WebLinkTextView
                 android:layout_width="wrap_content"
@@ -99,7 +100,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_app_author"
                 android:layout_marginTop="@dimen/setting_item_margin_top"
                 app:web_link_text="@string/setting_telegram_title"
-                app:web_link_icon="@drawable/ic_telegram"/>
+                app:web_link_icon="@drawable/ic_telegram" />
 
             <dev.arkbuilders.arkmemo.ui.views.WebLinkTextView
                 android:layout_width="wrap_content"
@@ -110,7 +111,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/tv_telegram"
                 app:web_link_text="@string/setting_website"
                 android:layout_marginEnd="8dp"
-                app:web_link_icon="@drawable/ic_globe"/>
+                app:web_link_icon="@drawable/ic_globe" />
 
             <dev.arkbuilders.arkmemo.ui.views.WebLinkTextView
                 android:layout_width="wrap_content"
@@ -121,7 +122,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/tv_telegram"
                 app:web_link_text="@string/setting_discord_title"
                 android:layout_marginStart="8dp"
-                app:web_link_icon="@drawable/ic_discord"/>
+                app:web_link_icon="@drawable/ic_discord" />
 
             <dev.arkbuilders.arkmemo.ui.views.SettingTextView
                 android:layout_width="match_parent"
@@ -134,7 +135,7 @@
                 app:stv_text="@string/light_mode"
                 app:stv_switch_on="true"
                 android:visibility="gone"
-                app:stv_icon="@drawable/ic_theme"/>
+                app:stv_icon="@drawable/ic_theme" />
 
             <dev.arkbuilders.arkmemo.ui.views.SettingTextView
                 android:layout_width="match_parent"
@@ -146,7 +147,7 @@
                 android:layout_marginTop="@dimen/setting_item_margin_top"
                 app:stv_text="@string/terms_of_service"
                 android:visibility="gone"
-                app:stv_icon="@drawable/ic_terms_of_service"/>
+                app:stv_icon="@drawable/ic_terms_of_service" />
 
             <dev.arkbuilders.arkmemo.ui.views.SettingTextView
                 android:layout_width="match_parent"
@@ -158,7 +159,7 @@
                 android:layout_marginTop="@dimen/setting_item_margin_top"
                 app:stv_text="@string/privacy_policy"
                 android:visibility="gone"
-                app:stv_icon="@drawable/ic_privacy"/>
+                app:stv_icon="@drawable/ic_privacy" />
 
             <dev.arkbuilders.arkmemo.ui.views.SettingTextView
                 android:layout_width="match_parent"
@@ -170,7 +171,7 @@
                 android:layout_marginTop="@dimen/setting_item_margin_top"
                 app:stv_text="@string/rate_us"
                 android:visibility="gone"
-                app:stv_icon="@drawable/ic_rate"/>
+                app:stv_icon="@drawable/ic_rate" />
 
             <dev.arkbuilders.arkmemo.ui.views.SettingTextView
                 android:layout_width="match_parent"
@@ -182,7 +183,7 @@
                 android:layout_marginTop="@dimen/setting_item_margin_top"
                 app:stv_text="@string/support"
                 android:visibility="gone"
-                app:stv_icon="@drawable/ic_feedback"/>
+                app:stv_icon="@drawable/ic_feedback" />
 
             <View
                 android:layout_width="match_parent"
@@ -191,7 +192,7 @@
                 android:layout_marginHorizontal="@dimen/common_padding"
                 app:layout_constraintTop_toBottomOf="@+id/tv_telegram"
                 android:layout_marginTop="32dp"
-                android:id="@+id/view_divider_line_support"/>
+                android:id="@+id/view_divider_line_support" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -204,7 +205,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginHorizontal="@dimen/common_padding"
                 app:layout_constraintStart_toStartOf="parent"
-                android:id="@+id/tv_support_us_title"/>
+                android:id="@+id/tv_support_us_title" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -214,7 +215,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_support_us_title"
                 android:layout_marginTop="4dp"
                 app:layout_constraintStart_toStartOf="@+id/tv_support_us_title"
-                android:id="@+id/tv_support_us_description"/>
+                android:id="@+id/tv_support_us_description" />
 
             <dev.arkbuilders.arkmemo.ui.views.SupportTextView
                 android:layout_width="wrap_content"
@@ -224,7 +225,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_support_us_description"
                 android:layout_marginTop="16dp"
                 app:support_text="@string/setting_donate_btc"
-                app:support_icon="@drawable/ic_btc"/>
+                app:support_icon="@drawable/ic_btc" />
 
             <dev.arkbuilders.arkmemo.ui.views.SupportTextView
                 android:layout_width="wrap_content"
@@ -235,7 +236,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/tv_donate_btc"
                 android:layout_marginStart="@dimen/setting_item_margin_start"
                 app:support_text="@string/setting_donate_eth"
-                app:support_icon="@drawable/ic_eth"/>
+                app:support_icon="@drawable/ic_eth" />
 
             <dev.arkbuilders.arkmemo.ui.views.SupportTextView
                 android:layout_width="wrap_content"
@@ -245,7 +246,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_donate_btc"
                 app:support_text="@string/setting_donate_patreon"
                 app:support_icon="@drawable/ic_patreon"
-                android:layout_marginTop="@dimen/setting_item_margin_top"/>
+                android:layout_marginTop="@dimen/setting_item_margin_top" />
 
             <dev.arkbuilders.arkmemo.ui.views.SupportTextView
                 android:layout_width="wrap_content"
@@ -256,7 +257,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/tv_donate_patreon"
                 app:support_text="@string/setting_donate_coffee"
                 app:support_icon="@drawable/ic_coffee"
-                android:layout_marginStart="@dimen/setting_item_margin_start"/>
+                android:layout_marginStart="@dimen/setting_item_margin_start" />
 
             <View
                 android:layout_width="match_parent"
@@ -265,7 +266,7 @@
                 android:layout_marginHorizontal="@dimen/common_padding"
                 app:layout_constraintTop_toBottomOf="@+id/tv_donate_patreon"
                 android:layout_marginTop="20dp"
-                android:id="@+id/view_divider_line_contribute"/>
+                android:id="@+id/view_divider_line_contribute" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -278,7 +279,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginHorizontal="@dimen/common_padding"
                 app:layout_constraintStart_toStartOf="parent"
-                android:id="@+id/tv_contribute_title"/>
+                android:id="@+id/tv_contribute_title" />
 
             <dev.arkbuilders.arkmemo.ui.views.SupportTextView
                 android:layout_width="wrap_content"
@@ -287,7 +288,7 @@
                 app:layout_constraintStart_toStartOf="@+id/tv_contribute_title"
                 app:layout_constraintTop_toBottomOf="@+id/tv_contribute_title"
                 app:support_text="@string/setting_contribute_issues"
-                android:layout_marginTop="@dimen/setting_item_margin_top"/>
+                android:layout_marginTop="@dimen/setting_item_margin_top" />
 
             <dev.arkbuilders.arkmemo.ui.views.SupportTextView
                 android:layout_width="wrap_content"
@@ -298,7 +299,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/tv_discover_issues"
                 app:support_text="@string/setting_contribute_bounties"
                 android:layout_marginStart="@dimen/setting_item_margin_start"
-                app:support_enabled="false"/>
+                app:support_enabled="false" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

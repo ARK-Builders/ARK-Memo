@@ -9,4 +9,4 @@
     android:paddingHorizontal="8dp"
     style="@style/TextXSmall"
     android:textColor="@color/text_tag"
-    android:id="@+id/tv_tag"/>
+    android:id="@+id/tv_tag" />

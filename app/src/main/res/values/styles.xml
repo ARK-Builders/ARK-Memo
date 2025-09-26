@@ -5,6 +5,7 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/text_secondary</item>
     </style>
+
     <style name="TextSmall">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/text_tertiary</item>
@@ -65,7 +66,7 @@
         <item name="sb_show_indicator">false</item>
         <item name="sb_checked_color">@color/warning</item>
     </style>
-    
+
     <style name="PositiveButton" parent="TextMedium">
         <item name="android:background">@drawable/bg_positive_button</item>
         <item name="android:paddingVertical">10dp</item>

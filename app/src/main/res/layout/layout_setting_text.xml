@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
     android:background="?attr/selectableItemBackground">
-    
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
         android:layout_marginStart="@dimen/common_padding"
         android:layout_marginVertical="8dp"
         android:id="@+id/iv_icon"
-        tools:src="@drawable/ic_theme"/>
+        tools:src="@drawable/ic_theme" />
 
     <TextView
         android:layout_width="0dp"
@@ -27,7 +27,7 @@
         style="@style/TextSmall"
         android:id="@+id/tv_text"
         android:textColor="@color/text_secondary"
-        tools:text="Light Mode"/>
+        tools:text="Light Mode" />
 
     <dev.arkbuilders.arkmemo.ui.views.SwitchButton
         android:layout_width="wrap_content"
@@ -37,6 +37,6 @@
         app:layout_constraintTop_toTopOf="@+id/iv_icon"
         app:layout_constraintBottom_toBottomOf="@+id/iv_icon"
         android:layout_marginEnd="@dimen/common_padding"
-        style="@style/SwitchButton"/>
+        style="@style/SwitchButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

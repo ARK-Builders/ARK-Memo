@@ -105,13 +105,16 @@ class ArkMediaPlayerFragment : BaseEditNoteFragment() {
             ArkMediaPlayerSideEffect.StartPlaying -> {
                 showPauseIcon()
             }
+
             ArkMediaPlayerSideEffect.StopPlaying -> {
                 showPlayIcon()
                 binding.layoutAudioView.animAudioPlaying.resetWave()
             }
+
             ArkMediaPlayerSideEffect.PausePlaying -> {
                 showPlayIcon()
             }
+
             ArkMediaPlayerSideEffect.ResumePlaying -> {
                 showPauseIcon()
             }

@@ -17,7 +17,7 @@
         android:src="@drawable/ic_record_big"
         android:scaleType="centerInside"
         android:id="@+id/iv_record"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="20dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,7 +29,7 @@
         android:text="@string/audio_record_guide_text_new"
         android:id="@+id/tv_record_guide"
         android:gravity="center_horizontal"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="24dp" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/anim_recording"
@@ -43,7 +43,7 @@
         app:lottie_loop="true"
         android:visibility="gone"
         tools:visibility="visible"
-        app:lottie_autoPlay="true"/>
+        app:lottie_autoPlay="true" />
 
     <dev.arkbuilders.arkmemo.ui.views.WaveView
         android:id="@+id/anim_sound_wave"
@@ -65,7 +65,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/barrier_timer_bottom"
-        android:layout_marginBottom="@dimen/common_padding"/>
+        android:layout_marginBottom="@dimen/common_padding" />
 
     <View
         android:layout_width="match_parent"
@@ -76,7 +76,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tv_duration"
         android:layout_marginBottom="12dp"
-        app:layout_goneMarginBottom="0dp"/>
+        app:layout_goneMarginBottom="0dp" />
 
     <TextView
         android:id="@+id/tv_save_recording"
@@ -92,7 +92,7 @@
         android:layout_marginEnd="@dimen/common_padding"
         android:layout_marginBottom="12dp"
         app:layout_goneMarginBottom="0dp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <View
         android:layout_width="match_parent"
@@ -102,15 +102,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tv_save_recording"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp" />
 
     <androidx.constraintlayout.widget.Barrier
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="anim_recording,anim_sound_wave,iv_record,tv_record_guide"
         app:barrierDirection="top"
-        android:id="@+id/barrier_timer_bottom"/>
-    
+        android:id="@+id/barrier_timer_bottom" />
+
     <com.google.android.material.imageview.ShapeableImageView
         android:layout_width="@dimen/record_small_button_size"
         android:layout_height="@dimen/record_small_button_size"
@@ -122,7 +122,7 @@
         android:visibility="gone"
         android:background="?attr/selectableItemBackgroundBorderless"
         tools:visibility="visible"
-        android:id="@+id/iv_pause_resume"/>
+        android:id="@+id/iv_pause_resume" />
 
     <ImageView
         android:layout_width="@dimen/record_small_button_size"
@@ -135,7 +135,7 @@
         tools:visibility="visible"
         android:id="@+id/iv_start_over"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_record_start_over"/>
+        android:src="@drawable/ic_record_start_over" />
 
     <androidx.constraintlayout.widget.Group
         android:layout_width="wrap_content"
@@ -148,6 +148,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/group_recording_views"
-        app:constraint_referenced_ids="tv_duration,iv_record,divider_top_duration"/>
+        app:constraint_referenced_ids="tv_duration,iv_record,divider_top_duration" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

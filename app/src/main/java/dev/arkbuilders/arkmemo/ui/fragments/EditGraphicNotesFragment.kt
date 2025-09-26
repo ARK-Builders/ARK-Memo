@@ -88,7 +88,8 @@ class EditGraphicNotesFragment : BaseEditNoteFragment() {
                     start: Int,
                     count: Int,
                     after: Int,
-                ) {}
+                ) {
+                }
 
                 override fun onTextChanged(
                     s: CharSequence?,

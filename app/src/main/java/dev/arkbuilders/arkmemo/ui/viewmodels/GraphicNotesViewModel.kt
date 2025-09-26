@@ -27,15 +27,16 @@ class GraphicNotesViewModel
             private const val TAG = "GraphicNotesViewModel"
         }
 
-        val paint get() =
-            Paint().also {
-                it.color = paintColor
-                it.style = Paint.Style.STROKE
-                it.strokeWidth = strokeWidth
-                it.strokeCap = Paint.Cap.ROUND
-                it.strokeJoin = Paint.Join.ROUND
-                it.isAntiAlias = true
-            }
+        val paint
+            get() =
+                Paint().also {
+                    it.color = paintColor
+                    it.style = Paint.Style.STROKE
+                    it.strokeWidth = strokeWidth
+                    it.strokeCap = Paint.Cap.ROUND
+                    it.strokeJoin = Paint.Join.ROUND
+                    it.isAntiAlias = true
+                }
 
         private val editPaths = ArrayDeque<DrawPath>()
 

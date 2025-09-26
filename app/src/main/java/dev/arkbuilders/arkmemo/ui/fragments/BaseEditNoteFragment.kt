@@ -105,7 +105,8 @@ abstract class BaseEditNoteFragment : BaseFragment() {
                     "dd MMM yyyy', 'hh:mm aa",
                     calendar,
                 ).toString()
-            binding.tvLastModified.text = getString(R.string.note_last_modified_time, lastModifiedTime)
+            binding.tvLastModified.text =
+                getString(R.string.note_last_modified_time, lastModifiedTime)
         }
     }
 

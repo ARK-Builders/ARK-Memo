@@ -80,7 +80,7 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
-    buildFeatures{
+    buildFeatures {
         buildConfig true
         viewBinding true
     }

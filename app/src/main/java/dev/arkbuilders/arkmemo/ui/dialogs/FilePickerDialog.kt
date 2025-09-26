@@ -20,7 +20,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class FilePickerDialog : ArkFilePickerFragment() {
-    @Inject lateinit var memoPreferences: MemoPreferences
+    @Inject
+    lateinit var memoPreferences: MemoPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

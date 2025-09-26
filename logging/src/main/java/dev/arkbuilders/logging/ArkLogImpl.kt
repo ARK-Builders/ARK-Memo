@@ -2,7 +2,7 @@ package dev.arkbuilders.logging
 
 import android.util.Log
 
-class ArkLogImpl: IArkLog {
+class ArkLogImpl : IArkLog {
 
     override fun d(tag: String?, msg: String): Int {
         return Log.d(tag, msg)

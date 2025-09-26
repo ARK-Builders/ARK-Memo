@@ -17,7 +17,7 @@
         android:text="@string/setting_donate_btc"
         android:layout_marginStart="@dimen/common_padding"
         android:layout_marginTop="20dp"
-        android:id="@+id/tv_title"/>
+        android:id="@+id/tv_title" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -43,8 +43,8 @@
         android:text="@string/dialog_donate_qr_message"
         android:autoLink="email"
         android:linksClickable="true"
-        android:id="@+id/tv_message"/>
-    
+        android:id="@+id/tv_message" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_message"
         android:layout_marginTop="16dp"
-        android:id="@+id/iv_qr"/>
+        android:id="@+id/iv_qr" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
@@ -77,7 +77,7 @@
             android:ellipsize="middle"
             tools:text="bc1qx8n9r4uwpgrhgnamt2uew53lmrxd8tuevp7lv5"
             app:layout_constraintHorizontal_weight="0.7"
-            android:id="@+id/tv_address"/>
+            android:id="@+id/tv_address" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
@@ -136,7 +136,7 @@
             android:gravity="center"
             app:drawableTint="@color/fg_secondary"
             app:drawableStartCompat="@drawable/ic_download"
-            android:drawablePadding="6dp"/>
+            android:drawablePadding="6dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

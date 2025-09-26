@@ -31,7 +31,8 @@ open class AboutFragment : Fragment(R.layout.fragment_about) {
         binding.toolbarCustom.tvRightActionText.gone()
         binding.toolbarCustom.ivRightActionIcon.gone()
 
-        binding.tvAppVersion.text = getString(R.string.setting_app_version, BuildConfig.VERSION_NAME)
+        binding.tvAppVersion.text =
+            getString(R.string.setting_app_version, BuildConfig.VERSION_NAME)
 
         initSettingActions()
     }

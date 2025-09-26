@@ -77,16 +77,22 @@ class BrushAdapter(
 
             is BrushColorBlack ->
                 holder.ivBrush.imageTintList = context.getColorStateList(R.color.black)
+
             is BrushColorBlue ->
                 holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_blue)
+
             is BrushColorGreen ->
                 holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_green)
+
             is BrushColorGrey ->
                 holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_grey)
+
             is BrushColorOrange ->
                 holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_orange)
+
             is BrushColorPurple ->
                 holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_purple)
+
             is BrushColorRed ->
                 holder.ivBrush.imageTintList = context.getColorStateList(R.color.brush_color_red)
         }

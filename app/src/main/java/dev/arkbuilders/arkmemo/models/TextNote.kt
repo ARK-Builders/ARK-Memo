@@ -14,4 +14,5 @@ data class TextNote(
     override var resource: Resource? = null,
     override var pendingForDelete: Boolean = false,
     override var selected: Boolean = false,
+    override var isForked: Boolean = false,
 ) : Note, Parcelable

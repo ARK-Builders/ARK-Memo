@@ -18,4 +18,5 @@ data class GraphicNote(
     override var pendingForDelete: Boolean = false,
     var thumb: Bitmap? = null,
     override var selected: Boolean = false,
+    override var isForked: Boolean = false,
 ) : Note, Parcelable

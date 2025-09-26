@@ -18,7 +18,7 @@
         android:contentDescription="@string/ark_memo_play_pause"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <dev.arkbuilders.arkmemo.ui.views.WaveView
         android:layout_width="0dp"
@@ -30,7 +30,7 @@
         android:layout_marginHorizontal="8dp"
         android:background="@drawable/audio_wave_thumb"
         app:layout_constraintTop_toTopOf="@+id/iv_play_audio"
-        android:id="@+id/anim_audio_playing"/>
+        android:id="@+id/anim_audio_playing" />
 
     <TextView
         android:id="@+id/tv_duration"

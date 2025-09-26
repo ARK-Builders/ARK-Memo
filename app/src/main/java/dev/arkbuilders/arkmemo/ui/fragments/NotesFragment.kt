@@ -368,7 +368,8 @@ class NotesFragment : BaseFragment() {
             this.itemAnimator =
                 object : DefaultItemAnimator() {
                     override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
-                        val isSwiping = (viewHolder as? NotesListAdapter.NoteViewHolder)?.isSwiping ?: false
+                        val isSwiping =
+                            (viewHolder as? NotesListAdapter.NoteViewHolder)?.isSwiping ?: false
                         return !isSwiping
                     }
                 }
@@ -440,7 +441,10 @@ class NotesFragment : BaseFragment() {
         if (arkMediaPlayerViewModel.isPlaying()) {
             playingAudioPath?.let {
                 arkMediaPlayerViewModel.onPlayOrPauseClick(it)
-                (notesAdapter?.getNotes()?.getOrNull(playingAudioPosition) as? VoiceNote)?.isPlaying = false
+                (
+                    notesAdapter?.getNotes()
+                        ?.getOrNull(playingAudioPosition) as? VoiceNote
+                )?.isPlaying = false
                 notesAdapter?.notifyItemChanged(playingAudioPosition)
             }
         }
@@ -587,7 +591,11 @@ class NotesFragment : BaseFragment() {
                     selectedCountForDelete,
                     selectedCountForDelete,
                 ),
-            message = resources.getQuantityString(R.plurals.delete_batch_note_message, selectedCountForDelete),
+            message =
+                resources.getQuantityString(
+                    R.plurals.delete_batch_note_message,
+                    selectedCountForDelete,
+                ),
             positiveText = R.string.action_delete,
             negativeText = R.string.ark_memo_cancel,
             isAlert = true,

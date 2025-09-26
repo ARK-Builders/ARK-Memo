@@ -41,7 +41,12 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
                             clipBoardText.length + cursorPos
                         }
                     try {
-                        newTextBuilder.append(noteContent.insertStringAtPosition(clipBoardText, cursorPos))
+                        newTextBuilder.append(
+                            noteContent.insertStringAtPosition(
+                                clipBoardText,
+                                cursorPos,
+                            ),
+                        )
                     } catch (e: IndexOutOfBoundsException) {
                         ALog.e(TAG, "pasteNoteClickListener exception: ${e.message}")
                         newTextBuilder.append(noteContent).append(clipBoardText)
@@ -93,7 +98,8 @@ class EditTextNotesFragment : BaseEditNoteFragment() {
                     start: Int,
                     count: Int,
                     after: Int,
-                ) {}
+                ) {
+                }
 
                 override fun onTextChanged(
                     s: CharSequence?,

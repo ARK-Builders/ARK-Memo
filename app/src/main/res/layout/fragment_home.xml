@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:padding="12dp"
         android:layout_marginTop="@dimen/home_padding_top"
-        android:id="@+id/iv_about"/>
+        android:id="@+id/iv_about" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="@dimen/home_toolbar_icon_size"
@@ -29,7 +29,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:padding="12dp"
         android:layout_marginTop="@dimen/home_padding_top"
-        android:id="@+id/iv_settings"/>
+        android:id="@+id/iv_settings" />
 
     <EditText
         android:layout_width="0dp"
@@ -60,7 +60,7 @@
         android:textSize="@dimen/text_small"
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/tv_instructions"
-        android:gravity="center_horizontal"/>
+        android:gravity="center_horizontal" />
 
     <TextView
         android:layout_width="match_parent"
@@ -74,7 +74,7 @@
         android:gravity="center_horizontal"
         android:textStyle="bold"
         android:layout_marginBottom="6dp"
-        android:id="@+id/tv_header"/>
+        android:id="@+id/tv_header" />
 
     <ImageView
         android:layout_width="72dp"
@@ -84,7 +84,7 @@
         app:layout_constraintBottom_toTopOf="@+id/tv_header"
         android:layout_marginBottom="16dp"
         android:id="@+id/iv_empty_state"
-        android:src="@drawable/ic_no_notes"/>
+        android:src="@drawable/ic_no_notes" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -154,7 +154,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/group_empty_state"
         app:constraint_referenced_ids="iv_empty_state,tv_header,tv_instructions,tv_new_memo,iv_record,iv_draw,tv_paste"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <View
         android:layout_width="match_parent"
@@ -163,7 +163,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:id="@+id/view_bottom_panel"/>
+        android:id="@+id/view_bottom_panel" />
 
     <View
         android:layout_width="match_parent"
@@ -172,7 +172,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/view_bottom_panel"
         android:background="@color/border_secondary"
-        android:id="@+id/divider_bottom_control"/>
+        android:id="@+id/divider_bottom_control" />
 
     <TextView
         android:text="@string/ark_memo_paste"
@@ -194,7 +194,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        app:icon="@drawable/add"/>
+        app:icon="@drawable/add" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
@@ -207,7 +207,7 @@
         app:layout_goneMarginTop="24dp"
         android:layout_marginStart="@dimen/home_horizontal_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edt_search"/>
+        app:layout_constraintTop_toBottomOf="@+id/edt_search" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
@@ -219,7 +219,7 @@
         android:textColor="@color/warning_600"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="@dimen/home_horizontal_margin"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_selected_note_count"/>
+        app:layout_constraintBottom_toBottomOf="@+id/tv_selected_note_count" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
@@ -230,7 +230,7 @@
         android:textColor="@color/warning_600"
         android:layout_marginEnd="@dimen/common_padding"
         app:layout_constraintEnd_toStartOf="@+id/tv_action_mode_cancel"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_selected_note_count"/>
+        app:layout_constraintBottom_toBottomOf="@+id/tv_selected_note_count" />
 
     <androidx.constraintlayout.widget.Group
         android:layout_width="wrap_content"
@@ -238,7 +238,7 @@
         app:constraint_referenced_ids="tv_selected_note_count,tv_action_mode_cancel,tv_action_mode_select_all,btn_delete"
         android:visibility="gone"
         android:id="@+id/group_action_mode_texts"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Barrier
         android:layout_width="wrap_content"
@@ -273,7 +273,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:gravity="center"
-            android:drawablePadding="6dp"/>
+            android:drawablePadding="6dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -286,7 +286,7 @@
         app:layout_constraintBottom_toTopOf="@+id/view_bottom_panel"
         android:paddingHorizontal="@dimen/home_horizontal_margin"
         android:id="@+id/rv_pinned_notes"
-        app:layout_constraintTop_toBottomOf="@+id/barrier_top_note_list"/>
+        app:layout_constraintTop_toBottomOf="@+id/barrier_top_note_list" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_draw"
@@ -336,7 +336,7 @@
         android:id="@+id/group_fab_actions"
         android:visibility="gone"
         tools:visibility="visible"
-        app:constraint_referenced_ids="view_fab_background,fab_draw,tv_create_drawing,fab_record_voice,tv_record_voice,fab_simple_memo,tv_simple_memo"/>
+        app:constraint_referenced_ids="view_fab_background,fab_draw,tv_create_drawing,fab_record_voice,tv_record_voice,fab_simple_memo,tv_simple_memo" />
 
     <View
         android:layout_width="match_parent"
@@ -348,7 +348,7 @@
         android:id="@+id/view_fab_background"
         android:visibility="gone"
         android:clickable="true"
-        app:layout_constraintBottom_toTopOf="@+id/divider_bottom_control"/>
+        app:layout_constraintBottom_toTopOf="@+id/divider_bottom_control" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -359,7 +359,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/fab_draw"
         android:text="@string/fab_create_drawing_text"
         android:layout_marginEnd="@dimen/fab_text_margin"
-        android:id="@+id/tv_create_drawing"/>
+        android:id="@+id/tv_create_drawing" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -370,7 +370,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/fab_record_voice"
         android:text="@string/fab_record_voice"
         android:layout_marginEnd="@dimen/fab_text_margin"
-        android:id="@+id/tv_record_voice"/>
+        android:id="@+id/tv_record_voice" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -381,7 +381,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/fab_simple_memo"
         android:text="@string/fab_simple_memo"
         android:layout_marginEnd="@dimen/fab_text_margin"
-        android:id="@+id/tv_simple_memo"/>
+        android:id="@+id/tv_simple_memo" />
 
     <androidx.constraintlayout.widget.Group
         android:layout_width="wrap_content"
@@ -389,7 +389,7 @@
         android:id="@+id/layout_bottom_control"
         android:visibility="gone"
         tools:visibility="visible"
-        app:constraint_referenced_ids="tv_bottom_panel_paste,fab_new_action,divider_bottom_control"/>
+        app:constraint_referenced_ids="tv_bottom_panel_paste,fab_new_action,divider_bottom_control" />
 
     <ProgressBar
         android:id="@+id/pb_loading"
@@ -403,7 +403,7 @@
         android:visibility="gone"
         tools:visibility="visible"
         android:indeterminate="true"
-        android:indeterminateDrawable="@drawable/ic_animated_loading"/>
+        android:indeterminateDrawable="@drawable/ic_animated_loading" />
 
     <ImageView
         android:layout_width="72dp"
@@ -414,7 +414,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:src="@drawable/ic_search_result_empty"
         android:contentDescription="@string/ark_memo_search_result_empty"
-        android:id="@+id/iv_search_result_empty"/>
+        android:id="@+id/iv_search_result_empty" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -425,13 +425,13 @@
         android:text="@string/ark_memo_search_result_empty"
         style="@style/TextXLarge"
         android:id="@+id/tv_search_result_empty"
-        android:layout_marginTop="@dimen/common_padding"/>
+        android:layout_marginTop="@dimen/common_padding" />
 
     <androidx.constraintlayout.widget.Group
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="iv_search_result_empty,tv_search_result_empty"
         android:id="@+id/group_search_result_empty"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

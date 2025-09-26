@@ -14,7 +14,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <include layout="@layout/layout_brush_size_chooser"
+    <include
+        layout="@layout/layout_brush_size_chooser"
         android:id="@+id/layout_size_chooser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,22 +23,23 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="@dimen/common_padding"
         tools:visibility="visible"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
-    <include layout="@layout/layout_brush_color_chooser"
+    <include
+        layout="@layout/layout_brush_color_chooser"
         android:id="@+id/layout_color_chooser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="12dp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <androidx.constraintlayout.widget.Barrier
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
         android:id="@+id/barrier_choosers"
-        app:constraint_referenced_ids="layout_color_chooser,layout_size_chooser"/>
+        app:constraint_referenced_ids="layout_color_chooser,layout_size_chooser" />
 
     <dev.arkbuilders.arkmemo.ui.views.GraphicControlTextView
         android:id="@+id/tv_brush_size"
@@ -54,7 +56,7 @@
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/barrier_choosers"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <dev.arkbuilders.arkmemo.ui.views.GraphicControlTextView
         android:id="@+id/tv_eraser"
@@ -87,6 +89,6 @@
         app:layout_constraintTop_toTopOf="@id/tv_eraser"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@+id/tv_eraser"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
