@@ -42,7 +42,6 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
             return false
         }
 
-        var finishDrawing = false
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
@@ -56,7 +55,10 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
                 }
                 currentX = x
                 currentY = y
+                val drawPath = DrawPath(path, viewModel.paint)
+                viewModel.onDrawPath(drawPath)
             }
+
             MotionEvent.ACTION_MOVE -> {
                 val x2 = (currentX + x) / 2
                 val y2 = (currentY + y) / 2
@@ -72,17 +74,24 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
                 currentX = x
                 currentY = y
             }
+
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (x == currentX && y == currentY) {
+                    path.lineTo(x, y)
+                    viewModel.svg().apply {
+                        addCommand(
+                            SVGCommand.AbsLineTo(x, y).apply {
+                                paintColor = viewModel.paint.color.getStrokeColor()
+                                brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
+                            },
+                        )
+                    }
+                }
                 path = Path()
-                finishDrawing = true
             }
         }
 
-        if (!finishDrawing) {
-            val drawPath = DrawPath(path, viewModel.paint)
-            viewModel.onDrawPath(drawPath)
-            invalidate()
-        }
+        invalidate()
 
         return true
     }
