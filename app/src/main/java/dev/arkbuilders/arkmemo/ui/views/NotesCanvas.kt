@@ -76,7 +76,17 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
             }
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                if (x == currentX && y == currentY) path.lineTo(x, y)
+                if (x == currentX && y == currentY) {
+                    path.lineTo(x, y)
+                    viewModel.svg().apply {
+                        addCommand(
+                            SVGCommand.AbsLineTo(x, y).apply {
+                                paintColor = viewModel.paint.color.getStrokeColor()
+                                brushSizeId = viewModel.paint.strokeWidth.getBrushSizeId()
+                            },
+                        )
+                    }
+                }
                 path = Path()
             }
         }
