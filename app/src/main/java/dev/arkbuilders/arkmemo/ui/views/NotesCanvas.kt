@@ -42,7 +42,6 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
             return false
         }
 
-        var finishDrawing = false
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(x, y)
@@ -77,14 +76,12 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
             }
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (x == currentX && y == currentY) path.lineTo(x, y)
                 path = Path()
-                finishDrawing = true
             }
         }
 
-        if (!finishDrawing) {
-            invalidate()
-        }
+        invalidate()
 
         return true
     }
