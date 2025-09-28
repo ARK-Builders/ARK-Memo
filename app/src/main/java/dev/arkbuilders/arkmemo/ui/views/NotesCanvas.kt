@@ -56,7 +56,10 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
                 }
                 currentX = x
                 currentY = y
+                val drawPath = DrawPath(path, viewModel.paint)
+                viewModel.onDrawPath(drawPath)
             }
+
             MotionEvent.ACTION_MOVE -> {
                 val x2 = (currentX + x) / 2
                 val y2 = (currentY + y) / 2
@@ -72,6 +75,7 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
                 currentX = x
                 currentY = y
             }
+
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 path = Path()
                 finishDrawing = true
@@ -79,8 +83,6 @@ class NotesCanvas(context: Context, attrs: AttributeSet) : View(context, attrs) 
         }
 
         if (!finishDrawing) {
-            val drawPath = DrawPath(path, viewModel.paint)
-            viewModel.onDrawPath(drawPath)
             invalidate()
         }
 
